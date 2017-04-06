@@ -106,9 +106,14 @@ void DirWidget::restore (QSettings &settings)
 void DirWidget::setPath (const QString &path)
 {
   QDir dir (path);
-  view_->setRootIndex (proxy_->mapFromSource (model_->index (dir.path ())));
+  auto index = proxy_->mapFromSource (model_->index (dir.absolutePath ()));
+  if (!index.isValid ())
+  {
+    return;
+  }
+  view_->setRootIndex (index);
   dirLabel_->setText (dir.dirName ());
-  pathLabel_->setText (dir.cdUp () ? dir.absolutePath () + QDir::separator () : QString ());
+  pathLabel_->setText ((dir.cdUp () ? dir.absolutePath () : QString ()) + QDir::separator () );
 }
 
 QString DirWidget::path () const
@@ -153,7 +158,11 @@ QString DirWidget::path (const QModelIndex &index) const
 
 void DirWidget::moveUp ()
 {
-  view_->setRootIndex (view_->model ()->parent (view_->rootIndex ()));
+  QDir dir (path (view_->rootIndex ()));
+  if (dir.cdUp ())
+  {
+    setPath (dir.absolutePath ());
+  }
 }
 
 void DirWidget::showContextMenu ()
