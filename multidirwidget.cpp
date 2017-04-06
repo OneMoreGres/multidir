@@ -76,15 +76,41 @@ void MultiDirWidget::restore (QSettings &settings)
 
 DirWidget * MultiDirWidget::addWidget ()
 {
-  auto i = widgets_.size ();
   auto *w = new DirWidget (model_, this);
-  layout_->addWidget (w, i / 2, i % 2);
   widgets_ << w;
   connect (w, &DirWidget::closeRequested,
            this, &MultiDirWidget::close);
   connect (w, &DirWidget::cloneRequested,
            this, &MultiDirWidget::clone);
+  addToLayout (w);
   return w;
+}
+
+void MultiDirWidget::addToLayout (DirWidget *widget)
+{
+  const auto cols = layout_->columnCount ();
+  const auto rows = layout_->rowCount ();
+  for (auto row = 0; row < rows; ++row)
+  {
+    for (auto col = 0; col < cols; ++col)
+    {
+      auto item = layout_->itemAtPosition (row, col);
+      if (!item)
+      {
+        layout_->addWidget (widget, row, col);
+        return;
+      }
+    }
+  }
+
+  if (cols > rows)
+  {
+    layout_->addWidget (widget, rows, 0);
+  }
+  else
+  {
+    layout_->addWidget (widget, 0, cols);
+  }
 }
 
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)

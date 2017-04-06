@@ -24,6 +24,7 @@ private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);
   DirWidget * addWidget ();
+  void addToLayout (DirWidget *widget);
 
   QFileSystemModel *model_;
   QList<DirWidget *> widgets_;
