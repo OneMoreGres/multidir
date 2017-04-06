@@ -1,6 +1,6 @@
 #include "dirwidget.h"
+#include "proxymodel.h"
 
-#include <QSortFilterProxyModel>
 #include <QFileSystemModel>
 #include <QTableView>
 #include <QBoxLayout>
@@ -19,24 +19,25 @@ namespace
 const QString qs_dir = "dir";
 const QString qs_isLocked = "locked";
 const QString qs_view = "view";
+const QString qs_showDirs = "showDirs";
 }
 
 DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   QWidget (parent),
   model_ (model),
-  proxy_ (new QSortFilterProxyModel (this)),
+  proxy_ (new ProxyModel (model, this)),
   view_ (new QTableView (this)),
   menu_ (new QMenu (this)),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   up_ (new QToolButton (this)),
+  showDirs_ (new QToolButton (this)),
   isLocked_ (false)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
            this, &DirWidget::showContextMenu);
 
-  proxy_->setSourceModel (model_);
   proxy_->setDynamicSortFilter (true);
 
   view_->setModel (proxy_);
@@ -63,6 +64,12 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   connect (up_, &QToolButton::pressed,
            this, &DirWidget::moveUp);
 
+  showDirs_->setIcon (QIcon::fromTheme ("folder"));
+  showDirs_->setCheckable (true);
+  showDirs_->setChecked (proxy_->showDirs ());
+  connect (showDirs_, &QToolButton::toggled,
+           this, &DirWidget::toggleShowDirs);
+
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
   auto dirFont = dirLabel_->font ();
@@ -73,6 +80,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   controls->addWidget (pathLabel_);
   controls->addWidget (dirLabel_);
   controls->addWidget (up_);
+  controls->addWidget (showDirs_);
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (controls);
@@ -91,6 +99,7 @@ void DirWidget::save (QSettings &settings) const
   settings.setValue (qs_dir, path (view_->rootIndex ()));
   settings.setValue (qs_isLocked, isLocked_);
   settings.setValue (qs_view, view_->horizontalHeader ()->saveState ());
+  settings.setValue (qs_showDirs, proxy_->showDirs ());
 }
 
 void DirWidget::restore (QSettings &settings)
@@ -101,6 +110,7 @@ void DirWidget::restore (QSettings &settings)
   {
     view_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
   }
+  proxy_->setShowDirs (settings.value (qs_showDirs, true).toBool ());
 }
 
 void DirWidget::setPath (const QString &path)
@@ -112,8 +122,9 @@ void DirWidget::setPath (const QString &path)
     return;
   }
   view_->setRootIndex (index);
+  proxy_->setCurrent (index);
   dirLabel_->setText (dir.dirName ());
-  pathLabel_->setText ((dir.cdUp () ? dir.absolutePath () : QString ()) + QDir::separator () );
+  pathLabel_->setText ((dir.cdUp () ? dir.absolutePath () : QString ()) + QDir::separator ());
 }
 
 QString DirWidget::path () const
@@ -163,6 +174,11 @@ void DirWidget::moveUp ()
   {
     setPath (dir.absolutePath ());
   }
+}
+
+void DirWidget::toggleShowDirs (bool show)
+{
+  proxy_->setShowDirs (show);
 }
 
 void DirWidget::showContextMenu ()

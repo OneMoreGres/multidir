@@ -2,7 +2,8 @@
 
 #include <QWidget>
 
-class QSortFilterProxyModel;
+class ProxyModel;
+
 class QTableView;
 class QFileSystemModel;
 class QLabel;
@@ -30,16 +31,18 @@ signals:
 private:
   void setIsLocked (bool isLocked);
   void moveUp ();
+  void toggleShowDirs (bool show);
   void showContextMenu ();
   void openPath (const QModelIndex &index);
   QString path (const QModelIndex &index) const;
 
   QFileSystemModel *model_;
-  QSortFilterProxyModel *proxy_;
+  ProxyModel *proxy_;
   QTableView *view_;
   QMenu *menu_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QToolButton *up_;
+  QToolButton *showDirs_;
   bool isLocked_;
 };
