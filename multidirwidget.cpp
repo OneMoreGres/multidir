@@ -27,7 +27,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   menu_ (new QMenu (tr ("File"), this)),
   findEdit_ (new QLineEdit (this))
 {
-  model_->setRootPath (QDir::rootPath ());
+  model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
 
   setWindowFlags (Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
@@ -93,7 +93,7 @@ void MultiDirWidget::restore (QSettings &settings)
   if (widgets_.isEmpty ())
   {
     auto widget = addWidget ();
-    widget->setPath (model_->rootPath ());
+    widget->setPath (QDir::homePath ());
   }
 }
 
@@ -107,6 +107,7 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::clone);
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
+  w->setPath (QDir::homePath ());
   addToLayout (w);
   return w;
 }
