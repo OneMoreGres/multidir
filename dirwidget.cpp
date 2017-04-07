@@ -115,16 +115,18 @@ void DirWidget::restore (QSettings &settings)
 
 void DirWidget::setPath (const QString &path)
 {
-  QDir dir (path);
-  auto index = proxy_->mapFromSource (model_->index (dir.absolutePath ()));
+  auto absolutePath = QDir (path).absolutePath ();
+  auto index = proxy_->mapFromSource (model_->index (absolutePath));
   if (!index.isValid ())
   {
     return;
   }
   view_->setRootIndex (index);
   proxy_->setCurrent (index);
-  dirLabel_->setText (dir.dirName ());
-  pathLabel_->setText ((dir.cdUp () ? dir.absolutePath () : QString ()) + QDir::separator ());
+
+  auto nameIndex = absolutePath.lastIndexOf (QDir::separator ()) + 1;
+  pathLabel_->setText (nameIndex ? absolutePath.left (nameIndex) : QString ());
+  dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
 }
 
 QString DirWidget::path () const
