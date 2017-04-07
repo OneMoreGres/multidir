@@ -30,9 +30,9 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   menu_ (new QMenu (this)),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
+  isLocked_ (nullptr),
   up_ (new QToolButton (this)),
-  showDirs_ (new QToolButton (this)),
-  isLocked_ (false)
+  showDirs_ (new QToolButton (this))
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
@@ -46,9 +46,9 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
            this, &DirWidget::openPath);
 
 
-  auto locked = menu_->addAction (tr ("Locked"));
-  locked->setCheckable (true);
-  connect (locked, &QAction::toggled,
+  isLocked_ = menu_->addAction (tr ("Locked"));
+  isLocked_->setCheckable (true);
+  connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
   auto close = menu_->addAction (tr ("Close"));
@@ -97,7 +97,7 @@ DirWidget::~DirWidget ()
 void DirWidget::save (QSettings &settings) const
 {
   settings.setValue (qs_dir, path (view_->rootIndex ()));
-  settings.setValue (qs_isLocked, isLocked_);
+  settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_view, view_->horizontalHeader ()->saveState ());
   settings.setValue (qs_showDirs, proxy_->showDirs ());
 }
@@ -105,12 +105,12 @@ void DirWidget::save (QSettings &settings) const
 void DirWidget::restore (QSettings &settings)
 {
   setPath (settings.value (qs_dir).toString ());
-  setIsLocked (settings.value (qs_isLocked, isLocked_).toBool ());
+  isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
   if (settings.contains (qs_view))
   {
     view_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
   }
-  proxy_->setShowDirs (settings.value (qs_showDirs, true).toBool ());
+  showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
 }
 
 void DirWidget::setPath (const QString &path)
@@ -134,7 +134,6 @@ QString DirWidget::path () const
 
 void DirWidget::setIsLocked (bool isLocked)
 {
-  isLocked_ = isLocked;
   up_->setEnabled (!isLocked);
 }
 
@@ -156,7 +155,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     QDesktopServices::openUrl (QUrl::fromLocalFile (path));
   }
-  else if (!isLocked_)
+  else if (!isLocked ())
   {
     setPath (path);
   }
@@ -165,6 +164,11 @@ void DirWidget::openPath (const QModelIndex &index)
 QString DirWidget::path (const QModelIndex &index) const
 {
   return model_->filePath (proxy_->mapToSource (index));
+}
+
+bool DirWidget::isLocked () const
+{
+  return isLocked_->isChecked ();
 }
 
 void DirWidget::moveUp ()

@@ -35,6 +35,7 @@ private:
   void showContextMenu ();
   void openPath (const QModelIndex &index);
   QString path (const QModelIndex &index) const;
+  bool isLocked () const;
 
   QFileSystemModel *model_;
   ProxyModel *proxy_;
@@ -42,7 +43,7 @@ private:
   QMenu *menu_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
+  QAction *isLocked_;
   QToolButton *up_;
   QToolButton *showDirs_;
-  bool isLocked_;
 };
