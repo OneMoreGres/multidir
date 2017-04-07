@@ -8,6 +8,7 @@ ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
   showDirs_ (true),
+  nameFilter_ (),
   current_ ()
 {
   setSourceModel (model);
@@ -24,6 +25,12 @@ void ProxyModel::setShowDirs (bool showDirs)
   invalidateFilter ();
 }
 
+void ProxyModel::setNameFilter (const QString &name)
+{
+  nameFilter_ = name;
+  invalidateFilter ();
+}
+
 void ProxyModel::setCurrent (const QModelIndex &current)
 {
   current_ = mapToSource (current);
@@ -32,15 +39,22 @@ void ProxyModel::setCurrent (const QModelIndex &current)
 
 bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const
 {
-  if (sourceParent == current_ && !showDirs_)
+  if (sourceParent == current_)
   {
-    auto index = model_->index (sourceRow, 0, sourceParent);
-    if (model_->isDir (index))
+    if (!showDirs_ || !nameFilter_.isEmpty ())
     {
-      return false;
+      auto index = model_->index (sourceRow, 0, sourceParent);
+      if (!showDirs_ && model_->isDir (index))
+      {
+        return false;
+      }
+      if (!nameFilter_.isEmpty () && !QDir::match (nameFilter_, index.data ().toString ()))
+      {
+        return false;
+      }
     }
   }
-  return QSortFilterProxyModel::filterAcceptsRow (sourceRow, sourceParent);
+  return true;
 }
 
 

@@ -12,6 +12,8 @@ public:
   bool showDirs () const;
   void setShowDirs (bool showDirs);
 
+  void setNameFilter (const QString &name);
+
   void setCurrent (const QModelIndex &current);
 
   QVariant headerData (int section, Qt::Orientation orientation, int role) const override;
@@ -22,5 +24,6 @@ protected:
 private:
   QFileSystemModel *model_;
   bool showDirs_;
+  QString nameFilter_;
   QPersistentModelIndex current_;
 };

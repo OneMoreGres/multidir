@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QSettings>
 #include <QKeyEvent>
+#include <QLineEdit>
 
 #include <QDebug>
 
@@ -23,7 +24,8 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   model_ (new QFileSystemModel (this)),
   widgets_ (),
   layout_ (new QGridLayout),
-  menu_ (new QMenu (tr ("File"), this))
+  menu_ (new QMenu (tr ("File"), this)),
+  findEdit_ (new QLineEdit (this))
 {
   model_->setRootPath (QDir::rootPath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
@@ -34,14 +36,26 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   auto add = toolbar->addAction (QIcon::fromTheme ("add"), tr ("add"));
   connect (add, &QAction::triggered, this, &MultiDirWidget::addWidget);
 
+  auto find = toolbar->addAction (QIcon::fromTheme ("find"), tr ("Find"));
+  find->setShortcut (QKeySequence::Find);
+  connect (find, &QAction::triggered, this, &MultiDirWidget::activateFindMode);
+
   menu_->addAction (add);
+  menu_->addAction (find);
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
            this, &MultiDirWidget::showContextMenu);
 
+  findEdit_->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Fixed);
+  findEdit_->setPlaceholderText (tr ("Name pattern"));
+  findEdit_->setVisible (false);
+
+  auto toolBarLayout = new QHBoxLayout;
+  toolBarLayout->addWidget (toolbar);
+  toolBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
-  layout->addWidget (toolbar);
+  layout->addLayout (toolBarLayout);
   layout->addLayout (layout_);
 }
 
@@ -90,6 +104,8 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::close);
   connect (w, &DirWidget::cloneRequested,
            this, &MultiDirWidget::clone);
+  connect (findEdit_, &QLineEdit::textChanged,
+           w, &DirWidget::setNameFilter);
   addToLayout (w);
   return w;
 }
@@ -126,10 +142,22 @@ void MultiDirWidget::showContextMenu ()
   menu_->exec (QCursor::pos ());
 }
 
+void MultiDirWidget::activateFindMode ()
+{
+  findEdit_->show ();
+  findEdit_->setFocus ();
+}
+
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Escape)
   {
+    if (findEdit_->hasFocus ())
+    {
+      findEdit_->clear ();
+      findEdit_->hide ();
+      return;
+    }
     hide ();
   }
 }

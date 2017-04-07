@@ -24,6 +24,8 @@ public:
   void setPath (const QString &path);
   QString path () const;
 
+  void setNameFilter (const QString &filter);
+
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);

@@ -134,6 +134,11 @@ QString DirWidget::path () const
   return path (view_->rootIndex ());
 }
 
+void DirWidget::setNameFilter (const QString &filter)
+{
+  proxy_->setNameFilter ("*" + filter + "*");
+}
+
 void DirWidget::setIsLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);

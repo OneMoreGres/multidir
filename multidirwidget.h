@@ -8,6 +8,7 @@ class QFileSystemModel;
 class QSettings;
 class QGridLayout;
 class QMenu;
+class QLineEdit;
 
 class MultiDirWidget : public QWidget
 {
@@ -27,9 +28,11 @@ private:
   DirWidget * addWidget ();
   void addToLayout (DirWidget *widget);
   void showContextMenu ();
+  void activateFindMode ();
 
   QFileSystemModel *model_;
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
   QMenu *menu_;
+  QLineEdit *findEdit_;
 };
