@@ -158,9 +158,12 @@ void MultiDirWidget::keyPressEvent (QKeyEvent *event)
     {
       findEdit_->clear ();
       findEdit_->hide ();
-      return;
     }
-    hide ();
+    else
+    {
+      hide ();
+    }
+    event->accept ();
   }
 }
 
