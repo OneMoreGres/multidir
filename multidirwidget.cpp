@@ -21,7 +21,9 @@ const QString qs_dirs = "dirs";
 MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
   model_ (new QFileSystemModel (this)),
-  layout_ (new QGridLayout)
+  widgets_ (),
+  layout_ (new QGridLayout),
+  menu_ (new QMenu (tr ("File"), this))
 {
   model_->setRootPath (QDir::rootPath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
@@ -31,6 +33,12 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   auto toolbar = new QToolBar (this);
   auto add = toolbar->addAction (QIcon::fromTheme ("add"), tr ("add"));
   connect (add, &QAction::triggered, this, &MultiDirWidget::addWidget);
+
+  menu_->addAction (add);
+  setContextMenuPolicy (Qt::CustomContextMenu);
+  connect (this, &QWidget::customContextMenuRequested,
+           this, &MultiDirWidget::showContextMenu);
+
 
   auto layout = new QVBoxLayout (this);
   layout->addWidget (toolbar);
@@ -111,6 +119,11 @@ void MultiDirWidget::addToLayout (DirWidget *widget)
   {
     layout_->addWidget (widget, 0, cols);
   }
+}
+
+void MultiDirWidget::showContextMenu ()
+{
+  menu_->exec (QCursor::pos ());
 }
 
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)

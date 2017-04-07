@@ -7,6 +7,7 @@ class DirWidget;
 class QFileSystemModel;
 class QSettings;
 class QGridLayout;
+class QMenu;
 
 class MultiDirWidget : public QWidget
 {
@@ -25,8 +26,10 @@ private:
   void clone (DirWidget *widget);
   DirWidget * addWidget ();
   void addToLayout (DirWidget *widget);
+  void showContextMenu ();
 
   QFileSystemModel *model_;
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
+  QMenu *menu_;
 };
