@@ -11,6 +11,8 @@
 #include <QToolButton>
 #include <QHeaderView>
 #include <QSettings>
+#include <QResizeEvent>
+#include <QFontMetrics>
 
 #include <QDebug>
 
@@ -32,7 +34,8 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   dirLabel_ (new QLabel (this)),
   isLocked_ (nullptr),
   up_ (new QToolButton (this)),
-  showDirs_ (new QToolButton (this))
+  showDirs_ (new QToolButton (this)),
+  controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
@@ -77,14 +80,15 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   dirFont.setBold (true);
   dirLabel_->setFont (dirFont);
 
-  auto controls = new QHBoxLayout;
-  controls->addWidget (pathLabel_);
-  controls->addWidget (dirLabel_);
-  controls->addWidget (up_);
-  controls->addWidget (showDirs_);
+  controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (pathLabel_);
+  controlsLayout_->addWidget (dirLabel_);
+  controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (up_);
+  controlsLayout_->addWidget (showDirs_);
 
   auto layout = new QVBoxLayout (this);
-  layout->addLayout (controls);
+  layout->addLayout (controlsLayout_);
   layout->addWidget (view_);
 
   setIsLocked (false);
@@ -125,8 +129,8 @@ void DirWidget::setPath (const QString &path)
   view_->setRootIndex (index);
   proxy_->setCurrent (index);
 
+  pathLabel_->setText (fittedPath ());
   auto nameIndex = absolutePath.lastIndexOf (QDir::separator ()) + 1;
-  pathLabel_->setText (nameIndex ? absolutePath.left (nameIndex) : QString ());
   dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
 }
 
@@ -196,4 +200,50 @@ void DirWidget::toggleShowDirs (bool show)
 void DirWidget::showContextMenu ()
 {
   menu_->exec (QCursor::pos ());
+}
+
+void DirWidget::resizeEvent (QResizeEvent */*event*/)
+{
+  const auto newText = fittedPath ();
+  if (newText != pathLabel_->text ())
+  {
+    pathLabel_->setText (newText);
+  }
+}
+
+QString DirWidget::fittedPath () const
+{
+  auto path = this->path ();
+  const auto nameIndex = path.lastIndexOf (QDir::separator ()) + 1;
+  if (!nameIndex)
+  {
+    return {};
+  }
+
+  const auto stretchWidth = controlsLayout_->itemAt (0)->geometry ().width ();
+  const auto pathText = pathLabel_->text ();
+
+  if (stretchWidth == 0 || pathText.isEmpty () || pathText.startsWith (QLatin1String ("...")))
+  {
+    const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10;
+    const QString prepend = QLatin1String ("...") + QDir::separator ();
+    const auto searchStartIndex = prepend.length ();
+
+    QFontMetrics metrics (pathLabel_->font ());
+    path = path.left (nameIndex);
+    auto width = metrics.width (path);
+
+    while (width > maxWidth)
+    {
+      auto index = path.indexOf (QDir::separator (), searchStartIndex);
+      if (index == -1)
+      {
+        break;
+      }
+      path = prepend + path.mid (index + 1);
+      width = metrics.width (path);
+    }
+    return path;
+  }
+  return pathText;
 }

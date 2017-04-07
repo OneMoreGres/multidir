@@ -10,6 +10,7 @@ class QLabel;
 class QMenu;
 class QToolButton;
 class QSettings;
+class QBoxLayout;
 
 class DirWidget : public QWidget
 {
@@ -30,6 +31,9 @@ signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
 
+protected:
+  void resizeEvent (QResizeEvent *event) override;
+
 private:
   void setIsLocked (bool isLocked);
   void moveUp ();
@@ -38,6 +42,7 @@ private:
   void openPath (const QModelIndex &index);
   QString path (const QModelIndex &index) const;
   bool isLocked () const;
+  QString fittedPath () const;
 
   QFileSystemModel *model_;
   ProxyModel *proxy_;
@@ -48,4 +53,5 @@ private:
   QAction *isLocked_;
   QToolButton *up_;
   QToolButton *showDirs_;
+  QBoxLayout *controlsLayout_;
 };
