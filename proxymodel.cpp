@@ -1,6 +1,7 @@
 #include "proxymodel.h"
+#include "filesystemmodel.h"
 
-#include <QFileSystemModel>
+#include <QDateTime>
 
 #include <QDebug>
 
@@ -76,4 +77,32 @@ Qt::ItemFlags ProxyModel::flags (const QModelIndex &index) const
     flags.setFlag (Qt::ItemIsEditable, false);
   }
   return flags;
+}
+
+
+bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) const
+{
+  switch (sortColumn ())
+  {
+    case FileSystemModel::Column::Name:
+      return model_->fileName (left) < model_->fileName (right);
+
+    case FileSystemModel::Column::Size:
+      return model_->size (left) < model_->size (right);
+
+    case FileSystemModel::Column::Type:
+    {
+      auto l = model_->isDir (left);
+      auto r = model_->isDir (right);
+      if (l != r)
+      {
+        return l;
+      }
+      return model_->type (left) < model_->type (right);
+    }
+
+    case FileSystemModel::Column::Date:
+      return model_->lastModified (left) < model_->lastModified (right);
+  }
+  return QSortFilterProxyModel::lessThan (left, right);
 }
