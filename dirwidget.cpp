@@ -13,6 +13,7 @@
 #include <QSettings>
 #include <QResizeEvent>
 #include <QFontMetrics>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -71,9 +72,9 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
 
   menu_->addSeparator ();
 
-  auto close = menu_->addAction (tr ("Close"));
+  auto close = menu_->addAction (tr ("Close..."));
   connect (close, &QAction::triggered,
-           this, [this]() {emit closeRequested (this);});
+           this, &DirWidget::promptClose);
 
   connect (menu_, &QMenu::aboutToShow,
            this, &DirWidget::updateMenu);
@@ -274,4 +275,14 @@ void DirWidget::startRenaming ()
   const auto nameIndex = index.sibling (index.row (), 0);
   view_->setCurrentIndex (nameIndex);
   view_->edit (nameIndex);
+}
+
+void DirWidget::promptClose ()
+{
+  auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?").arg (path ()),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::Yes)
+  {
+    emit closeRequested (this);
+  }
 }

@@ -45,6 +45,7 @@ private:
   QString fittedPath () const;
   void updateMenu ();
   void startRenaming ();
+  void promptClose ();
 
   QFileSystemModel *model_;
   ProxyModel *proxy_;
