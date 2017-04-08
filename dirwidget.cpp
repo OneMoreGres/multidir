@@ -225,13 +225,13 @@ QString DirWidget::fittedPath () const
 
   if (stretchWidth == 0 || pathText.isEmpty () || pathText.startsWith (QLatin1String ("...")))
   {
-    const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10;
+    const auto maxWidth = pathLabel_->width () + 2 * stretchWidth;
     const QString prepend = QLatin1String ("...") + QDir::separator ();
     const auto searchStartIndex = prepend.length ();
 
     QFontMetrics metrics (pathLabel_->font ());
     path = path.left (nameIndex);
-    auto width = metrics.width (path);
+    auto width = metrics.boundingRect (path).width ();
 
     while (width > maxWidth)
     {
@@ -241,7 +241,7 @@ QString DirWidget::fittedPath () const
         break;
       }
       path = prepend + path.mid (index + 1);
-      width = metrics.width (path);
+      width = metrics.boundingRect (path).width ();
     }
     return path;
   }
