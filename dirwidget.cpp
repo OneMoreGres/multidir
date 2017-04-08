@@ -301,12 +301,24 @@ void DirWidget::promptClose ()
 
 void DirWidget::promptRemove ()
 {
-  const auto index = proxy_->mapToSource (view_->currentIndex ());
-  const auto name = model_->fileName (index);
-  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?").arg (name),
+  const auto indexes = view_->selectionModel ()->selectedRows (0);
+  if (indexes.isEmpty ())
+  {
+    return;
+  }
+  QStringList names;
+  for (const auto &i: indexes)
+  {
+    names << i.data ().toString ();
+  }
+  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
+                                    .arg (names.join ("\", \"")),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
-    model_->remove (index);
+    for (const auto &i: indexes)
+    {
+      model_->remove (proxy_->mapToSource (i));
+    }
   }
 }
