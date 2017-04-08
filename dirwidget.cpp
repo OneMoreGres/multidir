@@ -71,7 +71,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
 
   menu_->addSeparator ();
 
-  isLocked_ = menu_->addAction (tr ("Locked"));
+  isLocked_ = menu_->addAction (tr ("Lock"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
