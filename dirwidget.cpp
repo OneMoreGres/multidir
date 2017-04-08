@@ -30,6 +30,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   proxy_ (new ProxyModel (model, this)),
   view_ (new QTableView (this)),
   menu_ (new QMenu (this)),
+  renameAction_ (nullptr),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   isLocked_ (nullptr),
@@ -46,11 +47,18 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   view_->setModel (proxy_);
   view_->setSortingEnabled (true);
   view_->setSelectionBehavior (QAbstractItemView::SelectRows);
+  view_->setEditTriggers (QAbstractItemView::SelectedClicked);
   view_->setDragDropMode (QAbstractItemView::DragDrop);
   view_->setDragDropOverwriteMode (false);
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
 
+
+  renameAction_ = menu_->addAction (tr ("Rename"));
+  connect (renameAction_, &QAction::triggered,
+           this, &DirWidget::startRenaming);
+
+  menu_->addSeparator ();
 
   isLocked_ = menu_->addAction (tr ("Locked"));
   isLocked_->setCheckable (true);
@@ -66,6 +74,9 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   auto close = menu_->addAction (tr ("Close"));
   connect (close, &QAction::triggered,
            this, [this]() {emit closeRequested (this);});
+
+  connect (menu_, &QMenu::aboutToShow,
+           this, &DirWidget::updateMenu);
 
 
   up_->setIcon (QIcon::fromTheme ("up"));
@@ -248,4 +259,19 @@ QString DirWidget::fittedPath () const
     return path;
   }
   return pathText;
+}
+
+void DirWidget::updateMenu ()
+{
+  const auto index = view_->currentIndex ();
+  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
+  renameAction_->setEnabled (index.isValid () && !isDotDot);
+}
+
+void DirWidget::startRenaming ()
+{
+  const auto index = view_->currentIndex ();
+  const auto nameIndex = index.sibling (index.row (), 0);
+  view_->setCurrentIndex (nameIndex);
+  view_->edit (nameIndex);
 }

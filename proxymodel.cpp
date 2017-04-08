@@ -66,3 +66,14 @@ QVariant ProxyModel::headerData (int section, Qt::Orientation orientation, int r
   }
   return QSortFilterProxyModel::headerData (section, orientation, role);
 }
+
+
+Qt::ItemFlags ProxyModel::flags (const QModelIndex &index) const
+{
+  auto flags = QSortFilterProxyModel::flags (index);
+  if (index.column () != 0 || index.data ().toString () == QLatin1String (".."))
+  {
+    flags.setFlag (Qt::ItemIsEditable, false);
+  }
+  return flags;
+}

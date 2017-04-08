@@ -43,11 +43,14 @@ private:
   QString path (const QModelIndex &index) const;
   bool isLocked () const;
   QString fittedPath () const;
+  void updateMenu ();
+  void startRenaming ();
 
   QFileSystemModel *model_;
   ProxyModel *proxy_;
   QTableView *view_;
   QMenu *menu_;
+  QAction *renameAction_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QAction *isLocked_;

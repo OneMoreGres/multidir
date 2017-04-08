@@ -17,6 +17,7 @@ public:
   void setCurrent (const QModelIndex &current);
 
   QVariant headerData (int section, Qt::Orientation orientation, int role) const override;
+  Qt::ItemFlags flags (const QModelIndex &index) const override;
 
 protected:
   bool filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const override;
