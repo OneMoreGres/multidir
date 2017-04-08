@@ -46,6 +46,7 @@ private:
   void updateMenu ();
   void startRenaming ();
   void promptClose ();
+  void promptRemove ();
 
   QFileSystemModel *model_;
   ProxyModel *proxy_;
@@ -53,6 +54,7 @@ private:
   QMenu *menu_;
   QAction *openAction_;
   QAction *renameAction_;
+  QAction *removeAction_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QAction *isLocked_;

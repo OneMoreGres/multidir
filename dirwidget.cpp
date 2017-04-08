@@ -33,6 +33,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   menu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
+  removeAction_ (nullptr),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   isLocked_ (nullptr),
@@ -63,6 +64,10 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   renameAction_ = menu_->addAction (tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
            this, &DirWidget::startRenaming);
+
+  removeAction_ = menu_->addAction (tr ("Remove..."));
+  connect (removeAction_, &QAction::triggered,
+           this, &DirWidget::promptRemove);
 
   menu_->addSeparator ();
 
@@ -273,6 +278,7 @@ void DirWidget::updateMenu ()
   const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
   openAction_->setEnabled (index.isValid ());
   renameAction_->setEnabled (index.isValid () && !isDotDot);
+  removeAction_->setEnabled (index.isValid () && !isDotDot);
 }
 
 void DirWidget::startRenaming ()
@@ -290,5 +296,17 @@ void DirWidget::promptClose ()
   if (res == QMessageBox::Yes)
   {
     emit closeRequested (this);
+  }
+}
+
+void DirWidget::promptRemove ()
+{
+  const auto index = proxy_->mapToSource (view_->currentIndex ());
+  const auto name = model_->fileName (index);
+  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?").arg (name),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::Yes)
+  {
+    model_->remove (index);
   }
 }
