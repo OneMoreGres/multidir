@@ -55,13 +55,15 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
-  auto close = menu_->addAction (tr ("Close"));
-  connect (close, &QAction::triggered,
-           this, [this]() {emit closeRequested (this);});
-
   auto clone = menu_->addAction (tr ("Clone"));
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
+
+  menu_->addSeparator ();
+
+  auto close = menu_->addAction (tr ("Close"));
+  connect (close, &QAction::triggered,
+           this, [this]() {emit closeRequested (this);});
 
 
   up_->setIcon (QIcon::fromTheme ("up"));
