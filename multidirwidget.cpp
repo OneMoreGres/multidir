@@ -29,6 +29,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 {
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
+  model_->setReadOnly (false);
 
   setWindowFlags (Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
 

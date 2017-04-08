@@ -46,6 +46,8 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   view_->setModel (proxy_);
   view_->setSortingEnabled (true);
   view_->setSelectionBehavior (QAbstractItemView::SelectRows);
+  view_->setDragDropMode (QAbstractItemView::DragDrop);
+  view_->setDragDropOverwriteMode (false);
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
 
