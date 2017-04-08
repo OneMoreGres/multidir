@@ -246,31 +246,25 @@ QString DirWidget::fittedPath () const
   }
 
   const auto stretchWidth = controlsLayout_->itemAt (0)->geometry ().width ();
-  const auto pathText = pathLabel_->text ();
+  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth;
+  const QString prepend = QLatin1String ("...") + QDir::separator ();
+  const auto searchStartIndex = prepend.length ();
 
-  if (stretchWidth == 0 || pathText.isEmpty () || pathText.startsWith (QLatin1String ("...")))
+  QFontMetrics metrics (pathLabel_->font ());
+  path = path.left (nameIndex);
+  auto width = metrics.boundingRect (path).width ();
+
+  while (width > maxWidth)
   {
-    const auto maxWidth = pathLabel_->width () + 2 * stretchWidth;
-    const QString prepend = QLatin1String ("...") + QDir::separator ();
-    const auto searchStartIndex = prepend.length ();
-
-    QFontMetrics metrics (pathLabel_->font ());
-    path = path.left (nameIndex);
-    auto width = metrics.boundingRect (path).width ();
-
-    while (width > maxWidth)
+    auto index = path.indexOf (QDir::separator (), searchStartIndex);
+    if (index == -1)
     {
-      auto index = path.indexOf (QDir::separator (), searchStartIndex);
-      if (index == -1)
-      {
-        break;
-      }
-      path = prepend + path.mid (index + 1);
-      width = metrics.boundingRect (path).width ();
+      break;
     }
-    return path;
+    path = prepend + path.mid (index + 1);
+    width = metrics.boundingRect (path).width ();
   }
-  return pathText;
+  return path;
 }
 
 void DirWidget::updateMenu ()
