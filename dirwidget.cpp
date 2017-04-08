@@ -31,6 +31,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   proxy_ (new ProxyModel (model, this)),
   view_ (new QTableView (this)),
   menu_ (new QMenu (this)),
+  openAction_ (nullptr),
   renameAction_ (nullptr),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
@@ -54,6 +55,10 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
 
+
+  openAction_ = menu_->addAction (tr ("Open"));
+  connect (openAction_, &QAction::triggered,
+           this, [this]() {openPath (view_->currentIndex ());});
 
   renameAction_ = menu_->addAction (tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
@@ -266,6 +271,7 @@ void DirWidget::updateMenu ()
 {
   const auto index = view_->currentIndex ();
   const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
+  openAction_->setEnabled (index.isValid ());
   renameAction_->setEnabled (index.isValid () && !isDotDot);
 }
 

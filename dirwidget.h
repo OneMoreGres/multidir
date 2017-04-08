@@ -51,6 +51,7 @@ private:
   ProxyModel *proxy_;
   QTableView *view_;
   QMenu *menu_;
+  QAction *openAction_;
   QAction *renameAction_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
