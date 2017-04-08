@@ -72,18 +72,18 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   menu_->addSeparator ();
 
-  isLocked_ = menu_->addAction (tr ("Lock"));
+  isLocked_ = menu_->addAction (tr ("Lock tab"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
-  auto clone = menu_->addAction (tr ("Clone"));
+  auto clone = menu_->addAction (tr ("Clone tab"));
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
 
   menu_->addSeparator ();
 
-  auto close = menu_->addAction (tr ("Close..."));
+  auto close = menu_->addAction (tr ("Close tab..."));
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
