@@ -3,8 +3,8 @@
 #include <QWidget>
 
 class DirWidget;
+class FileSystemModel;
 
-class QFileSystemModel;
 class QSettings;
 class QGridLayout;
 class QMenu;
@@ -30,7 +30,7 @@ private:
   void showContextMenu ();
   void activateFindMode ();
 
-  QFileSystemModel *model_;
+  FileSystemModel *model_;
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
   QMenu *menu_;

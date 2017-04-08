@@ -1,7 +1,7 @@
 #include "dirwidget.h"
 #include "proxymodel.h"
+#include "filesystemmodel.h"
 
-#include <QFileSystemModel>
 #include <QTableView>
 #include <QBoxLayout>
 #include <QLabel>
@@ -25,7 +25,7 @@ const QString qs_view = "view";
 const QString qs_showDirs = "showDirs";
 }
 
-DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
+DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
@@ -53,6 +53,7 @@ DirWidget::DirWidget (QFileSystemModel *model, QWidget *parent) :
   view_->setEditTriggers (QAbstractItemView::SelectedClicked);
   view_->setDragDropMode (QAbstractItemView::DragDrop);
   view_->setDragDropOverwriteMode (false);
+  view_->setDefaultDropAction (Qt::MoveAction);
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
 

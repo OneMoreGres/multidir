@@ -37,11 +37,13 @@ SOURCES += \
     controller.cpp \
     multidirwidget.cpp \
     globalaction.cpp \
-    proxymodel.cpp
+    proxymodel.cpp \
+    filesystemmodel.cpp
 
 HEADERS  += \
     dirwidget.h \
     multidirwidget.h \
     controller.h \
     globalaction.h \
-    proxymodel.h
+    proxymodel.h \
+    filesystemmodel.h

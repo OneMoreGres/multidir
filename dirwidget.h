@@ -3,9 +3,9 @@
 #include <QWidget>
 
 class ProxyModel;
+class FileSystemModel;
 
 class QTableView;
-class QFileSystemModel;
 class QLabel;
 class QMenu;
 class QToolButton;
@@ -16,7 +16,7 @@ class DirWidget : public QWidget
 {
 Q_OBJECT
 public:
-  DirWidget (QFileSystemModel *model, QWidget *parent = nullptr);
+  DirWidget (FileSystemModel *model, QWidget *parent = nullptr);
   ~DirWidget ();
 
   void save (QSettings &settings) const;
@@ -48,7 +48,7 @@ private:
   void promptClose ();
   void promptRemove ();
 
-  QFileSystemModel *model_;
+  FileSystemModel *model_;
   ProxyModel *proxy_;
   QTableView *view_;
   QMenu *menu_;

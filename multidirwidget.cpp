@@ -1,7 +1,7 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
+#include "filesystemmodel.h"
 
-#include <QFileSystemModel>
 #include <QGridLayout>
 #include <QBoxLayout>
 #include <QToolBar>
@@ -21,7 +21,7 @@ const QString qs_dirs = "dirs";
 
 MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
-  model_ (new QFileSystemModel (this)),
+  model_ (new FileSystemModel (this)),
   widgets_ (),
   layout_ (new QGridLayout),
   menu_ (new QMenu (tr ("File"), this)),
