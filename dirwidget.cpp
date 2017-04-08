@@ -159,19 +159,17 @@ void DirWidget::openPath (const QModelIndex &index)
   }
 
   const auto mapped = proxy_->mapToSource (index);
-  if (!(model_->permissions (mapped) & QFile::ExeUser))
-  {
-    return;
-  }
-
   auto path = model_->filePath (mapped);
   if (!model_->isDir (mapped))
   {
     QDesktopServices::openUrl (QUrl::fromLocalFile (path));
   }
-  else if (!isLocked ())
+  else
   {
-    setPath (path);
+    if (!isLocked () && model_->permissions (mapped) & QFile::ExeUser)
+    {
+      setPath (path);
+    }
   }
 }
 
