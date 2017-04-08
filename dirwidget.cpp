@@ -285,7 +285,7 @@ void DirWidget::updateMenu ()
 void DirWidget::startRenaming ()
 {
   const auto index = view_->currentIndex ();
-  const auto nameIndex = index.sibling (index.row (), 0);
+  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
   view_->setCurrentIndex (nameIndex);
   view_->edit (nameIndex);
 }
@@ -302,7 +302,7 @@ void DirWidget::promptClose ()
 
 void DirWidget::promptRemove ()
 {
-  const auto indexes = view_->selectionModel ()->selectedRows (0);
+  const auto indexes = view_->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
   if (indexes.isEmpty ())
   {
     return;
