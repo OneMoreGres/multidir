@@ -96,10 +96,12 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
 
   up_->setIcon (QIcon (":/up.png"));
+  up_->setToolTip (tr ("Move up"));
   connect (up_, &QToolButton::pressed,
            this, &DirWidget::moveUp);
 
   showDirs_->setIcon (QIcon (":/folder.png"));
+  showDirs_->setToolTip (tr ("Show directories"));
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QToolButton::toggled,
