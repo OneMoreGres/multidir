@@ -56,7 +56,7 @@ void Controller::save (QSettings &settings) const
 void Controller::restore (QSettings &settings)
 {
   widget_->restore (settings);
-  widget_->showMaximized ();
+  widget_->show ();
   widget_->activateWindow ();
 }
 
@@ -85,7 +85,7 @@ void Controller::toggleWidget ()
   }
   else
   {
-    widget_->showMaximized ();
+    widget_->show ();
     widget_->activateWindow ();
   }
 }

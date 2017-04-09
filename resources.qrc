@@ -12,5 +12,6 @@
         <file alias="lockTab.png">icons/locked-6.png</file>
         <file alias="rename.png">icons/edit.png</file>
         <file alias="remove.png">icons/garbage-1.png</file>
+        <file alias="overlayed.png">icons/windows-2.png</file>
     </qresource>
 </RCC>

@@ -29,10 +29,13 @@ private:
   void addToLayout (DirWidget *widget);
   void showContextMenu ();
   void activateFindMode ();
+  void setIsOverlay (bool isOn);
+  bool isOverlay () const;
 
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
   QMenu *menu_;
+  QAction *overlayAction_;
   QLineEdit *findEdit_;
 };

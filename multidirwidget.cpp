@@ -9,14 +9,15 @@
 #include <QSettings>
 #include <QKeyEvent>
 #include <QLineEdit>
+#include <QApplication>
 
 #include <QDebug>
-
-#include <math.h>
 
 namespace
 {
 const QString qs_dirs = "dirs";
+const QString qs_overlay = "overlay";
+const QString qs_geometry = "geometry";
 }
 
 MultiDirWidget::MultiDirWidget (QWidget *parent) :
@@ -25,13 +26,13 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   widgets_ (),
   layout_ (new QGridLayout),
   menu_ (new QMenu (tr ("File"), this)),
+  overlayAction_ (nullptr),
   findEdit_ (new QLineEdit (this))
 {
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
   model_->setReadOnly (false);
 
-  setWindowFlags (Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
 
   auto toolbar = new QToolBar (this);
   auto add = toolbar->addAction (QIcon (":/add.png"), tr ("Add"));
@@ -42,7 +43,18 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   find->setShortcut (QKeySequence::Find);
   connect (find, &QAction::triggered, this, &MultiDirWidget::activateFindMode);
 
-  menu_->addAction (add);
+  toolbar->addSeparator ();
+
+  overlayAction_ = toolbar->addAction (QIcon (":/overlayed.png"), tr ("Overlay mode"));
+  overlayAction_->setCheckable (true);
+  overlayAction_->setChecked (false);
+  connect (overlayAction_, &QAction::toggled, this, &MultiDirWidget::setIsOverlay);
+
+  auto quit = toolbar->addAction (QIcon (":/quit.png"), tr ("Quit"));
+  connect (quit, &QAction::triggered, qApp, &QApplication::quit);
+
+
+  menu_->addAction (quit);
   menu_->addAction (find);
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
@@ -68,6 +80,9 @@ MultiDirWidget::~MultiDirWidget ()
 
 void MultiDirWidget::save (QSettings &settings) const
 {
+  settings.setValue (qs_overlay, isOverlay ());
+  settings.setValue (qs_geometry, saveGeometry ());
+
   settings.beginWriteArray (qs_dirs, widgets_.size ());
   for (auto i = 0, end = widgets_.size (); i < end; ++i)
   {
@@ -79,6 +94,9 @@ void MultiDirWidget::save (QSettings &settings) const
 
 void MultiDirWidget::restore (QSettings &settings)
 {
+  overlayAction_->setChecked (settings.value (qs_overlay, isOverlay ()).toBool ());
+  restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
+
   qDeleteAll (widgets_);
   widgets_.clear ();
 
@@ -149,6 +167,32 @@ void MultiDirWidget::activateFindMode ()
 {
   findEdit_->show ();
   findEdit_->setFocus ();
+}
+
+void MultiDirWidget::setIsOverlay (bool isOn)
+{
+  const auto wasVisible = isVisible ();
+  QByteArray state;
+  if (wasVisible)
+  {
+    hide ();
+    state = saveGeometry ();
+  }
+  auto flags = windowFlags ();
+  flags.setFlag (Qt::FramelessWindowHint, isOn);
+  flags.setFlag (Qt::Tool, isOn);
+  flags.setFlag (Qt::WindowStaysOnTopHint, isOn);
+  setWindowFlags (flags);
+  if (wasVisible)
+  {
+    restoreGeometry (state);
+    show ();
+  }
+}
+
+bool MultiDirWidget::isOverlay () const
+{
+  return overlayAction_->isChecked ();
 }
 
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)
