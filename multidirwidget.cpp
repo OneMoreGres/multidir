@@ -186,6 +186,7 @@ void MultiDirWidget::setIsOverlay (bool isOn)
   {
     restoreGeometry (state);
     show ();
+    activateWindow ();
   }
 }
 
