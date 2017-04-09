@@ -174,7 +174,7 @@ QString DirWidget::path () const
 
 void DirWidget::setNameFilter (const QString &filter)
 {
-  proxy_->setNameFilter ("*" + filter + "*");
+  proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
 }
 
 void DirWidget::setIsLocked (bool isLocked)
@@ -333,7 +333,7 @@ void DirWidget::promptRemove ()
     names << i.data ().toString ();
   }
   auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names.join ("\", \"")),
+                                    .arg (names.join (QLatin1String ("\", \""))),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {

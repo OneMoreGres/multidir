@@ -9,8 +9,8 @@
 int main (int argc, char *argv[])
 {
   QApplication a (argc, argv);
-  a.setOrganizationName ("Gres");
-  a.setApplicationName ("MultiDir");
+  a.setOrganizationName (QLatin1String ("Gres"));
+  a.setApplicationName (QLatin1String ("MultiDir"));
   a.setQuitOnLastWindowClosed (false);
 
   QTranslator baseTranslator;
@@ -24,7 +24,7 @@ int main (int argc, char *argv[])
     a.installTranslator (&appTranslator);
   }
 
-  QLockFile f (QDir::home ().absoluteFilePath (".multidir.lock"));
+  QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
   if (!f.tryLock ())
   {
     qDebug () << "Another instance is running. Lock file is busy.";

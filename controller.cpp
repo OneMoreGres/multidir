@@ -20,7 +20,7 @@ Controller::Controller (QObject *parent) :
   toggleAction_ = menu->addAction (QIcon (":/popup.png"), tr ("Toggle"));
   toggleAction_->setCheckable (true);
   toggleAction_->setChecked (true);
-  toggleAction_->setShortcut (QKeySequence ("Ctrl+Alt+D"));
+  toggleAction_->setShortcut (QKeySequence (QLatin1String ("Ctrl+Alt+D")));
   GlobalAction::init ();
   GlobalAction::makeGlobal (toggleAction_);
 
