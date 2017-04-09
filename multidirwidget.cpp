@@ -179,7 +179,6 @@ void MultiDirWidget::setIsOverlay (bool isOn)
     state = saveGeometry ();
   }
   auto flags = windowFlags ();
-  flags.setFlag (Qt::FramelessWindowHint, isOn);
   flags.setFlag (Qt::Tool, isOn);
   flags.setFlag (Qt::WindowStaysOnTopHint, isOn);
   setWindowFlags (flags);
