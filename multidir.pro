@@ -12,6 +12,9 @@ linux{
   QT += x11extras
   LIBS += -lX11
 }
+win32{
+  LIBS += -lUser32
+}
 
 TARGET = multidir
 TEMPLATE = app
@@ -52,3 +55,9 @@ HEADERS  += \
 
 RESOURCES += \
     resources.qrc
+
+QMAKE_TARGET_COMPANY = Gres
+QMAKE_TARGET_PRODUCT = MultiDir
+QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
+VERSION = 1.0.0.0
+RC_ICONS = icons/icon.ico

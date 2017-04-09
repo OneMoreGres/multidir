@@ -189,18 +189,18 @@ quint32 GlobalAction::nativeModifiers (Qt::KeyboardModifiers modifiers)
 #  include <qt_windows.h>
 
 
-bool GlobalActionHelper::registerHotKey (quint32 nativeKey, quint32 nativeMods)
+bool GlobalAction::registerHotKey (quint32 nativeKey, quint32 nativeMods)
 {
   return RegisterHotKey (0, nativeMods ^ nativeKey, nativeMods, nativeKey);
 }
 
-bool GlobalActionHelper::unregisterHotKey (quint32 nativeKey, quint32 nativeMods)
+bool GlobalAction::unregisterHotKey (quint32 nativeKey, quint32 nativeMods)
 {
   return UnregisterHotKey (0, nativeMods ^ nativeKey);
 }
 
-bool GlobalActionHelper::nativeEventFilter (const QByteArray &eventType,
-                                            void *message, long *result)
+bool GlobalAction::nativeEventFilter (const QByteArray &eventType,
+                                      void *message, long *result)
 {
   Q_UNUSED (eventType);
   Q_UNUSED (result);
@@ -214,7 +214,7 @@ bool GlobalActionHelper::nativeEventFilter (const QByteArray &eventType,
   return false;
 }
 
-quint32 GlobalActionHelper::nativeKeycode (Qt::Key key)
+quint32 GlobalAction::nativeKeycode (Qt::Key key)
 {
   switch (key)
   {
@@ -376,7 +376,7 @@ quint32 GlobalActionHelper::nativeKeycode (Qt::Key key)
   }
 }
 
-quint32 GlobalActionHelper::nativeModifiers (Qt::KeyboardModifiers modifiers)
+quint32 GlobalAction::nativeModifiers (Qt::KeyboardModifiers modifiers)
 {
   // MOD_ALT, MOD_CONTROL, (MOD_KEYUP), MOD_SHIFT, MOD_WIN
   quint32 native = 0;
