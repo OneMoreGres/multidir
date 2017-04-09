@@ -17,21 +17,21 @@ Controller::Controller (QObject *parent) :
   connect (menu, &QMenu::aboutToShow,
            this, &Controller::updateMenu);
 
-  toggleAction_ = menu->addAction (tr ("Toggle"));
+  toggleAction_ = menu->addAction (QIcon (":/popup.png"), tr ("Toggle"));
   toggleAction_->setCheckable (true);
   toggleAction_->setChecked (true);
   toggleAction_->setShortcut (QKeySequence ("Ctrl+Alt+D"));
   GlobalAction::init ();
   GlobalAction::makeGlobal (toggleAction_);
 
-  auto quit = menu->addAction (tr ("Quit"));
+  auto quit = menu->addAction (QIcon (":/quit.png"), tr ("Quit"));
   connect (quit, &QAction::triggered,
            qApp, &QApplication::quit);
 
 
   tray_->setContextMenu (menu);
   tray_->setToolTip (tr ("MultiDir"));
-  tray_->setIcon (QIcon::fromTheme ("folder"));
+  tray_->setIcon (QIcon (":/app.png"));
   tray_->show ();
   connect (tray_, &QSystemTrayIcon::activated,
            this, &Controller::trayClicked);

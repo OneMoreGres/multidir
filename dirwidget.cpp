@@ -62,28 +62,28 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
 
-  renameAction_ = menu_->addAction (tr ("Rename"));
+  renameAction_ = menu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
            this, &DirWidget::startRenaming);
 
-  removeAction_ = menu_->addAction (tr ("Remove..."));
+  removeAction_ = menu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
   connect (removeAction_, &QAction::triggered,
            this, &DirWidget::promptRemove);
 
   menu_->addSeparator ();
 
-  isLocked_ = menu_->addAction (tr ("Lock tab"));
+  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
-  auto clone = menu_->addAction (tr ("Clone tab"));
+  auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
 
   menu_->addSeparator ();
 
-  auto close = menu_->addAction (tr ("Close tab..."));
+  auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
@@ -91,11 +91,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::updateMenu);
 
 
-  up_->setIcon (QIcon::fromTheme ("up"));
+  up_->setIcon (QIcon (":/up.png"));
   connect (up_, &QToolButton::pressed,
            this, &DirWidget::moveUp);
 
-  showDirs_->setIcon (QIcon::fromTheme ("folder"));
+  showDirs_->setIcon (QIcon (":/folder.png"));
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QToolButton::toggled,

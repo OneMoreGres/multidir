@@ -34,11 +34,11 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   setWindowFlags (Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
 
   auto toolbar = new QToolBar (this);
-  auto add = toolbar->addAction (QIcon::fromTheme ("add"), tr ("Add"));
+  auto add = toolbar->addAction (QIcon (":/add.png"), tr ("Add"));
   add->setShortcut (QKeySequence::AddTab);
   connect (add, &QAction::triggered, this, &MultiDirWidget::addWidget);
 
-  auto find = toolbar->addAction (QIcon::fromTheme ("find"), tr ("Find"));
+  auto find = toolbar->addAction (QIcon (":/find.png"), tr ("Find"));
   find->setShortcut (QKeySequence::Find);
   connect (find, &QAction::triggered, this, &MultiDirWidget::activateFindMode);
 
