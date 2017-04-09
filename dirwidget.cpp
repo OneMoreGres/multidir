@@ -163,7 +163,7 @@ void DirWidget::setPath (const QString &path)
   proxy_->setCurrent (index);
 
   pathLabel_->setText (fittedPath ());
-  auto nameIndex = absolutePath.lastIndexOf (QDir::separator ()) + 1;
+  auto nameIndex = absolutePath.lastIndexOf (QLatin1Char ('/')) + 1;
   dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
 }
 
@@ -265,15 +265,15 @@ void DirWidget::resizeEvent (QResizeEvent */*event*/)
 QString DirWidget::fittedPath () const
 {
   auto path = this->path ();
-  const auto nameIndex = path.lastIndexOf (QDir::separator ()) + 1;
+  const auto nameIndex = path.lastIndexOf (QLatin1Char ('/')) + 1;
   if (!nameIndex)
   {
     return {};
   }
 
   const auto stretchWidth = controlsLayout_->itemAt (0)->geometry ().width ();
-  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth;
-  const QString prepend = QLatin1String ("...") + QDir::separator ();
+  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
+  const QString prepend = QLatin1String (".../");
   const auto searchStartIndex = prepend.length ();
 
   QFontMetrics metrics (pathLabel_->font ());
@@ -282,7 +282,7 @@ QString DirWidget::fittedPath () const
 
   while (width > maxWidth)
   {
-    auto index = path.indexOf (QDir::separator (), searchStartIndex);
+    auto index = path.indexOf (QLatin1Char ('/'), searchStartIndex);
     if (index == -1)
     {
       break;
