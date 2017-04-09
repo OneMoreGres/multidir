@@ -45,6 +45,9 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 
   toolbar->addSeparator ();
 
+  auto settings = toolbar->addAction (QIcon (":/settings.png"), tr ("Settings"));
+  connect (settings, &QAction::triggered, this, &MultiDirWidget::settingsRequested);
+
   overlayAction_ = toolbar->addAction (QIcon (":/overlayed.png"), tr ("Overlay mode"));
   overlayAction_->setCheckable (true);
   overlayAction_->setChecked (false);

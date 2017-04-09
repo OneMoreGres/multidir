@@ -4,17 +4,17 @@
 <context>
     <name>Controller</name>
     <message>
-        <location filename="../controller.cpp" line="20"/>
+        <location filename="../controller.cpp" line="29"/>
         <source>Toggle</source>
         <translation>Показать</translation>
     </message>
     <message>
-        <location filename="../controller.cpp" line="27"/>
+        <location filename="../controller.cpp" line="34"/>
         <source>Quit</source>
         <translation>Выйти</translation>
     </message>
     <message>
-        <location filename="../controller.cpp" line="33"/>
+        <location filename="../controller.cpp" line="40"/>
         <source>MultiDir</source>
         <translation>MultiDir</translation>
     </message>
@@ -99,18 +99,36 @@
     </message>
     <message>
         <location filename="../multidirwidget.cpp" line="48"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="../multidirwidget.cpp" line="51"/>
         <source>Overlay mode</source>
         <translation>Поверх других окон</translation>
     </message>
     <message>
-        <location filename="../multidirwidget.cpp" line="53"/>
+        <location filename="../multidirwidget.cpp" line="56"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../multidirwidget.cpp" line="64"/>
+        <location filename="../multidirwidget.cpp" line="67"/>
         <source>Name pattern</source>
         <translation>Шаблон имени</translation>
+    </message>
+</context>
+<context>
+    <name>Settings</name>
+    <message>
+        <location filename="../settings.cpp" line="12"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="../settings.cpp" line="16"/>
+        <source>Toggle hotkey</source>
+        <translation>Горячая клавиша показа</translation>
     </message>
 </context>
 </TS>

@@ -20,6 +20,9 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+signals:
+  void settingsRequested ();
+
 protected:
   void keyPressEvent (QKeyEvent *event) override;
 

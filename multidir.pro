@@ -43,7 +43,8 @@ SOURCES += \
     multidirwidget.cpp \
     globalaction.cpp \
     proxymodel.cpp \
-    filesystemmodel.cpp
+    filesystemmodel.cpp \
+    settings.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -51,7 +52,8 @@ HEADERS  += \
     controller.h \
     globalaction.h \
     proxymodel.h \
-    filesystemmodel.h
+    filesystemmodel.h \
+    settings.h
 
 RESOURCES += \
     resources.qrc

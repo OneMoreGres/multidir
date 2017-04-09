@@ -21,6 +21,7 @@ private:
   void updateMenu ();
   void trayClicked (QSystemTrayIcon::ActivationReason reason);
   void toggleWidget ();
+  void editSettings ();
 
   QSystemTrayIcon *tray_;
   QScopedPointer<MultiDirWidget> widget_;
