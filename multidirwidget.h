@@ -12,6 +12,7 @@ class QLineEdit;
 
 class MultiDirWidget : public QWidget
 {
+Q_OBJECT
 public:
   explicit MultiDirWidget (QWidget *parent = nullptr);
   ~MultiDirWidget ();

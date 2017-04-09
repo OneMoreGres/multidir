@@ -56,6 +56,9 @@ HEADERS  += \
 RESOURCES += \
     resources.qrc
 
+TRANSLATIONS += \
+    translations/multidir_ru_RU.ts
+
 QMAKE_TARGET_COMPANY = Gres
 QMAKE_TARGET_PRODUCT = MultiDir
 QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
