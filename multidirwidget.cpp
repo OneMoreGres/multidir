@@ -54,7 +54,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menu_->addAction (quit);
+  menu_->addAction (add);
   menu_->addAction (find);
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
