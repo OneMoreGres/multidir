@@ -6,12 +6,12 @@
         <file alias="folder.png">icons/folder-10.png</file>
         <file alias="add.png">icons/plus.png</file>
         <file alias="find.png">icons/search-1.png</file>
-        <file alias="up.png">icons/upload.png</file>
         <file alias="popup.png">icons/windows-1.png</file>
         <file alias="quit.png">icons/exit-1.png</file>
         <file alias="lockTab.png">icons/locked-6.png</file>
         <file alias="rename.png">icons/edit.png</file>
         <file alias="remove.png">icons/garbage-1.png</file>
         <file alias="overlayed.png">icons/windows-2.png</file>
+        <file alias="up.png">icons/folder-16.png</file>
     </qresource>
 </RCC>
