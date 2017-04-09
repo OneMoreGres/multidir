@@ -39,6 +39,7 @@ private:
   void moveUp ();
   void toggleShowDirs (bool show);
   void showContextMenu ();
+  void showHeaderContextMenu ();
   void openPath (const QModelIndex &index);
   QString path (const QModelIndex &index) const;
   bool isLocked () const;

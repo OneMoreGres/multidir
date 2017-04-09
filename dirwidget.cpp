@@ -57,6 +57,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
 
+  view_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
+  connect (view_->horizontalHeader (), &QWidget::customContextMenuRequested,
+           this, &DirWidget::showHeaderContextMenu);
+
 
   openAction_ = menu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
@@ -225,6 +229,26 @@ void DirWidget::toggleShowDirs (bool show)
 void DirWidget::showContextMenu ()
 {
   menu_->exec (QCursor::pos ());
+}
+
+void DirWidget::showHeaderContextMenu ()
+{
+  QMenu menu;
+  auto header = view_->horizontalHeader ();
+  for (auto i = 0, end = proxy_->columnCount (); i < end; ++i)
+  {
+    auto action = menu.addAction (proxy_->headerData (i, Qt::Horizontal).toString ());
+    action->setCheckable (true);
+    action->setChecked (!header->isSectionHidden (i));
+    action->setData (i);
+  }
+
+  auto choice = menu.exec (QCursor::pos ());
+  if (choice)
+  {
+    header->setSectionHidden (choice->data ().toInt (), !choice->isChecked ());
+  }
+
 }
 
 void DirWidget::resizeEvent (QResizeEvent */*event*/)
