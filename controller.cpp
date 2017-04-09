@@ -79,7 +79,7 @@ void Controller::trayClicked (QSystemTrayIcon::ActivationReason reason)
 
 void Controller::toggleWidget ()
 {
-  if (widget_->isVisible ())
+  if (widget_->isVisible () && widget_->isActiveWindow ())
   {
     widget_->hide ();
   }
