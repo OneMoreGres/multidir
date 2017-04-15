@@ -177,6 +177,12 @@ void DirWidget::setNameFilter (const QString &filter)
   proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
 }
 
+void DirWidget::setIsExtensiveView (bool isExtensive)
+{
+  const auto margins = (isExtensive ? 14 : 4);
+  view_->verticalHeader ()->setDefaultSectionSize (view_->fontMetrics ().height () + margins);
+}
+
 void DirWidget::setIsLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);

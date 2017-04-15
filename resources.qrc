@@ -14,5 +14,6 @@
         <file alias="overlayed.png">icons/windows-2.png</file>
         <file alias="up.png">icons/folder-16.png</file>
         <file alias="settings.png">icons/controls-6.png</file>
+        <file alias="extensive.png">icons/more-2.png</file>
     </qresource>
 </RCC>

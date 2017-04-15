@@ -27,6 +27,8 @@ public:
 
   void setNameFilter (const QString &filter);
 
+  void setIsExtensiveView (bool isExtensive);
+
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);

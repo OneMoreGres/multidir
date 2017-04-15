@@ -41,5 +41,6 @@ private:
   QGridLayout *layout_;
   QMenu *contextMenu_;
   QAction *overlayAction_;
+  QAction *extensiveAction_;
   QLineEdit *findEdit_;
 };
