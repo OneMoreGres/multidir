@@ -5,6 +5,11 @@
 
 #include <QDebug>
 
+namespace
+{
+const auto parentFolderName = QLatin1String ("..");
+}
+
 ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
@@ -59,6 +64,25 @@ bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParen
 }
 
 
+QVariant ProxyModel::data (const QModelIndex &index, int role) const
+{
+  if (role == Qt::BackgroundRole)
+  {
+    const auto info = model_->fileInfo (mapToSource (index));
+    if (info.isDir ())
+    {
+      return QColor (204,255,255);
+    }
+    if (info.isExecutable ())
+    {
+      return QColor (255,204,153);
+    }
+    return {};
+  }
+  return QSortFilterProxyModel::data (index, role);
+}
+
+
 QVariant ProxyModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Vertical && role == Qt::DisplayRole)
@@ -72,7 +96,7 @@ QVariant ProxyModel::headerData (int section, Qt::Orientation orientation, int r
 Qt::ItemFlags ProxyModel::flags (const QModelIndex &index) const
 {
   auto flags = QSortFilterProxyModel::flags (index);
-  if (index.column () != 0 || index.data ().toString () == QLatin1String (".."))
+  if (index.column () != 0 || index.data ().toString () == parentFolderName)
   {
     flags.setFlag (Qt::ItemIsEditable, false);
   }
@@ -84,12 +108,12 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
 {
   // keep .. on top
   const auto l = model_->fileInfo (left);
-  if (l.fileName () == QLatin1String (".."))
+  if (l.fileName () == parentFolderName)
   {
     return sortOrder () == Qt::AscendingOrder;
   }
   const auto r = model_->fileInfo (right);
-  if (r.fileName () == QLatin1String (".."))
+  if (r.fileName () == parentFolderName)
   {
     return sortOrder () != Qt::AscendingOrder;
   }
