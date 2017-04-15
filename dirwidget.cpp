@@ -87,8 +87,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   view_->setModel (proxy_);
   view_->setSortingEnabled (true);
   view_->setSelectionBehavior (QAbstractItemView::SelectRows);
-  view_->setEditTriggers (QAbstractItemView::SelectedClicked);
-  view_->setDragDropMode (QAbstractItemView::DragDrop);
   view_->setDragDropOverwriteMode (false);
   view_->setDefaultDropAction (Qt::MoveAction);
   view_->setContextMenuPolicy (Qt::CustomContextMenu);
@@ -211,6 +209,9 @@ void DirWidget::setIsExtensiveView (bool isExtensive)
 void DirWidget::setIsLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);
+  using View = QAbstractItemView;
+  view_->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
+  view_->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
 }
 
 void DirWidget::openPath (const QModelIndex &index)
