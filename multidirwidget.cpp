@@ -20,6 +20,9 @@ const QString qs_overlay = "overlay";
 const QString qs_geometry = "geometry";
 }
 
+#define STR2(XXX) #XXX
+#define STR(XXX) STR2 (XXX)
+
 MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
@@ -29,6 +32,8 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   overlayAction_ (nullptr),
   findEdit_ (new QLineEdit (this))
 {
+  setWindowTitle (tr ("MultiDir") + " - v." STR (APP_VERSION));
+
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
   model_->setReadOnly (false);
