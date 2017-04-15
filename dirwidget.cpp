@@ -52,6 +52,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (openExternal, &QAction::triggered,
            this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (path ()));});
 
+  auto editPath = menu_->addAction (QIcon (":/rename.png"), tr ("Change path"));
+  connect (editPath, &QAction::triggered,
+           this, [this] {togglePathEdition (true);});
+
   isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
