@@ -39,7 +39,7 @@ private:
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
-  QMenu *menu_;
+  QMenu *contextMenu_;
   QAction *overlayAction_;
   QLineEdit *findEdit_;
 };

@@ -6,6 +6,7 @@
 #include <QBoxLayout>
 #include <QToolBar>
 #include <QMenu>
+#include <QMenuBar>
 #include <QSettings>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -28,7 +29,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   model_ (new FileSystemModel (this)),
   widgets_ (),
   layout_ (new QGridLayout),
-  menu_ (new QMenu (tr ("File"), this)),
+  contextMenu_ (new QMenu (tr ("Context"), this)),
   overlayAction_ (nullptr),
   findEdit_ (new QLineEdit (this))
 {
@@ -62,11 +63,21 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menu_->addAction (add);
-  menu_->addAction (find);
+  contextMenu_->addAction (add);
+  contextMenu_->addAction (find);
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
            this, &MultiDirWidget::showContextMenu);
+
+
+  auto menuBar = new QMenuBar (this);
+  auto fileMenu = menuBar->addMenu (tr ("File"));
+  fileMenu->addAction (add);
+  fileMenu->addAction (find);
+  fileMenu->addSeparator ();
+  fileMenu->addAction (settings);
+  fileMenu->addAction (quit);
+
 
   findEdit_->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Fixed);
   findEdit_->setPlaceholderText (tr ("Name pattern"));
@@ -77,6 +88,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   toolBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
+  layout->addWidget (menuBar);
   layout->addLayout (toolBarLayout);
   layout->addLayout (layout_);
 }
@@ -168,7 +180,7 @@ void MultiDirWidget::addToLayout (DirWidget *widget)
 
 void MultiDirWidget::showContextMenu ()
 {
-  menu_->exec (QCursor::pos ());
+  contextMenu_->exec (QCursor::pos ());
 }
 
 void MultiDirWidget::activateFindMode ()
