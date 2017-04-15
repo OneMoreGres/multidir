@@ -11,7 +11,6 @@
         <file alias="lockTab.png">icons/locked-6.png</file>
         <file alias="rename.png">icons/edit.png</file>
         <file alias="remove.png">icons/garbage-1.png</file>
-        <file alias="overlayed.png">icons/windows-2.png</file>
         <file alias="up.png">icons/folder-16.png</file>
         <file alias="settings.png">icons/controls-6.png</file>
         <file alias="extensive.png">icons/more-2.png</file>
