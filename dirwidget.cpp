@@ -48,6 +48,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (this, &QWidget::customContextMenuRequested,
            this, [this] {menu_->exec (QCursor::pos ());});
 
+  auto openExternal = menu_->addAction (QIcon (":/openExternal.png"), tr ("Open in explorer"));
+  connect (openExternal, &QAction::triggered,
+           this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (path ()));});
+
   isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
