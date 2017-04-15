@@ -93,9 +93,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
-  connect (menu_, &QMenu::aboutToShow,
-           this, &DirWidget::updateMenu);
-
 
   up_->setIcon (QIcon (":/up.png"));
   up_->setToolTip (tr ("Move up"));
@@ -250,6 +247,12 @@ void DirWidget::toggleShowDirs (bool show)
 
 void DirWidget::showContextMenu ()
 {
+  const auto index = view_->currentIndex ();
+  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
+  openAction_->setEnabled (index.isValid ());
+  renameAction_->setEnabled (index.isValid () && !isDotDot);
+  removeAction_->setEnabled (index.isValid () && !isDotDot);
+
   menu_->exec (QCursor::pos ());
 }
 
@@ -311,15 +314,6 @@ QString DirWidget::fittedPath () const
     width = metrics.boundingRect (path).width ();
   }
   return path;
-}
-
-void DirWidget::updateMenu ()
-{
-  const auto index = view_->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
-  openAction_->setEnabled (index.isValid ());
-  renameAction_->setEnabled (index.isValid () && !isDotDot);
-  removeAction_->setEnabled (index.isValid () && !isDotDot);
 }
 
 void DirWidget::startRenaming ()

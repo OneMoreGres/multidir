@@ -49,7 +49,6 @@ private:
   QString path (const QModelIndex &index) const;
   bool isLocked () const;
   QString fittedPath () const;
-  void updateMenu ();
   void startRenaming ();
   void promptClose ();
   void promptRemove ();
