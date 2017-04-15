@@ -31,7 +31,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   view_ (new QTableView (this)),
-  menu_ (new QMenu (this)),
+  viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
   removeAction_ (nullptr),
@@ -44,8 +44,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (this, &QWidget::customContextMenuRequested,
-           this, &DirWidget::showContextMenu);
 
   proxy_->setDynamicSortFilter (true);
 
@@ -56,40 +54,44 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   view_->setDragDropMode (QAbstractItemView::DragDrop);
   view_->setDragDropOverwriteMode (false);
   view_->setDefaultDropAction (Qt::MoveAction);
+  view_->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (view_, &QTableView::doubleClicked,
            this, &DirWidget::openPath);
+  connect (view_, &QWidget::customContextMenuRequested,
+           this, &DirWidget::showViewContextMenu);
+
 
   view_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (view_->horizontalHeader (), &QWidget::customContextMenuRequested,
            this, &DirWidget::showHeaderContextMenu);
 
 
-  openAction_ = menu_->addAction (tr ("Open"));
+  openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
 
-  renameAction_ = menu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
+  renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
            this, &DirWidget::startRenaming);
 
-  removeAction_ = menu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
+  removeAction_ = viewMenu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
   connect (removeAction_, &QAction::triggered,
            this, &DirWidget::promptRemove);
 
-  menu_->addSeparator ();
+  viewMenu_->addSeparator ();
 
-  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
+  isLocked_ = viewMenu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
-  auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
+  auto clone = viewMenu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
 
-  menu_->addSeparator ();
+  viewMenu_->addSeparator ();
 
-  auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
+  auto close = viewMenu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
@@ -245,7 +247,7 @@ void DirWidget::toggleShowDirs (bool show)
   proxy_->setShowDirs (show);
 }
 
-void DirWidget::showContextMenu ()
+void DirWidget::showViewContextMenu ()
 {
   const auto index = view_->currentIndex ();
   const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
@@ -253,7 +255,7 @@ void DirWidget::showContextMenu ()
   renameAction_->setEnabled (index.isValid () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isDotDot);
 
-  menu_->exec (QCursor::pos ());
+  viewMenu_->exec (QCursor::pos ());
 }
 
 void DirWidget::showHeaderContextMenu ()

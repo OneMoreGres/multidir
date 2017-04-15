@@ -43,7 +43,7 @@ private:
   void setIsLocked (bool isLocked);
   void moveUp ();
   void toggleShowDirs (bool show);
-  void showContextMenu ();
+  void showViewContextMenu ();
   void showHeaderContextMenu ();
   void openPath (const QModelIndex &index);
   QString path (const QModelIndex &index) const;
@@ -57,7 +57,7 @@ private:
   FileSystemModel *model_;
   ProxyModel *proxy_;
   QTableView *view_;
-  QMenu *menu_;
+  QMenu *viewMenu_;
   QAction *openAction_;
   QAction *renameAction_;
   QAction *removeAction_;
