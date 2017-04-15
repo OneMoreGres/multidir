@@ -41,7 +41,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathEdit_ (new QLineEdit (this)),
   isLocked_ (nullptr),
   up_ (new QToolButton (this)),
-  showDirs_ (new QToolButton (this)),
+  showDirs_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
@@ -56,18 +56,28 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
 
-  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
+  menu_->addSeparator ();
+
+  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setIsLocked);
 
-  auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
+  showDirs_ = menu_->addAction (QIcon (":/folder.png"), tr ("Show directories"));
+  showDirs_->setCheckable (true);
+  showDirs_->setChecked (proxy_->showDirs ());
+  connect (showDirs_, &QAction::toggled,
+           this, &DirWidget::toggleShowDirs);
+
+  menu_->addSeparator ();
+
+  auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone"));
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
 
   menu_->addSeparator ();
 
-  auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
+  auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close..."));
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
@@ -105,24 +115,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (removeAction_, &QAction::triggered,
            this, &DirWidget::promptRemove);
 
-  viewMenu_->addSeparator ();
-  viewMenu_->addAction (isLocked_);
-  viewMenu_->addAction (clone);
-  viewMenu_->addSeparator ();
-  viewMenu_->addAction (close);
-
 
   up_->setIcon (QIcon (":/up.png"));
   up_->setToolTip (tr ("Move up"));
   connect (up_, &QToolButton::pressed,
            this, &DirWidget::moveUp);
-
-  showDirs_->setIcon (QIcon (":/folder.png"));
-  showDirs_->setToolTip (tr ("Show directories"));
-  showDirs_->setCheckable (true);
-  showDirs_->setChecked (proxy_->showDirs ());
-  connect (showDirs_, &QToolButton::toggled,
-           this, &DirWidget::toggleShowDirs);
 
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
@@ -145,7 +142,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_->addWidget (pathEdit_);
   controlsLayout_->addStretch (1);
   controlsLayout_->addWidget (up_);
-  controlsLayout_->addWidget (showDirs_);
 
   controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 

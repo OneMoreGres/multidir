@@ -67,6 +67,6 @@ private:
   QLineEdit *pathEdit_;
   QAction *isLocked_;
   QToolButton *up_;
-  QToolButton *showDirs_;
+  QAction *showDirs_;
   QBoxLayout *controlsLayout_;
 };
