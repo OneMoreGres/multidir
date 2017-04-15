@@ -11,6 +11,7 @@ class QMenu;
 class QToolButton;
 class QSettings;
 class QBoxLayout;
+class QLineEdit;
 
 class DirWidget : public QWidget
 {
@@ -28,6 +29,8 @@ public:
   void setNameFilter (const QString &filter);
 
   void setIsExtensiveView (bool isExtensive);
+
+  bool eventFilter (QObject *watched, QEvent *event) override;
 
 signals:
   void closeRequested (DirWidget *widget);
@@ -50,6 +53,7 @@ private:
   void startRenaming ();
   void promptClose ();
   void promptRemove ();
+  void togglePathEdition (bool isOn);
 
   FileSystemModel *model_;
   ProxyModel *proxy_;
@@ -60,6 +64,7 @@ private:
   QAction *removeAction_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
+  QLineEdit *pathEdit_;
   QAction *isLocked_;
   QToolButton *up_;
   QToolButton *showDirs_;

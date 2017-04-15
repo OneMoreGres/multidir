@@ -14,6 +14,7 @@
 #include <QResizeEvent>
 #include <QFontMetrics>
 #include <QMessageBox>
+#include <QLineEdit>
 
 #include <QDebug>
 
@@ -36,6 +37,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   removeAction_ (nullptr),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
+  pathEdit_ (new QLineEdit (this)),
   isLocked_ (nullptr),
   up_ (new QToolButton (this)),
   showDirs_ (new QToolButton (this)),
@@ -109,16 +111,28 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
+  pathLabel_->installEventFilter (this);
+
   auto dirFont = dirLabel_->font ();
   dirFont.setBold (true);
   dirLabel_->setFont (dirFont);
+  dirLabel_->installEventFilter (this);
+
+  pathEdit_->installEventFilter (this);
+  connect (pathEdit_, &QLineEdit::editingFinished,
+           this, [this] {togglePathEdition (false);});
+
+  togglePathEdition (false);
 
   controlsLayout_->addStretch (1);
   controlsLayout_->addWidget (pathLabel_);
   controlsLayout_->addWidget (dirLabel_);
+  controlsLayout_->addWidget (pathEdit_);
   controlsLayout_->addStretch (1);
   controlsLayout_->addWidget (up_);
   controlsLayout_->addWidget (showDirs_);
+
+  controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (controlsLayout_);
@@ -346,6 +360,51 @@ void DirWidget::promptRemove ()
     for (const auto &i: indexes)
     {
       model_->remove (proxy_->mapToSource (i));
+    }
+  }
+}
+
+bool DirWidget::eventFilter (QObject *watched, QEvent *event)
+{
+  if (event->type () == QEvent::MouseButtonDblClick &&
+      (watched == pathLabel_ || watched == dirLabel_))
+  {
+    togglePathEdition (true);
+    return true;
+  }
+  if (event->type () == QEvent::KeyPress && watched == pathEdit_)
+  {
+    if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
+    {
+      if (pathEdit_->isModified ())
+      {
+        togglePathEdition (true); // reset changes
+      }
+      pathEdit_->hide (); // trigger editionFinished
+      return true;
+    }
+  }
+  return false;
+}
+
+void DirWidget::togglePathEdition (bool isOn)
+{
+  pathLabel_->setVisible (!isOn);
+  dirLabel_->setVisible (!isOn);
+  pathEdit_->setVisible (isOn);
+
+  const auto path = pathLabel_->text () + dirLabel_->text ();
+  if (isOn)
+  {
+    pathEdit_->setText (path);
+    pathEdit_->setFocus ();
+  }
+  else
+  {
+    const auto newPath = pathEdit_->text ();
+    if (newPath != path && QFile::exists (newPath))
+    {
+      setPath (newPath);
     }
   }
 }
