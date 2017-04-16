@@ -5,7 +5,9 @@
 class ProxyModel;
 class FileSystemModel;
 
+class QAbstractItemView;
 class QTableView;
+class QListView;
 class QLabel;
 class QMenu;
 class QToolButton;
@@ -40,13 +42,17 @@ protected:
   void resizeEvent (QResizeEvent *event) override;
 
 private:
+  enum class ViewMode : int
+  {
+    List, Table
+  };
+
   void setIsLocked (bool isLocked);
   void moveUp ();
   void toggleShowDirs (bool show);
   void showViewContextMenu ();
   void showHeaderContextMenu ();
   void openPath (const QModelIndex &index);
-  QString path (const QModelIndex &index) const;
   bool isLocked () const;
   QString fittedPath () const;
   void startRenaming ();
@@ -54,10 +60,15 @@ private:
   void promptRemove ();
   void togglePathEdition (bool isOn);
 
+  ViewMode viewMode () const;
+  void setViewMode (ViewMode mode);
+  QAbstractItemView * view () const;
+
   QMenu *menu_;
   FileSystemModel *model_;
   ProxyModel *proxy_;
-  QTableView *view_;
+  QTableView *tableView_;
+  QListView *listView_;
   QMenu *viewMenu_;
   QAction *openAction_;
   QAction *renameAction_;
@@ -68,5 +79,6 @@ private:
   QAction *isLocked_;
   QToolButton *up_;
   QAction *showDirs_;
+  QAction *listMode_;
   QBoxLayout *controlsLayout_;
 };

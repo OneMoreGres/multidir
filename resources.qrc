@@ -15,5 +15,6 @@
         <file alias="settings.png">icons/controls-6.png</file>
         <file alias="extensive.png">icons/more-2.png</file>
         <file alias="openExternal.png">icons/folder-2.png</file>
+        <file alias="listMode.png">icons/list-1.png</file>
     </qresource>
 </RCC>

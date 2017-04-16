@@ -15,11 +15,13 @@
 #include <QFontMetrics>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QListView>
 
 #include <QDebug>
 
 namespace
 {
+const QString qs_mode = "mode";
 const QString qs_dir = "dir";
 const QString qs_isLocked = "locked";
 const QString qs_view = "view";
@@ -31,7 +33,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   menu_ (new QMenu (this)),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
-  view_ (new QTableView (this)),
+  tableView_ (nullptr),
+  listView_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
@@ -42,6 +45,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   isLocked_ (nullptr),
   up_ (new QToolButton (this)),
   showDirs_ (nullptr),
+  listMode_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
@@ -69,6 +73,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showDirs_, &QAction::toggled,
            this, &DirWidget::toggleShowDirs);
 
+
+  listMode_ = menu_->addAction (QIcon (":/listMode.png"), tr ("List mode"));
+  listMode_->setCheckable (true);
+  listMode_->setChecked (false);
+  connect (listMode_, &QAction::toggled,
+           this, [this](bool on) {setViewMode (on ? ViewMode::List : ViewMode::Table);});
+
   menu_->addSeparator ();
 
   auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone"));
@@ -84,26 +95,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   proxy_->setDynamicSortFilter (true);
 
-  view_->setModel (proxy_);
-  view_->setSortingEnabled (true);
-  view_->setSelectionBehavior (QAbstractItemView::SelectRows);
-  view_->setDragDropOverwriteMode (false);
-  view_->setDefaultDropAction (Qt::MoveAction);
-  view_->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (view_, &QTableView::doubleClicked,
-           this, &DirWidget::openPath);
-  connect (view_, &QWidget::customContextMenuRequested,
-           this, &DirWidget::showViewContextMenu);
-
-
-  view_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (view_->horizontalHeader (), &QWidget::customContextMenuRequested,
-           this, &DirWidget::showHeaderContextMenu);
-
-
   openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
-           this, [this]() {openPath (view_->currentIndex ());});
+           this, [this]() {openPath (view ()->currentIndex ());});
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
@@ -145,8 +139,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (controlsLayout_);
-  layout->addWidget (view_);
 
+  setViewMode (ViewMode::Table);
   setIsLocked (false);
 }
 
@@ -157,19 +151,24 @@ DirWidget::~DirWidget ()
 
 void DirWidget::save (QSettings &settings) const
 {
-  settings.setValue (qs_dir, path (view_->rootIndex ()));
+  settings.setValue (qs_mode, int(viewMode ()));
+  settings.setValue (qs_dir, path ());
   settings.setValue (qs_isLocked, isLocked ());
-  settings.setValue (qs_view, view_->horizontalHeader ()->saveState ());
+  if (tableView_)
+  {
+    settings.setValue (qs_view, tableView_->horizontalHeader ()->saveState ());
+  }
   settings.setValue (qs_showDirs, proxy_->showDirs ());
 }
 
 void DirWidget::restore (QSettings &settings)
 {
+  setViewMode (ViewMode (settings.value (qs_mode, int (ViewMode::Table)).toInt ()));
   setPath (settings.value (qs_dir).toString ());
   isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
-  if (settings.contains (qs_view))
+  if (tableView_ && settings.contains (qs_view))
   {
-    view_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
+    tableView_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
   }
   showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
 }
@@ -182,7 +181,7 @@ void DirWidget::setPath (const QString &path)
   {
     return;
   }
-  view_->setRootIndex (index);
+  view ()->setRootIndex (index);
   proxy_->setCurrent (index);
 
   pathLabel_->setText (fittedPath ());
@@ -192,7 +191,7 @@ void DirWidget::setPath (const QString &path)
 
 QString DirWidget::path () const
 {
-  return path (view_->rootIndex ());
+  return model_->filePath (proxy_->mapToSource (view ()->rootIndex ()));
 }
 
 void DirWidget::setNameFilter (const QString &filter)
@@ -202,16 +201,19 @@ void DirWidget::setNameFilter (const QString &filter)
 
 void DirWidget::setIsExtensiveView (bool isExtensive)
 {
-  const auto margins = (isExtensive ? 14 : 4);
-  view_->verticalHeader ()->setDefaultSectionSize (view_->fontMetrics ().height () + margins);
+  if (tableView_)
+  {
+    const auto margins = (isExtensive ? 14 : 4);
+    tableView_->verticalHeader ()->setDefaultSectionSize (tableView_->fontMetrics ().height () + margins);
+  }
 }
 
 void DirWidget::setIsLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);
   using View = QAbstractItemView;
-  view_->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
-  view_->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
+  view ()->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
+  view ()->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
 }
 
 void DirWidget::openPath (const QModelIndex &index)
@@ -236,11 +238,6 @@ void DirWidget::openPath (const QModelIndex &index)
   }
 }
 
-QString DirWidget::path (const QModelIndex &index) const
-{
-  return model_->filePath (proxy_->mapToSource (index));
-}
-
 bool DirWidget::isLocked () const
 {
   return isLocked_->isChecked ();
@@ -248,7 +245,7 @@ bool DirWidget::isLocked () const
 
 void DirWidget::moveUp ()
 {
-  QDir dir (path (view_->rootIndex ()));
+  QDir dir (path ());
   if (dir.cdUp ())
   {
     setPath (dir.absolutePath ());
@@ -262,11 +259,11 @@ void DirWidget::toggleShowDirs (bool show)
 
 void DirWidget::showViewContextMenu ()
 {
-  const auto index = view_->currentIndex ();
+  const auto index = view ()->currentIndex ();
   const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
   openAction_->setEnabled (index.isValid ());
-  renameAction_->setEnabled (index.isValid () && !isDotDot);
-  removeAction_->setEnabled (index.isValid () && !isDotDot);
+  renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
+  removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
 
   viewMenu_->exec (QCursor::pos ());
 }
@@ -274,7 +271,7 @@ void DirWidget::showViewContextMenu ()
 void DirWidget::showHeaderContextMenu ()
 {
   QMenu menu;
-  auto header = view_->horizontalHeader ();
+  auto header = tableView_->horizontalHeader ();
   for (auto i = 0, end = proxy_->columnCount (); i < end; ++i)
   {
     auto action = menu.addAction (proxy_->headerData (i, Qt::Horizontal).toString ());
@@ -333,10 +330,10 @@ QString DirWidget::fittedPath () const
 
 void DirWidget::startRenaming ()
 {
-  const auto index = view_->currentIndex ();
+  const auto index = view ()->currentIndex ();
   const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
-  view_->setCurrentIndex (nameIndex);
-  view_->edit (nameIndex);
+  view ()->setCurrentIndex (nameIndex);
+  view ()->edit (nameIndex);
 }
 
 void DirWidget::promptClose ()
@@ -351,7 +348,7 @@ void DirWidget::promptClose ()
 
 void DirWidget::promptRemove ()
 {
-  const auto indexes = view_->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  const auto indexes = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
   if (indexes.isEmpty ())
   {
     return;
@@ -416,4 +413,85 @@ void DirWidget::togglePathEdition (bool isOn)
       setPath (newPath);
     }
   }
+}
+
+DirWidget::ViewMode DirWidget::viewMode () const
+{
+  return (tableView_ ? ViewMode::Table : ViewMode::List);
+}
+
+void DirWidget::setViewMode (ViewMode mode)
+{
+  auto path = view () ? this->path () : QDir::homePath ();
+  switch (mode)
+  {
+    case ViewMode::List:
+      if (tableView_)
+      {
+        tableView_->deleteLater ();
+        tableView_ = nullptr;
+      }
+      if (!listView_)
+      {
+        listView_ = new QListView (this);
+
+        listView_->setModel (proxy_);
+        listView_->setFlow (QListView::LeftToRight);
+        listView_->setWrapping (true);
+        listView_->setViewMode (QListView::IconMode);
+        listView_->setIconSize ({32,32});
+        listView_->setResizeMode (QListView::Adjust);
+        listView_->setGridSize ({80,80});
+        listView_->setMovement (QListView::Snap);
+
+        listView_->setDragDropOverwriteMode (false);
+        listView_->setDefaultDropAction (Qt::MoveAction);
+        listView_->setContextMenuPolicy (Qt::CustomContextMenu);
+        connect (listView_, &QWidget::customContextMenuRequested,
+                 this, &DirWidget::showViewContextMenu);
+
+        layout ()->addWidget (listView_);
+      }
+      break;
+
+    default:
+      if (listView_)
+      {
+        listView_->deleteLater ();
+        listView_ = nullptr;
+      }
+      if (!tableView_)
+      {
+        tableView_ = new QTableView (this);
+
+        tableView_->setModel (proxy_);
+        tableView_->setSortingEnabled (true);
+        tableView_->setSelectionBehavior (QAbstractItemView::SelectRows);
+        tableView_->setDragDropOverwriteMode (false);
+        tableView_->setDefaultDropAction (Qt::MoveAction);
+        tableView_->setContextMenuPolicy (Qt::CustomContextMenu);
+        connect (tableView_, &QTableView::doubleClicked,
+                 this, &DirWidget::openPath);
+        connect (tableView_, &QWidget::customContextMenuRequested,
+                 this, &DirWidget::showViewContextMenu);
+
+
+        tableView_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
+        connect (tableView_->horizontalHeader (), &QWidget::customContextMenuRequested,
+                 this, &DirWidget::showHeaderContextMenu);
+
+        layout ()->addWidget (tableView_);
+      }
+      break;
+  }
+
+  setIsLocked (isLocked ());
+  setPath (path);
+}
+
+QAbstractItemView * DirWidget::view () const
+{
+  return (tableView_
+          ? static_cast<QAbstractItemView *>(tableView_)
+          : static_cast<QAbstractItemView *>(listView_) );
 }
