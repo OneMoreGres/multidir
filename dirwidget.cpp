@@ -21,6 +21,7 @@
 
 namespace
 {
+const QString qs_extensive = "extensive";
 const QString qs_mode = "mode";
 const QString qs_dir = "dir";
 const QString qs_isLocked = "locked";
@@ -46,6 +47,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   up_ (new QToolButton (this)),
   showDirs_ (nullptr),
   listMode_ (nullptr),
+  extensiveAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
@@ -73,6 +75,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showDirs_, &QAction::toggled,
            this, &DirWidget::toggleShowDirs);
 
+  extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
+  extensiveAction_->setCheckable (true);
+  extensiveAction_->setChecked (true);
+  connect (extensiveAction_, &QAction::toggled,
+           this, &DirWidget::setExtensive);
 
   listMode_ = menu_->addAction (QIcon (":/listMode.png"), tr ("List mode"));
   listMode_->setCheckable (true);
@@ -154,6 +161,7 @@ void DirWidget::save (QSettings &settings) const
   settings.setValue (qs_mode, int(viewMode ()));
   settings.setValue (qs_dir, path ());
   settings.setValue (qs_isLocked, isLocked ());
+  settings.setValue (qs_extensive, extensiveAction_->isChecked ());
   if (tableView_)
   {
     settings.setValue (qs_view, tableView_->horizontalHeader ()->saveState ());
@@ -163,9 +171,11 @@ void DirWidget::save (QSettings &settings) const
 
 void DirWidget::restore (QSettings &settings)
 {
-  setViewMode (ViewMode (settings.value (qs_mode, int (ViewMode::Table)).toInt ()));
+  auto mode = ViewMode (settings.value (qs_mode, int (ViewMode::Table)).toInt ());
+  listMode_->setChecked (mode == ViewMode::List);
   setPath (settings.value (qs_dir).toString ());
   isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
+  extensiveAction_->setChecked (settings.value (qs_extensive, false).toBool ());
   if (tableView_ && settings.contains (qs_view))
   {
     tableView_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
@@ -197,15 +207,6 @@ QString DirWidget::path () const
 void DirWidget::setNameFilter (const QString &filter)
 {
   proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
-}
-
-void DirWidget::setIsExtensiveView (bool isExtensive)
-{
-  if (tableView_)
-  {
-    const auto margins = (isExtensive ? 14 : 4);
-    tableView_->verticalHeader ()->setDefaultSectionSize (tableView_->fontMetrics ().height () + margins);
-  }
 }
 
 void DirWidget::setIsLocked (bool isLocked)
@@ -415,6 +416,29 @@ void DirWidget::togglePathEdition (bool isOn)
   }
 }
 
+bool DirWidget::isExtensive () const
+{
+  return extensiveAction_->isChecked ();
+}
+
+void DirWidget::setExtensive (bool isExtensive)
+{
+  const auto fontHeight = view ()->fontMetrics ().height ();
+  if (tableView_)
+  {
+    const auto margins = (isExtensive ? 14 : 4);
+    tableView_->verticalHeader ()->setDefaultSectionSize (fontHeight + margins);
+  }
+  else
+  {
+    const auto iconSize = (isExtensive ? 64 : 16);
+    const auto margins = 4;
+    const auto width = 120;
+    listView_->setIconSize ({iconSize, iconSize});
+    listView_->setGridSize ({width + margins, iconSize + fontHeight + margins});
+  }
+}
+
 DirWidget::ViewMode DirWidget::viewMode () const
 {
   return (tableView_ ? ViewMode::Table : ViewMode::List);
@@ -436,13 +460,11 @@ void DirWidget::setViewMode (ViewMode mode)
         listView_ = new QListView (this);
 
         listView_->setModel (proxy_);
-        listView_->setFlow (QListView::LeftToRight);
         listView_->setWrapping (true);
-        listView_->setViewMode (QListView::IconMode);
-        listView_->setIconSize ({32,32});
         listView_->setResizeMode (QListView::Adjust);
-        listView_->setGridSize ({80,80});
+        listView_->setViewMode (QListView::IconMode);
         listView_->setMovement (QListView::Snap);
+        listView_->setUniformItemSizes (true);
 
         listView_->setDragDropOverwriteMode (false);
         listView_->setDefaultDropAction (Qt::MoveAction);
@@ -486,6 +508,7 @@ void DirWidget::setViewMode (ViewMode mode)
   }
 
   setIsLocked (isLocked ());
+  setExtensive (isExtensive ());
   setPath (path);
 }
 

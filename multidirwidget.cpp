@@ -17,7 +17,6 @@
 namespace
 {
 const QString qs_dirs = "dirs";
-const QString qs_extensive = "extensive";
 const QString qs_geometry = "geometry";
 }
 
@@ -30,7 +29,6 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   widgets_ (),
   layout_ (new QGridLayout),
   contextMenu_ (new QMenu (tr ("Context"), this)),
-  extensiveAction_ (nullptr),
   findEdit_ (new QLineEdit (this))
 {
   setWindowTitle (tr ("MultiDir") + " - v." STR (APP_VERSION));
@@ -53,10 +51,6 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 
   auto settings = toolbar->addAction (QIcon (":/settings.png"), tr ("Settings"));
   connect (settings, &QAction::triggered, this, &MultiDirWidget::settingsRequested);
-
-  extensiveAction_ = toolbar->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
-  extensiveAction_->setCheckable (true);
-  extensiveAction_->setChecked (true);
 
   auto quit = toolbar->addAction (QIcon (":/quit.png"), tr ("Quit"));
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
@@ -100,7 +94,6 @@ MultiDirWidget::~MultiDirWidget ()
 void MultiDirWidget::save (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
-  settings.setValue (qs_extensive, extensiveAction_->isChecked ());
 
   settings.beginWriteArray (qs_dirs, widgets_.size ());
   for (auto i = 0, end = widgets_.size (); i < end; ++i)
@@ -132,9 +125,6 @@ void MultiDirWidget::restore (QSettings &settings)
     auto widget = addWidget ();
     widget->setPath (QDir::homePath ());
   }
-
-  extensiveAction_->setChecked (settings.value (qs_extensive, false).toBool ());
-
 }
 
 DirWidget * MultiDirWidget::addWidget ()
@@ -147,8 +137,6 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::clone);
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
-  connect (extensiveAction_, &QAction::toggled,
-           w, &DirWidget::setIsExtensiveView);
   w->setPath (QDir::homePath ());
   addToLayout (w);
   return w;

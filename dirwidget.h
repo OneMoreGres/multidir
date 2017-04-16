@@ -30,8 +30,6 @@ public:
 
   void setNameFilter (const QString &filter);
 
-  void setIsExtensiveView (bool isExtensive);
-
   bool eventFilter (QObject *watched, QEvent *event) override;
 
 signals:
@@ -60,6 +58,9 @@ private:
   void promptRemove ();
   void togglePathEdition (bool isOn);
 
+  bool isExtensive () const;
+  void setExtensive (bool isExtensive);
+
   ViewMode viewMode () const;
   void setViewMode (ViewMode mode);
   QAbstractItemView * view () const;
@@ -80,5 +81,6 @@ private:
   QToolButton *up_;
   QAction *showDirs_;
   QAction *listMode_;
+  QAction *extensiveAction_;
   QBoxLayout *controlsLayout_;
 };

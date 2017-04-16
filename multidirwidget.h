@@ -38,6 +38,5 @@ private:
   QList<DirWidget *> widgets_;
   QGridLayout *layout_;
   QMenu *contextMenu_;
-  QAction *extensiveAction_;
   QLineEdit *findEdit_;
 };
