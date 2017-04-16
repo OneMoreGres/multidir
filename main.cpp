@@ -14,7 +14,7 @@ int main (int argc, char *argv[])
   a.setQuitOnLastWindowClosed (false);
 
   QTranslator baseTranslator;
-  if (baseTranslator.load (QLocale (), QLatin1String ("qtbase"), QLatin1String ("_")))
+  if (baseTranslator.load (QLocale (), QLatin1String ("qt"), QLatin1String ("_")))
   {
     a.installTranslator (&baseTranslator);
   }
