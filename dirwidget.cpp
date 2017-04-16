@@ -479,6 +479,8 @@ void DirWidget::setViewMode (ViewMode mode)
         listView_->setDragDropOverwriteMode (false);
         listView_->setDefaultDropAction (Qt::MoveAction);
         listView_->setContextMenuPolicy (Qt::CustomContextMenu);
+        connect (listView_, &QListView::doubleClicked,
+                 this, &DirWidget::openPath);
         connect (listView_, &QWidget::customContextMenuRequested,
                  this, &DirWidget::showViewContextMenu);
 
