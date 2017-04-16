@@ -28,6 +28,7 @@ const QString qs_showDirs = "showDirs";
 
 DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
+  menu_ (new QMenu (this)),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   view_ (new QTableView (this)),
@@ -44,6 +45,24 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_ (new QHBoxLayout)
 {
   setContextMenuPolicy (Qt::CustomContextMenu);
+  connect (this, &QWidget::customContextMenuRequested,
+           this, [this] {menu_->exec (QCursor::pos ());});
+
+  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
+  isLocked_->setCheckable (true);
+  connect (isLocked_, &QAction::toggled,
+           this, &DirWidget::setIsLocked);
+
+  auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
+  connect (clone, &QAction::triggered,
+           this, [this]() {emit cloneRequested (this);});
+
+  menu_->addSeparator ();
+
+  auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
+  connect (close, &QAction::triggered,
+           this, &DirWidget::promptClose);
+
 
   proxy_->setDynamicSortFilter (true);
 
@@ -79,21 +98,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::promptRemove);
 
   viewMenu_->addSeparator ();
-
-  isLocked_ = viewMenu_->addAction (QIcon (":/lockTab.png"), tr ("Lock tab"));
-  isLocked_->setCheckable (true);
-  connect (isLocked_, &QAction::toggled,
-           this, &DirWidget::setIsLocked);
-
-  auto clone = viewMenu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone tab"));
-  connect (clone, &QAction::triggered,
-           this, [this]() {emit cloneRequested (this);});
-
+  viewMenu_->addAction (isLocked_);
+  viewMenu_->addAction (clone);
   viewMenu_->addSeparator ();
-
-  auto close = viewMenu_->addAction (QIcon (":/closeTab.png"), tr ("Close tab..."));
-  connect (close, &QAction::triggered,
-           this, &DirWidget::promptClose);
+  viewMenu_->addAction (close);
 
 
   up_->setIcon (QIcon (":/up.png"));

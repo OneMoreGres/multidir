@@ -54,6 +54,7 @@ private:
   void promptRemove ();
   void togglePathEdition (bool isOn);
 
+  QMenu *menu_;
   FileSystemModel *model_;
   ProxyModel *proxy_;
   QTableView *view_;
