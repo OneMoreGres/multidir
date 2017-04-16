@@ -31,25 +31,29 @@ const QString qs_showDirs = "showDirs";
 
 DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
-  menu_ (new QMenu (this)),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   tableView_ (nullptr),
   listView_ (nullptr),
+  pathLabel_ (new QLabel (this)),
+  dirLabel_ (new QLabel (this)),
+  pathEdit_ (new QLineEdit (this)),
+  menu_ (new QMenu (this)),
+  isLocked_ (nullptr),
+  showDirs_ (nullptr),
+  extensiveAction_ (nullptr),
+  listMode_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
   removeAction_ (nullptr),
-  pathLabel_ (new QLabel (this)),
-  dirLabel_ (new QLabel (this)),
-  pathEdit_ (new QLineEdit (this)),
-  isLocked_ (nullptr),
   up_ (new QToolButton (this)),
-  showDirs_ (nullptr),
-  listMode_ (nullptr),
-  extensiveAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
+  proxy_->setDynamicSortFilter (true);
+
+
+  // menu
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
            this, [this] {menu_->exec (QCursor::pos ());});
@@ -73,7 +77,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QAction::toggled,
-           this, &DirWidget::toggleShowDirs);
+           this, &DirWidget::setShowDirs);
 
   extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
   extensiveAction_->setCheckable (true);
@@ -99,9 +103,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
-
-  proxy_->setDynamicSortFilter (true);
-
+  // view menu
   openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view ()->currentIndex ());});
@@ -115,6 +117,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::promptRemove);
 
 
+  // controls
   up_->setIcon (QIcon (":/up.png"));
   up_->setToolTip (tr ("Move up"));
   connect (up_, &QToolButton::pressed,
@@ -144,6 +147,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 
+
+  // defaults
   auto layout = new QVBoxLayout (this);
   layout->addLayout (controlsLayout_);
 
@@ -183,6 +188,11 @@ void DirWidget::restore (QSettings &settings)
   showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
 }
 
+QString DirWidget::path () const
+{
+  return model_->filePath (proxy_->mapToSource (view ()->rootIndex ()));
+}
+
 void DirWidget::setPath (const QString &path)
 {
   auto absolutePath = QDir (path).absolutePath ();
@@ -199,22 +209,9 @@ void DirWidget::setPath (const QString &path)
   dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
 }
 
-QString DirWidget::path () const
-{
-  return model_->filePath (proxy_->mapToSource (view ()->rootIndex ()));
-}
-
 void DirWidget::setNameFilter (const QString &filter)
 {
   proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
-}
-
-void DirWidget::setLocked (bool isLocked)
-{
-  up_->setEnabled (!isLocked);
-  using View = QAbstractItemView;
-  view ()->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
-  view ()->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
 }
 
 void DirWidget::openPath (const QModelIndex &index)
@@ -236,65 +233,6 @@ void DirWidget::openPath (const QModelIndex &index)
     {
       setPath (path);
     }
-  }
-}
-
-bool DirWidget::isLocked () const
-{
-  return isLocked_->isChecked ();
-}
-
-void DirWidget::moveUp ()
-{
-  QDir dir (path ());
-  if (dir.cdUp ())
-  {
-    setPath (dir.absolutePath ());
-  }
-}
-
-void DirWidget::toggleShowDirs (bool show)
-{
-  proxy_->setShowDirs (show);
-}
-
-void DirWidget::showViewContextMenu ()
-{
-  const auto index = view ()->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
-  openAction_->setEnabled (index.isValid ());
-  renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
-  removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
-
-  viewMenu_->exec (QCursor::pos ());
-}
-
-void DirWidget::showHeaderContextMenu ()
-{
-  QMenu menu;
-  auto header = tableView_->horizontalHeader ();
-  for (auto i = 0, end = proxy_->columnCount (); i < end; ++i)
-  {
-    auto action = menu.addAction (proxy_->headerData (i, Qt::Horizontal).toString ());
-    action->setCheckable (true);
-    action->setChecked (!header->isSectionHidden (i));
-    action->setData (i);
-  }
-
-  auto choice = menu.exec (QCursor::pos ());
-  if (choice)
-  {
-    header->setSectionHidden (choice->data ().toInt (), !choice->isChecked ());
-  }
-
-}
-
-void DirWidget::resizeEvent (QResizeEvent */*event*/)
-{
-  const auto newText = fittedPath ();
-  if (newText != pathLabel_->text ())
-  {
-    pathLabel_->setText (newText);
   }
 }
 
@@ -329,45 +267,21 @@ QString DirWidget::fittedPath () const
   return path;
 }
 
-void DirWidget::startRenaming ()
+void DirWidget::moveUp ()
 {
-  const auto index = view ()->currentIndex ();
-  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
-  view ()->setCurrentIndex (nameIndex);
-  view ()->edit (nameIndex);
-}
-
-void DirWidget::promptClose ()
-{
-  auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?").arg (path ()),
-                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-  if (res == QMessageBox::Yes)
+  QDir dir (path ());
+  if (dir.cdUp ())
   {
-    emit closeRequested (this);
+    setPath (dir.absolutePath ());
   }
 }
 
-void DirWidget::promptRemove ()
+void DirWidget::resizeEvent (QResizeEvent */*event*/)
 {
-  const auto indexes = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
-  if (indexes.isEmpty ())
+  const auto newText = fittedPath ();
+  if (newText != pathLabel_->text ())
   {
-    return;
-  }
-  QStringList names;
-  for (const auto &i: indexes)
-  {
-    names << i.data ().toString ();
-  }
-  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names.join (QLatin1String ("\", \""))),
-                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-  if (res == QMessageBox::Yes)
-  {
-    for (const auto &i: indexes)
-    {
-      model_->remove (proxy_->mapToSource (i));
-    }
+    pathLabel_->setText (newText);
   }
 }
 
@@ -414,6 +328,102 @@ void DirWidget::togglePathEdition (bool isOn)
       setPath (newPath);
     }
   }
+}
+
+void DirWidget::startRenaming ()
+{
+  const auto index = view ()->currentIndex ();
+  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
+  view ()->setCurrentIndex (nameIndex);
+  view ()->edit (nameIndex);
+}
+
+void DirWidget::promptClose ()
+{
+  auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?").arg (path ()),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::Yes)
+  {
+    emit closeRequested (this);
+  }
+}
+
+void DirWidget::promptRemove ()
+{
+  const auto indexes = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  if (indexes.isEmpty ())
+  {
+    return;
+  }
+  QStringList names;
+  for (const auto &i: indexes)
+  {
+    names << i.data ().toString ();
+  }
+  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
+                                    .arg (names.join (QLatin1String ("\", \""))),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::Yes)
+  {
+    for (const auto &i: indexes)
+    {
+      model_->remove (proxy_->mapToSource (i));
+    }
+  }
+}
+
+void DirWidget::showViewContextMenu ()
+{
+  const auto index = view ()->currentIndex ();
+  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
+  openAction_->setEnabled (index.isValid ());
+  renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
+  removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
+
+  viewMenu_->exec (QCursor::pos ());
+}
+
+void DirWidget::showHeaderContextMenu ()
+{
+  QMenu menu;
+  auto header = tableView_->horizontalHeader ();
+  for (auto i = 0, end = proxy_->columnCount (); i < end; ++i)
+  {
+    auto action = menu.addAction (proxy_->headerData (i, Qt::Horizontal).toString ());
+    action->setCheckable (true);
+    action->setChecked (!header->isSectionHidden (i));
+    action->setData (i);
+  }
+
+  auto choice = menu.exec (QCursor::pos ());
+  if (choice)
+  {
+    header->setSectionHidden (choice->data ().toInt (), !choice->isChecked ());
+  }
+
+}
+
+bool DirWidget::isLocked () const
+{
+  return isLocked_->isChecked ();
+}
+
+void DirWidget::setLocked (bool isLocked)
+{
+  up_->setEnabled (!isLocked);
+  using View = QAbstractItemView;
+  view ()->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
+  view ()->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
+}
+
+bool DirWidget::isShowDirs () const
+{
+  return showDirs_->isChecked ();
+}
+
+void DirWidget::setShowDirs (bool show)
+{
+  proxy_->setShowDirs (show);
 }
 
 bool DirWidget::isExtensive () const

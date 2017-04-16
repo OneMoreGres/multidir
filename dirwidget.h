@@ -45,18 +45,23 @@ private:
     List, Table
   };
 
-  void setLocked (bool isLocked);
-  void moveUp ();
-  void toggleShowDirs (bool show);
-  void showViewContextMenu ();
-  void showHeaderContextMenu ();
   void openPath (const QModelIndex &index);
-  bool isLocked () const;
   QString fittedPath () const;
+  void moveUp ();
+
+  void togglePathEdition (bool isOn);
   void startRenaming ();
   void promptClose ();
   void promptRemove ();
-  void togglePathEdition (bool isOn);
+
+  void showViewContextMenu ();
+  void showHeaderContextMenu ();
+
+  bool isLocked () const;
+  void setLocked (bool isLocked);
+
+  bool isShowDirs () const;
+  void setShowDirs (bool show);
 
   bool isExtensive () const;
   void setExtensive (bool isExtensive);
@@ -65,22 +70,25 @@ private:
   void setViewMode (ViewMode mode);
   QAbstractItemView * view () const;
 
-  QMenu *menu_;
   FileSystemModel *model_;
   ProxyModel *proxy_;
   QTableView *tableView_;
   QListView *listView_;
+  QLabel *pathLabel_;
+  QLabel *dirLabel_;
+  QLineEdit *pathEdit_;
+
+  QMenu *menu_;
+  QAction *isLocked_;
+  QAction *showDirs_;
+  QAction *extensiveAction_;
+  QAction *listMode_;
+
   QMenu *viewMenu_;
   QAction *openAction_;
   QAction *renameAction_;
   QAction *removeAction_;
-  QLabel *pathLabel_;
-  QLabel *dirLabel_;
-  QLineEdit *pathEdit_;
-  QAction *isLocked_;
+
   QToolButton *up_;
-  QAction *showDirs_;
-  QAction *listMode_;
-  QAction *extensiveAction_;
   QBoxLayout *controlsLayout_;
 };
