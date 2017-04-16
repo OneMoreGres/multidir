@@ -287,6 +287,10 @@ void DirWidget::resizeEvent (QResizeEvent */*event*/)
 
 bool DirWidget::eventFilter (QObject *watched, QEvent *event)
 {
+  if (isLocked ())
+  {
+    return false;
+  }
   if (event->type () == QEvent::MouseButtonDblClick &&
       (watched == pathLabel_ || watched == dirLabel_))
   {
