@@ -4,7 +4,6 @@
 
 #include <QGridLayout>
 #include <QBoxLayout>
-#include <QToolBar>
 #include <QMenu>
 #include <QMenuBar>
 #include <QSettings>
@@ -38,26 +37,14 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   model_->setReadOnly (false);
 
 
-  auto toolbar = new QToolBar (this);
-  auto add = toolbar->addAction (QIcon (":/add.png"), tr ("Add"));
+  auto add = contextMenu_->addAction (QIcon (":/add.png"), tr ("Add"));
   add->setShortcut (QKeySequence::AddTab);
   connect (add, &QAction::triggered, this, &MultiDirWidget::addWidget);
 
-  auto find = toolbar->addAction (QIcon (":/find.png"), tr ("Find"));
+  auto find = contextMenu_->addAction (QIcon (":/find.png"), tr ("Find"));
   find->setShortcut (QKeySequence::Find);
   connect (find, &QAction::triggered, this, &MultiDirWidget::activateFindMode);
 
-  toolbar->addSeparator ();
-
-  auto settings = toolbar->addAction (QIcon (":/settings.png"), tr ("Settings"));
-  connect (settings, &QAction::triggered, this, &MultiDirWidget::settingsRequested);
-
-  auto quit = toolbar->addAction (QIcon (":/quit.png"), tr ("Quit"));
-  connect (quit, &QAction::triggered, qApp, &QApplication::quit);
-
-
-  contextMenu_->addAction (add);
-  contextMenu_->addAction (find);
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,
            this, &MultiDirWidget::showContextMenu);
@@ -68,21 +55,23 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   fileMenu->addAction (add);
   fileMenu->addAction (find);
   fileMenu->addSeparator ();
-  fileMenu->addAction (settings);
-  fileMenu->addAction (quit);
+  auto settings = fileMenu->addAction (QIcon (":/settings.png"), tr ("Settings"));
+  connect (settings, &QAction::triggered, this, &MultiDirWidget::settingsRequested);
+
+  auto quit = fileMenu->addAction (QIcon (":/quit.png"), tr ("Quit"));
+  connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
   findEdit_->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Fixed);
   findEdit_->setPlaceholderText (tr ("Name pattern"));
   findEdit_->setVisible (false);
 
-  auto toolBarLayout = new QHBoxLayout;
-  toolBarLayout->addWidget (toolbar);
-  toolBarLayout->addWidget (findEdit_);
+  auto menuBarLayout = new QHBoxLayout;
+  menuBarLayout->addWidget (menuBar);
+  menuBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
-  layout->addWidget (menuBar);
-  layout->addLayout (toolBarLayout);
+  layout->addLayout (menuBarLayout);
   layout->addLayout (layout_);
 }
 
