@@ -45,7 +45,7 @@ private:
     List, Table
   };
 
-  void setIsLocked (bool isLocked);
+  void setLocked (bool isLocked);
   void moveUp ();
   void toggleShowDirs (bool show);
   void showViewContextMenu ();

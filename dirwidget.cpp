@@ -67,7 +67,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
   isLocked_->setCheckable (true);
   connect (isLocked_, &QAction::toggled,
-           this, &DirWidget::setIsLocked);
+           this, &DirWidget::setLocked);
 
   showDirs_ = menu_->addAction (QIcon (":/folder.png"), tr ("Show directories"));
   showDirs_->setCheckable (true);
@@ -148,7 +148,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   layout->addLayout (controlsLayout_);
 
   setViewMode (ViewMode::Table);
-  setIsLocked (false);
+  setLocked (false);
 }
 
 DirWidget::~DirWidget ()
@@ -209,7 +209,7 @@ void DirWidget::setNameFilter (const QString &filter)
   proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
 }
 
-void DirWidget::setIsLocked (bool isLocked)
+void DirWidget::setLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);
   using View = QAbstractItemView;
@@ -507,7 +507,7 @@ void DirWidget::setViewMode (ViewMode mode)
       break;
   }
 
-  setIsLocked (isLocked ());
+  setLocked (isLocked ());
   setExtensive (isExtensive ());
   setPath (path);
 }
