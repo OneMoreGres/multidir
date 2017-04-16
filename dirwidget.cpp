@@ -310,9 +310,9 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
 
 void DirWidget::togglePathEdition (bool isOn)
 {
+  pathEdit_->setVisible (isOn);
   pathLabel_->setVisible (!isOn);
   dirLabel_->setVisible (!isOn);
-  pathEdit_->setVisible (isOn);
 
   const auto path = pathLabel_->text () + dirLabel_->text ();
   if (isOn)
