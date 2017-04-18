@@ -14,6 +14,7 @@ class QToolButton;
 class QSettings;
 class QBoxLayout;
 class QLineEdit;
+class QFileInfo;
 
 class DirWidget : public QWidget
 {
@@ -46,13 +47,18 @@ private:
   };
 
   void openPath (const QModelIndex &index);
-  QString fittedPath () const;
   void moveUp ();
+
+  QString fittedPath () const;
+  QList<QFileInfo> selected () const;
 
   void togglePathEdition (bool isOn);
   void startRenaming ();
   void promptClose ();
   void promptRemove ();
+  void cut ();
+  void copy ();
+  void paste ();
 
   void showViewContextMenu ();
   void showHeaderContextMenu ();
@@ -88,6 +94,9 @@ private:
   QAction *openAction_;
   QAction *renameAction_;
   QAction *removeAction_;
+  QAction *cutAction_;
+  QAction *copyAction_;
+  QAction *pasteAction_;
 
   QToolButton *up_;
   QBoxLayout *controlsLayout_;

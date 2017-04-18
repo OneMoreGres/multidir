@@ -1,6 +1,7 @@
 #include "dirwidget.h"
 #include "proxymodel.h"
 #include "filesystemmodel.h"
+#include "copypaste.h"
 
 #include <QTableView>
 #include <QBoxLayout>
@@ -47,6 +48,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openAction_ (nullptr),
   renameAction_ (nullptr),
   removeAction_ (nullptr),
+  cutAction_ (nullptr),
+  copyAction_ (nullptr),
+  pasteAction_ (nullptr),
   up_ (new QToolButton (this)),
   controlsLayout_ (new QHBoxLayout)
 {
@@ -107,6 +111,29 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view ()->currentIndex ());});
+
+  cutAction_ = viewMenu_->addAction (QIcon::fromTheme ("cut"), tr ("Cut"));
+  cutAction_->setShortcut (QKeySequence::Cut);
+  cutAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  this->addAction (cutAction_);
+  connect (cutAction_, &QAction::triggered,
+           this, &DirWidget::cut);
+
+  copyAction_ = viewMenu_->addAction (QIcon::fromTheme ("copy"), tr ("Copy"));
+  copyAction_->setShortcut (QKeySequence::Copy);
+  copyAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  this->addAction (copyAction_);
+  connect (copyAction_, &QAction::triggered,
+           this, &DirWidget::copy);
+
+  pasteAction_ = viewMenu_->addAction (QIcon::fromTheme ("paste"), tr ("Paste"));
+  pasteAction_->setShortcut (QKeySequence::Paste);
+  pasteAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  this->addAction (pasteAction_);
+  connect (pasteAction_, &QAction::triggered,
+           this, &DirWidget::paste);
+
+  viewMenu_->addSeparator ();
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
@@ -374,6 +401,46 @@ void DirWidget::promptRemove ()
       model_->remove (proxy_->mapToSource (i));
     }
   }
+}
+
+QList<QFileInfo> DirWidget::selected () const
+{
+  const auto indexes = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  if (indexes.isEmpty ())
+  {
+    return {};
+  }
+  QList<QFileInfo> infos;
+  for (const auto &i: indexes)
+  {
+    infos << model_->fileInfo (proxy_->mapToSource (i));
+  }
+  return infos;
+}
+
+
+void DirWidget::cut ()
+{
+  CopyPaste ().cut (selected ());
+}
+
+void DirWidget::copy ()
+{
+  CopyPaste ().copy (selected ());
+}
+
+void DirWidget::paste ()
+{
+  auto index = view ()->currentIndex ();
+  if (!index.isValid ())
+  {
+    index = view ()->rootIndex ();
+  }
+  if (!index.isValid ())
+  {
+    return;
+  }
+  CopyPaste ().paste (model_->fileInfo (proxy_->mapToSource (index)));
 }
 
 void DirWidget::showViewContextMenu ()
