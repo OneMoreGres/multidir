@@ -482,6 +482,8 @@ bool DirWidget::isLocked () const
 void DirWidget::setLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);
+  pasteAction_->setEnabled (!isLocked);
+  cutAction_->setEnabled (!isLocked);
   using View = QAbstractItemView;
   view ()->setEditTriggers (isLocked ? View::NoEditTriggers : View::SelectedClicked);
   view ()->setDragDropMode (isLocked ? View::NoDragDrop : View::DragDrop);
