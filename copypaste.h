@@ -18,6 +18,7 @@ public:
 private:
   bool isCut (const QMimeData &mime) const;
   QString uniqueFilePath (const QString &targetPath, const QString &name) const;
+  QStringList names (const QList<QUrl> &urls) const;
   QList<QUrl> urls (const QList<QFileInfo> &infos) const;
   QList<QFileInfo> infos (const QList<QUrl> &urls) const;
 };

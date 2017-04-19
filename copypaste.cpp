@@ -14,7 +14,8 @@ namespace
 const QString kdeCut = QLatin1String ("application/x-kde-cutselection");
 const QByteArray kdeCutValue = "1";
 const QString gnomeCut = QLatin1String ("x-special/gnome-copied-files");
-const QByteArray gnomeCutValue = "cut\nfile";
+const QByteArray gnomeCutValue = "cut\n";
+const QByteArray gnomeCopyValue = "copy\n";
 const QString winCut = QLatin1String ("Preferred DropEffect");
 const QByteArray winCutValue = QByteArray::fromHex ("02000000");
 }
@@ -27,17 +28,22 @@ CopyPaste::CopyPaste ()
 void CopyPaste::copy (const QList<QFileInfo> &sources) const
 {
   auto mime = new QMimeData;
-  mime->setUrls (urls (sources));
+  const auto urls = this->urls (sources);
+  mime->setUrls (urls);
+#ifdef Q_OS_LINUX
+  mime->setData (gnomeCut, gnomeCopyValue + names (urls).join ("\n").toUtf8 ());
+#endif
   QApplication::clipboard ()->setMimeData (mime);
 }
 
 void CopyPaste::cut (const QList<QFileInfo> &sources) const
 {
   auto mime = new QMimeData;
-  mime->setUrls (urls (sources));
+  const auto urls = this->urls (sources);
+  mime->setUrls (urls);
 #ifdef Q_OS_LINUX
   mime->setData (kdeCut, kdeCutValue);
-  mime->setData (gnomeCut, gnomeCutValue);
+  mime->setData (gnomeCut, gnomeCutValue + names (urls).join ("\n").toUtf8 ());
 #elif Q_OS_WIN
   mime->setData (winCut, winCutValue);
 #endif
@@ -97,7 +103,7 @@ bool CopyPaste::isCut (const QMimeData &mime) const
 {
 #ifdef Q_OS_LINUX
   return (mime.data (kdeCut) == kdeCutValue ||
-          mime.data (gnomeCut) == gnomeCutValue);
+          mime.data (gnomeCut).startsWith (gnomeCutValue));
 #elif Q_OS_WIN
   return (mime.data (winCut) == winCutValue);
 #endif
@@ -113,9 +119,24 @@ QString CopyPaste::uniqueFilePath (const QString &targetPath, const QString &nam
   return targetPath + targetName;
 }
 
+QStringList CopyPaste::names (const QList<QUrl> &urls) const
+{
+  QStringList result;
+  result.reserve (urls.size ());
+  for (const auto &i: urls)
+  {
+    if (i.isLocalFile ())
+    {
+      result << i.toString ();
+    }
+  }
+  return result;
+}
+
 QList<QUrl> CopyPaste::urls (const QList<QFileInfo> &infos) const
 {
   QList<QUrl> urls;
+  urls.reserve (infos.size ());
   for (const auto &i: infos)
   {
     urls << QUrl::fromLocalFile (i.absoluteFilePath ());
@@ -126,6 +147,7 @@ QList<QUrl> CopyPaste::urls (const QList<QFileInfo> &infos) const
 QList<QFileInfo> CopyPaste::infos (const QList<QUrl> &urls) const
 {
   QList<QFileInfo> result;
+  result.reserve (urls.size ());
   for (const auto &i: urls)
   {
     if (i.isLocalFile ())
