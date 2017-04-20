@@ -16,6 +16,20 @@ namespace
 const QString qs_view = "header";
 }
 
+
+DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
+  QWidget (parent),
+  isList_ (false),
+  isLocked_ (false),
+  isExtensive_ (false),
+  model_ (&model),
+  table_ (nullptr),
+  list_ (nullptr)
+{
+  setLayout (new QVBoxLayout);
+  setIsList (isList_);
+}
+
 void DirView::save (QSettings &settings) const
 {
   if (table_)
@@ -30,19 +44,6 @@ void DirView::restore (QSettings &settings)
   {
     table_->horizontalHeader ()->restoreState (settings.value (qs_view).toByteArray ());
   }
-}
-
-DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
-  QWidget (parent),
-  isList_ (false),
-  isLocked_ (false),
-  isExtensive_ (false),
-  model_ (&model),
-  table_ (nullptr),
-  list_ (nullptr)
-{
-  setLayout (new QVBoxLayout);
-  setIsList (isList_);
 }
 
 QModelIndex DirView::currentIndex () const
@@ -70,9 +71,12 @@ QModelIndexList DirView::selectedRows () const
   return view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
 }
 
-void DirView::edit (const QModelIndex &index)
+void DirView::renameCurrent ()
 {
-  view ()->edit (index);
+  const auto index = currentIndex ();
+  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
+  setCurrentIndex (nameIndex);
+  view ()->edit (nameIndex);
 }
 
 bool DirView::isList () const

@@ -26,7 +26,7 @@ public:
 
   QModelIndexList selectedRows () const;
 
-  void edit (const QModelIndex &index);
+  void renameCurrent ();
 
   bool isList () const;
   void setIsList (bool isList);

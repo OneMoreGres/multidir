@@ -77,7 +77,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QAction::toggled,
-           this, &DirWidget::setShowDirs);
+           this, [this](bool on) {proxy_->setShowDirs (on);});
 
   extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
   extensiveAction_->setCheckable (true);
@@ -133,7 +133,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
-           this, &DirWidget::startRenaming);
+           view_, &DirView::renameCurrent);
 
   removeAction_ = viewMenu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
   connect (removeAction_, &QAction::triggered,
@@ -350,14 +350,6 @@ void DirWidget::togglePathEdition (bool isOn)
   }
 }
 
-void DirWidget::startRenaming ()
-{
-  const auto index = view_->currentIndex ();
-  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
-  view_->setCurrentIndex (nameIndex);
-  view_->edit (nameIndex);
-}
-
 void DirWidget::promptClose ()
 {
   auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?").arg (path ()),
@@ -394,13 +386,8 @@ void DirWidget::promptRemove ()
 
 QList<QFileInfo> DirWidget::selected () const
 {
-  const auto indexes = view_->selectedRows ();
-  if (indexes.isEmpty ())
-  {
-    return {};
-  }
   QList<QFileInfo> infos;
-  for (const auto &i: indexes)
+  for (const auto &i: view_->selectedRows ())
   {
     infos << model_->fileInfo (proxy_->mapToSource (i));
   }
@@ -454,14 +441,4 @@ void DirWidget::setLocked (bool isLocked)
   pasteAction_->setEnabled (!isLocked);
   cutAction_->setEnabled (!isLocked);
   view_->setLocked (isLocked);
-}
-
-bool DirWidget::isShowDirs () const
-{
-  return showDirs_->isChecked ();
-}
-
-void DirWidget::setShowDirs (bool show)
-{
-  proxy_->setShowDirs (show);
 }

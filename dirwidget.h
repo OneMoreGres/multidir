@@ -58,9 +58,6 @@ private:
   bool isLocked () const;
   void setLocked (bool isLocked);
 
-  bool isShowDirs () const;
-  void setShowDirs (bool show);
-
 
   FileSystemModel *model_;
   ProxyModel *proxy_;
