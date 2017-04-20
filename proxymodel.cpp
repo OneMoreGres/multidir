@@ -121,7 +121,7 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
   // keep folders on top
   if (l.isDir () != r.isDir ())
   {
-    return l.isDir () && sortOrder () == Qt::AscendingOrder;
+    return (sortOrder () == Qt::AscendingOrder ? l.isDir () : !l.isDir ());
   }
 
 
