@@ -48,7 +48,8 @@ SOURCES += \
     proxymodel.cpp \
     filesystemmodel.cpp \
     settings.cpp \
-    copypaste.cpp
+    copypaste.cpp \
+    dirview.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -58,7 +59,8 @@ HEADERS  += \
     proxymodel.h \
     filesystemmodel.h \
     settings.h \
-    copypaste.h
+    copypaste.h \
+    dirview.h
 
 RESOURCES += \
     resources.qrc

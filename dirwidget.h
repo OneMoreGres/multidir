@@ -4,10 +4,8 @@
 
 class ProxyModel;
 class FileSystemModel;
+class DirView;
 
-class QAbstractItemView;
-class QTableView;
-class QListView;
 class QLabel;
 class QMenu;
 class QToolButton;
@@ -41,11 +39,6 @@ protected:
   void resizeEvent (QResizeEvent *event) override;
 
 private:
-  enum class ViewMode : int
-  {
-    List, Table
-  };
-
   void openPath (const QModelIndex &index);
   void moveUp ();
 
@@ -61,7 +54,6 @@ private:
   void paste ();
 
   void showViewContextMenu ();
-  void showHeaderContextMenu ();
 
   bool isLocked () const;
   void setLocked (bool isLocked);
@@ -69,17 +61,10 @@ private:
   bool isShowDirs () const;
   void setShowDirs (bool show);
 
-  bool isExtensive () const;
-  void setExtensive (bool isExtensive);
-
-  ViewMode viewMode () const;
-  void setViewMode (ViewMode mode);
-  QAbstractItemView * view () const;
 
   FileSystemModel *model_;
   ProxyModel *proxy_;
-  QTableView *tableView_;
-  QListView *listView_;
+  DirView *view_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QLineEdit *pathEdit_;
