@@ -23,5 +23,5 @@ bool FileSystemModel::dropMimeData (const QMimeData *data, Qt::DropAction action
     return false;
   }
 
-  return CopyPaste ().paste (data->urls (), fileInfo (parent), action);
+  return CopyPaste::paste (data->urls (), fileInfo (parent), action);
 }

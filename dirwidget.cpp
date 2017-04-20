@@ -421,12 +421,12 @@ QList<QFileInfo> DirWidget::selected () const
 
 void DirWidget::cut ()
 {
-  CopyPaste ().cut (selected ());
+  CopyPaste::cut (selected ());
 }
 
 void DirWidget::copy ()
 {
-  CopyPaste ().copy (selected ());
+  CopyPaste::copy (selected ());
 }
 
 void DirWidget::paste ()
@@ -440,7 +440,7 @@ void DirWidget::paste ()
   {
     return;
   }
-  CopyPaste ().paste (model_->fileInfo (proxy_->mapToSource (index)));
+  CopyPaste::paste (model_->fileInfo (proxy_->mapToSource (index)));
 }
 
 void DirWidget::showViewContextMenu ()
