@@ -21,7 +21,7 @@
 namespace
 {
 const QString qs_extensive = "extensive";
-const QString qs_mode = "mode";
+const QString qs_isList = "isList";
 const QString qs_dir = "dir";
 const QString qs_isLocked = "locked";
 const QString qs_showDirs = "showDirs";
@@ -89,7 +89,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   listMode_->setCheckable (true);
   listMode_->setChecked (false);
   connect (listMode_, &QAction::toggled,
-           this, [this](bool on) {view_->setMode (on ? DirView::Mode::List : DirView::Mode::Table);});
+           view_, &DirView::setIsList);
 
   menu_->addSeparator ();
 
@@ -188,7 +188,7 @@ DirWidget::~DirWidget ()
 
 void DirWidget::save (QSettings &settings) const
 {
-  settings.setValue (qs_mode, int(view_->mode ()));
+  settings.setValue (qs_isList, view_->isList ());
   settings.setValue (qs_dir, path ());
   settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_extensive, extensiveAction_->isChecked ());
@@ -197,8 +197,7 @@ void DirWidget::save (QSettings &settings) const
 
 void DirWidget::restore (QSettings &settings)
 {
-  auto mode = DirView::Mode (settings.value (qs_mode, int (DirView::Mode::Table)).toInt ());
-  listMode_->setChecked (mode == DirView::Mode::List);
+  listMode_->setChecked (settings.value (qs_isList, isLocked ()).toBool ());
   setPath (settings.value (qs_dir).toString ());
   isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
   extensiveAction_->setChecked (settings.value (qs_extensive, false).toBool ());

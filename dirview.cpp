@@ -8,10 +8,12 @@
 #include <QSettings>
 #include <QMenu>
 
+#include <QDebug>
+
 
 namespace
 {
-const QString qs_view = "view";
+const QString qs_view = "header";
 }
 
 void DirView::save (QSettings &settings) const
@@ -32,7 +34,7 @@ void DirView::restore (QSettings &settings)
 
 DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   QWidget (parent),
-  mode_ (Mode::Table),
+  isList_ (false),
   isLocked_ (false),
   isExtensive_ (false),
   model_ (&model),
@@ -40,7 +42,7 @@ DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   list_ (nullptr)
 {
   setLayout (new QVBoxLayout);
-  setMode (mode_);
+  setIsList (isList_);
 }
 
 QModelIndex DirView::currentIndex () const
@@ -73,9 +75,9 @@ void DirView::edit (const QModelIndex &index)
   view ()->edit (index);
 }
 
-DirView::Mode DirView::mode () const
+bool DirView::isList () const
 {
-  return mode_;
+  return isList_;
 }
 
 namespace
@@ -91,12 +93,12 @@ void cleanup (T * &w)
 }
 }
 
-void DirView::setMode (Mode mode)
+void DirView::setIsList (bool isList)
 {
   auto root = view () ? rootIndex () : QModelIndex ();
 
-  mode_ = mode;
-  if (mode_ == Mode::Table)
+  isList_ = isList;
+  if (!isList_)
   {
     cleanup (list_);
 

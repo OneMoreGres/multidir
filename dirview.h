@@ -13,18 +13,14 @@ class DirView : public QWidget
 {
 Q_OBJECT
 public:
-  enum class Mode
-  {
-    List, Table
-  };
+  DirView (QAbstractItemModel &model, QWidget *parent = nullptr);
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
-  DirView (QAbstractItemModel &model, QWidget *parent = nullptr);
-
   QModelIndex currentIndex () const;
   void setCurrentIndex (const QModelIndex &index);
+
   QModelIndex rootIndex () const;
   void setRootIndex (const QModelIndex &index);
 
@@ -32,8 +28,8 @@ public:
 
   void edit (const QModelIndex &index);
 
-  Mode mode () const;
-  void setMode (Mode mode);
+  bool isList () const;
+  void setIsList (bool isList);
 
   bool isLocked () const;
   void setLocked (bool isLocked);
@@ -51,7 +47,7 @@ private:
   void initTable ();
   void initList ();
 
-  Mode mode_;
+  bool isList_;
   bool isLocked_;
   bool isExtensive_;
   QAbstractItemModel *model_;
