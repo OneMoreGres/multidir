@@ -81,13 +81,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
   extensiveAction_->setCheckable (true);
-  extensiveAction_->setChecked (true);
+  extensiveAction_->setChecked (view_->isExtensive ());
   connect (extensiveAction_, &QAction::toggled,
            view_, &DirView::setExtensive);
 
   listMode_ = menu_->addAction (QIcon (":/listMode.png"), tr ("List mode"));
   listMode_->setCheckable (true);
-  listMode_->setChecked (false);
+  listMode_->setChecked (view_->isList ());
   connect (listMode_, &QAction::toggled,
            view_, &DirView::setIsList);
 
@@ -188,7 +188,7 @@ DirWidget::~DirWidget ()
 
 void DirWidget::save (QSettings &settings) const
 {
-  settings.setValue (qs_isList, view_->isList ());
+  settings.setValue (qs_isList, listMode_->isChecked ());
   settings.setValue (qs_dir, path ());
   settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_extensive, extensiveAction_->isChecked ());
