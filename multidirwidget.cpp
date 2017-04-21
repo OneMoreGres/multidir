@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QApplication>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -19,8 +20,6 @@ const QString qs_dirs = "dirs";
 const QString qs_geometry = "geometry";
 }
 
-#define STR2(XXX) #XXX
-#define STR(XXX) STR2 (XXX)
 
 MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
@@ -30,7 +29,8 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   contextMenu_ (new QMenu (tr ("Context"), this)),
   findEdit_ (new QLineEdit (this))
 {
-  setWindowTitle (tr ("MultiDir") + " - v." STR (APP_VERSION));
+  setWindowTitle (tr ("MultiDir"));
+  setWindowIcon (QIcon (":/app.png"));
 
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
@@ -60,6 +60,12 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 
   auto quit = fileMenu->addAction (QIcon (":/quit.png"), tr ("Quit"));
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
+
+
+  auto helpMenu = menuBar->addMenu (tr ("Help"));
+  auto about = helpMenu->addAction (QIcon::fromTheme ("about"), tr ("About"));
+  connect (about, &QAction::triggered, this, &MultiDirWidget::showAbout);
+
 
 
   findEdit_->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Fixed);
@@ -167,6 +173,28 @@ void MultiDirWidget::activateFindMode ()
 {
   findEdit_->show ();
   findEdit_->setFocus ();
+}
+
+void MultiDirWidget::showAbout ()
+{
+#define STR2(XXX) #XXX
+#define STR(XXX) STR2 (XXX)
+  QStringList lines {
+    tr ("<b>%1</b> version %2").arg (windowTitle (), STR (APP_VERSION)),
+    tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
+    tr ("Homepage: <a href='%1'>%1</a>").arg ("http://gres.biz/multidir"),
+    tr ("Sources: <a href='%1'>%1</a>").arg ("http://github.com/onemoregres/multidir"),
+    "",
+    tr ("This program is distributed in the hope that it will be useful, "
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
+  };
+  QMessageBox about (QMessageBox::Information, windowTitle (),
+                     lines.join ("<br>"), QMessageBox::Ok);
+  about.setIconPixmap (QPixmap (":/app.png").scaledToHeight (100, Qt::SmoothTransformation));
+  about.exec ();
+#undef STR
+#undef STR
 }
 
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)

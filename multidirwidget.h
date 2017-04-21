@@ -33,6 +33,7 @@ private:
   void addToLayout (DirWidget *widget);
   void showContextMenu ();
   void activateFindMode ();
+  void showAbout ();
 
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;
