@@ -185,6 +185,8 @@ void MultiDirWidget::showAbout ()
     tr ("Homepage: <a href='%1'>%1</a>").arg ("http://gres.biz/multidir"),
     tr ("Sources: <a href='%1'>%1</a>").arg ("http://github.com/onemoregres/multidir"),
     "",
+    tr ("Icons designed by Madebyoliver from Flaticon"),
+    "",
     tr ("This program is distributed in the hope that it will be useful, "
         "but WITHOUT ANY WARRANTY; without even the implied warranty of "
         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
