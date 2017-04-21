@@ -25,7 +25,8 @@ bool isCut (const QMimeData &mime)
 #ifdef Q_OS_LINUX
   return (mime.data (kdeCut) == kdeCutValue ||
           mime.data (gnomeCut).startsWith (gnomeCutValue));
-#elif Q_OS_WIN
+#endif
+#ifdef Q_OS_WIN
   return (mime.data (winCut) == winCutValue);
 #endif
 }
@@ -97,7 +98,8 @@ void CopyPaste::cut (const QList<QFileInfo> &sources)
 #ifdef Q_OS_LINUX
   mime->setData (kdeCut, kdeCutValue);
   mime->setData (gnomeCut, gnomeCutValue + names (urls).join ("\n").toUtf8 ());
-#elif Q_OS_WIN
+#endif
+#ifdef Q_OS_WIN
   mime->setData (winCut, winCutValue);
 #endif
   QApplication::clipboard ()->setMimeData (mime);
