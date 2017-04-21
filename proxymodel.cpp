@@ -1,7 +1,10 @@
 #include "proxymodel.h"
 #include "filesystemmodel.h"
+#include "constants.h"
 
 #include <QDateTime>
+#include <QPixmapCache>
+#include <QImageReader>
 
 #include <QDebug>
 
@@ -14,6 +17,7 @@ ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
   showDirs_ (true),
+  showThumbnails_ (false),
   nameFilter_ (),
   current_ ()
 {
@@ -29,6 +33,18 @@ void ProxyModel::setShowDirs (bool showDirs)
 {
   showDirs_ = showDirs;
   invalidateFilter ();
+}
+
+bool ProxyModel::showThumbnails () const
+{
+  return showThumbnails_;
+}
+
+void ProxyModel::setShowThumbnails (bool isOn)
+{
+  showThumbnails_ = isOn;
+  emit dataChanged (index (0, FileSystemModel::Name), index (rowCount () - 1, FileSystemModel::Size),
+                    {Qt::DecorationRole});
 }
 
 void ProxyModel::setNameFilter (const QString &name)
@@ -79,6 +95,30 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
     }
     return {};
   }
+
+  if (showThumbnails_ && role == Qt::DecorationRole && index.column () == FileSystemModel::Name)
+  {
+    const auto info = model_->fileInfo (mapToSource (index));
+    if (QImageReader::supportedImageFormats ().contains (info.suffix ().toUtf8 ()))
+    {
+      const auto path = info.absoluteFilePath ();
+      if (auto cached = QPixmapCache::find (path))
+      {
+        return QIcon (*cached);
+      }
+      QImageReader reader (path);
+      reader.setScaledSize ({constants::iconSize, constants::iconSize});
+      const auto image = reader.read ();
+      if (!image.isNull ())
+      {
+        const auto pixmap = QPixmap::fromImage (image);
+        QPixmapCache::insert (path, pixmap);
+        return QIcon (pixmap);
+      }
+    }
+    return QSortFilterProxyModel::data (index, role);
+  }
+
   return QSortFilterProxyModel::data (index, role);
 }
 
@@ -102,7 +142,6 @@ Qt::ItemFlags ProxyModel::flags (const QModelIndex &index) const
   }
   return flags;
 }
-
 
 bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) const
 {

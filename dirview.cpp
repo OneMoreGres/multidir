@@ -1,5 +1,6 @@
 #include "dirview.h"
 #include "filesystemmodel.h"
+#include "constants.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -200,7 +201,7 @@ void DirView::setExtensive (bool isExtensive)
   }
   else
   {
-    const auto iconSize = (isExtensive ? 64 : 16);
+    const auto iconSize = (isExtensive ? constants::iconSize : constants::iconMinSize);
     const auto margins = 4;
     const auto width = 120;
     list_->setIconSize ({iconSize, iconSize});

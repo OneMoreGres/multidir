@@ -60,7 +60,8 @@ HEADERS  += \
     filesystemmodel.h \
     settings.h \
     copypaste.h \
-    dirview.h
+    dirview.h \
+    constants.h
 
 RESOURCES += \
     resources.qrc

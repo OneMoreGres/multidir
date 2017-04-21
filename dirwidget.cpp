@@ -25,6 +25,7 @@ const QString qs_isList = "isList";
 const QString qs_dir = "dir";
 const QString qs_isLocked = "locked";
 const QString qs_showDirs = "showDirs";
+const QString qs_showThumbs = "showThumbs";
 }
 
 DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
@@ -40,6 +41,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showDirs_ (nullptr),
   extensiveAction_ (nullptr),
   listMode_ (nullptr),
+  showThumbs_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
@@ -90,6 +92,12 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   listMode_->setChecked (view_->isList ());
   connect (listMode_, &QAction::toggled,
            view_, &DirView::setIsList);
+
+  showThumbs_ = menu_->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
+  showThumbs_->setCheckable (true);
+  showThumbs_->setChecked (proxy_->showThumbnails ());
+  connect (showThumbs_, &QAction::toggled,
+           proxy_, &ProxyModel::setShowThumbnails);
 
   menu_->addSeparator ();
 
@@ -195,6 +203,7 @@ void DirWidget::save (QSettings &settings) const
   settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_extensive, extensiveAction_->isChecked ());
   settings.setValue (qs_showDirs, proxy_->showDirs ());
+  settings.setValue (qs_showThumbs, showThumbs_->isChecked ());
 }
 
 void DirWidget::restore (QSettings &settings)
@@ -204,6 +213,7 @@ void DirWidget::restore (QSettings &settings)
   isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
   extensiveAction_->setChecked (settings.value (qs_extensive, false).toBool ());
   showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
+  showThumbs_->setChecked (settings.value (qs_showThumbs, false).toBool ());
 }
 
 QString DirWidget::path () const

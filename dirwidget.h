@@ -71,6 +71,7 @@ private:
   QAction *showDirs_;
   QAction *extensiveAction_;
   QAction *listMode_;
+  QAction *showThumbs_;
 
   QMenu *viewMenu_;
   QAction *openAction_;

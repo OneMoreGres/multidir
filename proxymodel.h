@@ -21,6 +21,9 @@ public:
                        int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags (const QModelIndex &index) const override;
 
+  bool showThumbnails () const;
+  void setShowThumbnails (bool isOn);
+
 protected:
   bool filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const override;
   bool lessThan (const QModelIndex &left, const QModelIndex &right) const override;
@@ -28,6 +31,7 @@ protected:
 private:
   QFileSystemModel *model_;
   bool showDirs_;
+  bool showThumbnails_;
   QString nameFilter_;
   QPersistentModelIndex current_;
 };
