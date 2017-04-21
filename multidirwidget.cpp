@@ -182,8 +182,8 @@ void MultiDirWidget::showAbout ()
   QStringList lines {
     tr ("<b>%1</b> version %2").arg (windowTitle (), STR (APP_VERSION)),
     tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
-    tr ("Homepage: <a href='%1'>%1</a>").arg ("http://gres.biz/multidir"),
-    tr ("Sources: <a href='%1'>%1</a>").arg ("http://github.com/onemoregres/multidir"),
+    tr ("Homepage: <a href='%1'>%1</a>").arg ("https://gres.biz/multidir"),
+    tr ("Sources: <a href='%1'>%1</a>").arg ("https://github.com/onemoregres/multidir"),
     "",
     tr ("Icons designed by Madebyoliver from Flaticon"),
     "",
