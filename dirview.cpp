@@ -1,6 +1,7 @@
 #include "dirview.h"
 #include "filesystemmodel.h"
 #include "constants.h"
+#include "delegate.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -23,6 +24,7 @@ DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   isList_ (false),
   isLocked_ (false),
   isExtensive_ (false),
+  delegate_ (nullptr),
   model_ (&model),
   table_ (nullptr),
   list_ (nullptr)
@@ -120,6 +122,11 @@ void DirView::setIsList (bool isList)
     {
       initList ();
     }
+    if (!delegate_)
+    {
+      delegate_ = new Delegate (this);
+      list_->setItemDelegate (delegate_);
+    }
   }
 
   setRootIndex (root);
@@ -193,19 +200,16 @@ void DirView::setExtensive (bool isExtensive)
 {
   isExtensive_ = isExtensive;
 
-  const auto fontHeight = view ()->fontMetrics ().height ();
   if (table_)
   {
-    const auto margins = (isExtensive ? 14 : 4);
+    const auto margins = (isExtensive ? 14 : constants::itemVerticalMargins);
+    const auto fontHeight = view ()->fontMetrics ().height ();
     table_->verticalHeader ()->setDefaultSectionSize (fontHeight + margins);
   }
   else
   {
     const auto iconSize = (isExtensive ? constants::iconSize : constants::iconMinSize);
-    const auto margins = 4;
-    const auto width = 120;
     list_->setIconSize ({iconSize, iconSize});
-    list_->setGridSize ({width + margins, iconSize + fontHeight + margins});
   }
 }
 

@@ -49,7 +49,8 @@ SOURCES += \
     filesystemmodel.cpp \
     settings.cpp \
     copypaste.cpp \
-    dirview.cpp
+    dirview.cpp \
+    delegate.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -61,7 +62,8 @@ HEADERS  += \
     settings.h \
     copypaste.h \
     dirview.h \
-    constants.h
+    constants.h \
+    delegate.h
 
 RESOURCES += \
     resources.qrc

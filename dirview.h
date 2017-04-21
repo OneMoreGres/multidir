@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QModelIndex>
 
+class Delegate;
+
 class QTableView;
 class QListView;
 class QAbstractItemView;
@@ -50,6 +52,7 @@ private:
   bool isList_;
   bool isLocked_;
   bool isExtensive_;
+  Delegate *delegate_;
   QAbstractItemModel *model_;
   QTableView *table_;
   QListView *list_;
