@@ -202,7 +202,7 @@ void DirView::setExtensive (bool isExtensive)
 
   if (table_)
   {
-    const auto margins = (isExtensive ? 14 : constants::itemVerticalMargins);
+    const auto margins = (isExtensive ? 2 : 1) * constants::itemVerticalMargins;
     const auto fontHeight = view ()->fontMetrics ().height ();
     table_->verticalHeader ()->setDefaultSectionSize (fontHeight + margins);
   }
