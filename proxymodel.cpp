@@ -119,6 +119,11 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
     return QSortFilterProxyModel::data (index, role);
   }
 
+  if (role == Qt::TextAlignmentRole && index.column () == FileSystemModel::Size)
+  {
+    return int (Qt::AlignVCenter) | Qt::AlignRight;
+  }
+
   return QSortFilterProxyModel::data (index, role);
 }
 
