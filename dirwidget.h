@@ -41,6 +41,7 @@ protected:
 private:
   void openPath (const QModelIndex &index);
   void moveUp ();
+  void newFolder ();
 
   QString fittedPath () const;
   QList<QFileInfo> selected () const;
@@ -82,5 +83,6 @@ private:
   QAction *pasteAction_;
 
   QToolButton *up_;
+  QToolButton *newFolder_;
   QBoxLayout *controlsLayout_;
 };

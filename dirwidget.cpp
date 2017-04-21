@@ -50,6 +50,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
   up_ (new QToolButton (this)),
+  newFolder_ (new QToolButton (this)),
   controlsLayout_ (new QHBoxLayout)
 {
   proxy_->setDynamicSortFilter (true);
@@ -154,6 +155,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (up_, &QToolButton::pressed,
            this, &DirWidget::moveUp);
 
+  newFolder_->setIcon (QIcon (":/newFolder.png"));
+  newFolder_->setToolTip (tr ("Create folder"));
+  connect (newFolder_, &QToolButton::pressed,
+           this, &DirWidget::newFolder);
+
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
   pathLabel_->installEventFilter (this);
@@ -174,6 +180,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_->addWidget (dirLabel_);
   controlsLayout_->addWidget (pathEdit_);
   controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (newFolder_);
   controlsLayout_->addWidget (up_);
 
   controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
@@ -302,6 +309,21 @@ void DirWidget::moveUp ()
   {
     setPath (dir.absolutePath ());
   }
+}
+
+void DirWidget::newFolder ()
+{
+  QDir dir (path ());
+  auto name = tr ("New");
+  auto i = 0;
+  while (dir.exists (name))
+  {
+    name = tr ("New") + QString::number (++i);
+  }
+
+  auto index = model_->mkdir (proxy_->mapToSource (view_->rootIndex ()), name);
+  view_->setCurrentIndex (proxy_->mapFromSource (index));
+  view_->renameCurrent ();
 }
 
 void DirWidget::resizeEvent (QResizeEvent */*event*/)
@@ -450,6 +472,7 @@ bool DirWidget::isLocked () const
 void DirWidget::setLocked (bool isLocked)
 {
   up_->setEnabled (!isLocked);
+  newFolder_->setEnabled (!isLocked);
   pasteAction_->setEnabled (!isLocked);
   cutAction_->setEnabled (!isLocked);
   view_->setLocked (isLocked);

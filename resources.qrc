@@ -17,5 +17,6 @@
         <file alias="openExternal.png">icons/folder-2.png</file>
         <file alias="listMode.png">icons/list-1.png</file>
         <file alias="showThumbs.png">icons/picture.png</file>
+        <file alias="newFolder.png">icons/folder-4.png</file>
     </qresource>
 </RCC>
