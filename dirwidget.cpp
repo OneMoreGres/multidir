@@ -80,7 +80,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QAction::toggled,
-           this, [this](bool on) {proxy_->setShowDirs (on);});
+           this, &DirWidget::setShowDirs);
 
   extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
   extensiveAction_->setCheckable (true);
@@ -491,9 +491,23 @@ bool DirWidget::isLocked () const
 
 void DirWidget::setLocked (bool isLocked)
 {
-  up_->setEnabled (!isLocked);
-  newFolder_->setEnabled (!isLocked);
-  pasteAction_->setEnabled (!isLocked);
-  cutAction_->setEnabled (!isLocked);
   view_->setLocked (isLocked);
+  updateActions ();
+}
+
+void DirWidget::setShowDirs (bool on)
+{
+  proxy_->setShowDirs (on);
+  updateActions ();
+}
+
+void DirWidget::updateActions ()
+{
+  const auto dirs = showDirs_->isChecked ();
+  const auto lock = isLocked_->isChecked ();
+  newFolder_->setEnabled (dirs && !lock);
+  up_->setEnabled (!lock);
+
+  pasteAction_->setEnabled (!lock);
+  cutAction_->setEnabled (!lock);
 }
