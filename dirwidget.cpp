@@ -346,7 +346,7 @@ void DirWidget::newFolder ()
   view_->renameCurrent ();
 }
 
-void DirWidget::resizeEvent (QResizeEvent */*event*/)
+void DirWidget::resizeEvent (QResizeEvent *)
 {
   const auto newText = fittedPath ();
   if (newText != pathLabel_->text ())
