@@ -320,7 +320,12 @@ QString DirWidget::fittedPath () const
 
 void DirWidget::moveUp ()
 {
-  QDir dir (path ());
+  const auto path = this->path ();
+  if (path.isEmpty ())
+  {
+    return;
+  }
+  QDir dir (path);
   if (dir.cdUp ())
   {
     setPath (dir.absolutePath ());
