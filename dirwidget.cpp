@@ -230,6 +230,15 @@ QString DirWidget::path () const
 
 void DirWidget::setPath (const QString &path)
 {
+  if (path.isEmpty ())
+  {
+    // do not change proxy current path to disable possible dir filtering
+    view_->setRootIndex ({});
+    pathLabel_->clear ();
+    dirLabel_->setText (tr ("Drives"));
+    return;
+  }
+
   auto absolutePath = QDir (path).absolutePath ();
   auto index = proxy_->mapFromSource (model_->index (absolutePath));
   if (!index.isValid ())
@@ -266,7 +275,14 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     if (!isLocked () && model_->permissions (mapped) & QFile::ExeUser)
     {
-      setPath (path);
+      if (!path.endsWith (QLatin1String ("..")))
+      {
+        setPath (path);
+      }
+      else
+      {
+        moveUp ();
+      }
     }
   }
 }
@@ -308,6 +324,10 @@ void DirWidget::moveUp ()
   if (dir.cdUp ())
   {
     setPath (dir.absolutePath ());
+  }
+  else
+  {
+    setPath ({});
   }
 }
 
