@@ -37,7 +37,10 @@ DEFINES += APP_VERSION="$$APP_VERSION"
 
 OTHER_FILES += \
     uncrustify.cfg \
-    icons/README.md
+    icons/README.md \
+    LICENSE.md \
+    translations/LICENSE_ru.md \
+    README.md
 
 SOURCES += \
     main.cpp \
