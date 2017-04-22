@@ -13,15 +13,23 @@ int main (int argc, char *argv[])
   a.setApplicationName (QLatin1String ("MultiDir"));
   a.setQuitOnLastWindowClosed (false);
 
-  QTranslator baseTranslator;
-  if (baseTranslator.load (QLocale (), QLatin1String ("qt"), QLatin1String ("_")))
   {
-    a.installTranslator (&baseTranslator);
-  }
-  QTranslator appTranslator;
-  if (appTranslator.load (QLocale (), QLatin1String ("multidir"), QLatin1String ("_")))
-  {
-    a.installTranslator (&appTranslator);
+    QStringList dirs {QLatin1String ("translations")};
+    QStringList names {QLatin1String ("qt"), QLatin1String ("qtbase"),
+                       QLatin1String ("multidir")};
+    auto last = new QTranslator (&a);
+    for (const auto &name: names)
+    {
+      for (const auto &dir: dirs)
+      {
+        if (last->load (QLocale (), name, QLatin1String ("_"), dir))
+        {
+          a.installTranslator (last);
+          last = new QTranslator (&a);
+        }
+      }
+    }
+    last->deleteLater ();
   }
 
   QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
