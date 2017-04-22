@@ -69,38 +69,40 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
 
+
   menu_->addSeparator ();
 
-  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
-  isLocked_->setCheckable (true);
-  connect (isLocked_, &QAction::toggled,
-           this, &DirWidget::setLocked);
+  auto representMenu = menu_->addMenu (tr ("View"));
 
-  showDirs_ = menu_->addAction (QIcon (":/folder.png"), tr ("Show directories"));
+  showDirs_ = representMenu->addAction (QIcon (":/folder.png"), tr ("Show directories"));
   showDirs_->setCheckable (true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QAction::toggled,
            this, &DirWidget::setShowDirs);
 
-  extensiveAction_ = menu_->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
+  extensiveAction_ = representMenu->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
   extensiveAction_->setCheckable (true);
   extensiveAction_->setChecked (view_->isExtensive ());
   connect (extensiveAction_, &QAction::toggled,
            view_, &DirView::setExtensive);
 
-  listMode_ = menu_->addAction (QIcon (":/listMode.png"), tr ("List mode"));
+  listMode_ = representMenu->addAction (QIcon (":/listMode.png"), tr ("List mode"));
   listMode_->setCheckable (true);
   listMode_->setChecked (view_->isList ());
   connect (listMode_, &QAction::toggled,
            view_, &DirView::setIsList);
 
-  showThumbs_ = menu_->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
+  showThumbs_ = representMenu->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
   showThumbs_->setCheckable (true);
   showThumbs_->setChecked (proxy_->showThumbnails ());
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
 
-  menu_->addSeparator ();
+
+  isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
+  isLocked_->setCheckable (true);
+  connect (isLocked_, &QAction::toggled,
+           this, &DirWidget::setLocked);
 
   auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone"));
   connect (clone, &QAction::triggered,
