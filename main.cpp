@@ -14,7 +14,13 @@ int main (int argc, char *argv[])
   a.setQuitOnLastWindowClosed (false);
 
   {
-    QStringList dirs {QLatin1String ("translations")};
+    QStringList dirs {
+      QLatin1String ("translations")
+#ifdef Q_OS_LINUX
+      , QLatin1String ("/usr/share/multidir/translations"),
+      qgetenv ("APPDIR") + QLatin1String ("/usr/share/multidir/translations") // appimage
+#endif
+    };
     QStringList names {QLatin1String ("qt"), QLatin1String ("qtbase"),
                        QLatin1String ("multidir")};
     auto last = new QTranslator (&a);
