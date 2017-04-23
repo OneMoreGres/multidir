@@ -205,7 +205,7 @@ void MultiDirWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Escape)
   {
-    if (findEdit_->hasFocus ())
+    if (findEdit_->isVisible ())
     {
       findEdit_->clear ();
       findEdit_->hide ();
