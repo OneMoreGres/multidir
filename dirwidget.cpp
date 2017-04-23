@@ -518,6 +518,7 @@ void DirWidget::showViewContextMenu ()
   openAction_->setEnabled (index.isValid ());
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
+  trashAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
 
   viewMenu_->exec (QCursor::pos ());
 }
