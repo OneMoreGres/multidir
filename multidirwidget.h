@@ -9,6 +9,7 @@ class QSettings;
 class QGridLayout;
 class QMenu;
 class QLineEdit;
+class QFileInfo;
 
 class MultiDirWidget : public QWidget
 {
@@ -29,7 +30,7 @@ protected:
 private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);
-  void add (const QString &path);
+  void add (const QFileInfo &path);
   DirWidget * addWidget ();
   void addToLayout (DirWidget *widget);
   void showContextMenu ();

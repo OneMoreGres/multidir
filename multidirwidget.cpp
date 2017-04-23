@@ -230,7 +230,7 @@ void MultiDirWidget::clone (DirWidget *widget)
   w->setPath (widget->path ());
 }
 
-void MultiDirWidget::add (const QString &path)
+void MultiDirWidget::add (const QFileInfo &path)
 {
   auto w = addWidget ();
   w->setPath (path);

@@ -24,8 +24,8 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
-  void setPath (const QString &path);
-  QString path () const;
+  void setPath (const QFileInfo &path);
+  QFileInfo path () const;
 
   void setNameFilter (const QString &filter);
 
@@ -34,19 +34,20 @@ public:
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
-  void newTabRequested (const QString &path);
+  void newTabRequested (const QFileInfo &path);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;
 
 private:
   void openPath (const QModelIndex &index);
-  void moveUp ();
   void newFolder ();
 
   QString fittedPath () const;
   QList<QFileInfo> selected () const;
   QFileInfo current () const;
+  QFileInfo fileInfo (const QModelIndex &index) const;
+  QStringList names (const QList<QModelIndex> &indexes) const;
 
   void togglePathEdition (bool isOn);
   void startRenaming ();

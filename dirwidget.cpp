@@ -67,7 +67,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   auto openExternal = menu_->addAction (QIcon (":/openExternal.png"), tr ("Open in explorer"));
   connect (openExternal, &QAction::triggered,
-           this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (path ()));});
+           this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (
+                                                      path ().absoluteFilePath ()));});
 
   auto editPath = menu_->addAction (QIcon (":/rename.png"), tr ("Change path"));
   connect (editPath, &QAction::triggered,
@@ -167,7 +168,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   up_->setIcon (QIcon (":/up.png"));
   up_->setToolTip (tr ("Move up"));
   connect (up_, &QToolButton::pressed,
-           this, &DirWidget::moveUp);
+           this, [this] {openPath (view_->rootIndex ().parent ());});
 
   newFolder_->setIcon (QIcon (":/newFolder.png"));
   newFolder_->setToolTip (tr ("Create folder"));
@@ -220,7 +221,7 @@ DirWidget::~DirWidget ()
 void DirWidget::save (QSettings &settings) const
 {
   settings.setValue (qs_isList, listMode_->isChecked ());
-  settings.setValue (qs_dir, path ());
+  settings.setValue (qs_dir, path ().absoluteFilePath ());
   settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_extensive, extensiveAction_->isChecked ());
   settings.setValue (qs_showDirs, proxy_->showDirs ());
@@ -237,34 +238,14 @@ void DirWidget::restore (QSettings &settings)
   showThumbs_->setChecked (settings.value (qs_showThumbs, false).toBool ());
 }
 
-QString DirWidget::path () const
+QFileInfo DirWidget::path () const
 {
-  return model_->filePath (proxy_->mapToSource (view_->rootIndex ()));
+  return fileInfo (view_->rootIndex ());
 }
 
-void DirWidget::setPath (const QString &path)
+void DirWidget::setPath (const QFileInfo &path)
 {
-  if (path.isEmpty ())
-  {
-    // do not change proxy current path to disable possible dir filtering
-    view_->setRootIndex ({});
-    pathLabel_->clear ();
-    dirLabel_->setText (tr ("Drives"));
-    return;
-  }
-
-  auto absolutePath = QDir (path).absolutePath ();
-  auto index = proxy_->mapFromSource (model_->index (absolutePath));
-  if (!index.isValid ())
-  {
-    return;
-  }
-  view_->setRootIndex (index);
-  proxy_->setCurrent (index);
-
-  pathLabel_->setText (fittedPath ());
-  auto nameIndex = absolutePath.lastIndexOf (QLatin1Char ('/')) + 1;
-  dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
+  openPath (proxy_->mapFromSource (model_->index (path.absoluteFilePath ())));
 }
 
 void DirWidget::setNameFilter (const QString &filter)
@@ -274,36 +255,46 @@ void DirWidget::setNameFilter (const QString &filter)
 
 void DirWidget::openPath (const QModelIndex &index)
 {
-  if (!index.isValid ())
+  if (!index.isValid ()) // drives
+  {
+    // do not change proxy current path to disable possible dir filtering
+    view_->setRootIndex ({});
+    pathLabel_->clear ();
+    dirLabel_->setText (tr ("Drives"));
+    return;
+  }
+
+  const auto info = fileInfo (index);
+  if (!info.isDir ())
+  {
+    QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
+    return;
+  }
+
+  if (isLocked () || !info.permission (QFile::ExeUser))
   {
     return;
   }
 
-  const auto mapped = proxy_->mapToSource (index);
-  auto path = model_->filePath (mapped);
-  if (!model_->isDir (mapped))
+  if (info.fileName () == constants::dotdot)
   {
-    QDesktopServices::openUrl (QUrl::fromLocalFile (path));
+    openPath (index.parent ().parent ());
   }
   else
   {
-    if (!isLocked () && model_->permissions (mapped) & QFile::ExeUser)
-    {
-      if (!path.endsWith (constants::dotdot))
-      {
-        setPath (path);
-      }
-      else
-      {
-        moveUp ();
-      }
-    }
+    view_->setRootIndex (index);
+    proxy_->setCurrent (index);
+
+    pathLabel_->setText (fittedPath ());
+    const auto absolutePath = info.absoluteFilePath ();
+    auto nameIndex = absolutePath.lastIndexOf (QLatin1Char ('/')) + 1;
+    dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
   }
 }
 
 QString DirWidget::fittedPath () const
 {
-  auto path = this->path ();
+  auto path = this->path ().absoluteFilePath ();
   const auto nameIndex = path.lastIndexOf (QLatin1Char ('/')) + 1;
   if (!nameIndex)
   {
@@ -332,27 +323,9 @@ QString DirWidget::fittedPath () const
   return path;
 }
 
-void DirWidget::moveUp ()
-{
-  const auto path = this->path ();
-  if (path.isEmpty ())
-  {
-    return;
-  }
-  QDir dir (path);
-  if (dir.cdUp ())
-  {
-    setPath (dir.absolutePath ());
-  }
-  else
-  {
-    setPath ({});
-  }
-}
-
 void DirWidget::newFolder ()
 {
-  QDir dir (path ());
+  QDir dir (path ().absoluteFilePath ());
   auto name = tr ("New");
   auto i = 0;
   while (dir.exists (name))
@@ -425,7 +398,8 @@ void DirWidget::togglePathEdition (bool isOn)
 
 void DirWidget::promptClose ()
 {
-  auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?").arg (path ()),
+  auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?")
+                                    .arg (path ().absoluteFilePath ()),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
@@ -440,19 +414,14 @@ void DirWidget::promptTrash ()
   {
     return;
   }
-  QStringList names;
-  for (const auto &i: indexes)
-  {
-    names << i.data ().toString ();
-  }
   auto res = QMessageBox::question (this, {}, tr ("Move files \"%1\" to trash?")
-                                    .arg (names.join (QLatin1String ("\", \""))),
+                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
     for (const auto &i: indexes)
     {
-      Trash::trash (model_->fileInfo (proxy_->mapToSource (i)));
+      Trash::trash (fileInfo (i));
     }
   }
 }
@@ -464,13 +433,8 @@ void DirWidget::promptRemove ()
   {
     return;
   }
-  QStringList names;
-  for (const auto &i: indexes)
-  {
-    names << i.data ().toString ();
-  }
   auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names.join (QLatin1String ("\", \""))),
+                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
@@ -486,14 +450,38 @@ QList<QFileInfo> DirWidget::selected () const
   QList<QFileInfo> infos;
   for (const auto &i: view_->selectedRows ())
   {
-    infos << model_->fileInfo (proxy_->mapToSource (i));
+    infos << fileInfo (i);
   }
   return infos;
 }
 
 QFileInfo DirWidget::current () const
 {
-  return model_->fileInfo (proxy_->mapToSource (view_->currentIndex ()));
+  return fileInfo (view_->currentIndex ());
+}
+
+QFileInfo DirWidget::fileInfo (const QModelIndex &index) const
+{
+  if (!index.isValid ())
+  {
+    return {};
+  }
+
+  if (index.model () == model_)
+  {
+    return model_->fileInfo (index);
+  }
+  return model_->fileInfo (proxy_->mapToSource (index));
+}
+
+QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
+{
+  QStringList names;
+  for (const auto &i: indexes)
+  {
+    names << i.data ().toString ();
+  }
+  return names;
 }
 
 void DirWidget::cut ()
@@ -517,7 +505,7 @@ void DirWidget::paste ()
   {
     return;
   }
-  CopyPaste::paste (model_->fileInfo (proxy_->mapToSource (index)));
+  CopyPaste::paste (fileInfo (index));
 }
 
 void DirWidget::showViewContextMenu ()
