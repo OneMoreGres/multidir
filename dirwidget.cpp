@@ -4,6 +4,7 @@
 #include "copypaste.h"
 #include "dirview.h"
 #include "trash.h"
+#include "constants.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -283,7 +284,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     if (!isLocked () && model_->permissions (mapped) & QFile::ExeUser)
     {
-      if (!path.endsWith (QLatin1String ("..")))
+      if (!path.endsWith (constants::dotdot))
       {
         setPath (path);
       }
@@ -513,7 +514,7 @@ void DirWidget::paste ()
 void DirWidget::showViewContextMenu ()
 {
   const auto index = view_->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == QLatin1String ("..");
+  const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
   openAction_->setEnabled (index.isValid ());
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
