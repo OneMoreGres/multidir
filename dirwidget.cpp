@@ -3,6 +3,7 @@
 #include "filesystemmodel.h"
 #include "copypaste.h"
 #include "dirview.h"
+#include "trash.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -45,6 +46,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   renameAction_ (nullptr),
+  trashAction_ (nullptr),
   removeAction_ (nullptr),
   cutAction_ (nullptr),
   copyAction_ (nullptr),
@@ -145,6 +147,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
   connect (renameAction_, &QAction::triggered,
            view_, &DirView::renameCurrent);
+
+  trashAction_ = viewMenu_->addAction (QIcon (":/trash.png"), tr ("Move to trash..."));
+  connect (trashAction_, &QAction::triggered,
+           this, &DirWidget::promptTrash);
 
   removeAction_ = viewMenu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
   connect (removeAction_, &QAction::triggered,
@@ -418,6 +424,30 @@ void DirWidget::promptClose ()
   if (res == QMessageBox::Yes)
   {
     emit closeRequested (this);
+  }
+}
+
+void DirWidget::promptTrash ()
+{
+  const auto indexes = view_->selectedRows ();
+  if (indexes.isEmpty ())
+  {
+    return;
+  }
+  QStringList names;
+  for (const auto &i: indexes)
+  {
+    names << i.data ().toString ();
+  }
+  auto res = QMessageBox::question (this, {}, tr ("Move files \"%1\" to trash?")
+                                    .arg (names.join (QLatin1String ("\", \""))),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::Yes)
+  {
+    for (const auto &i: indexes)
+    {
+      Trash::trash (model_->fileInfo (proxy_->mapToSource (i)));
+    }
   }
 }
 

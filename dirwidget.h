@@ -49,6 +49,7 @@ private:
   void togglePathEdition (bool isOn);
   void startRenaming ();
   void promptClose ();
+  void promptTrash ();
   void promptRemove ();
   void cut ();
   void copy ();
@@ -81,6 +82,7 @@ private:
   QMenu *viewMenu_;
   QAction *openAction_;
   QAction *renameAction_;
+  QAction *trashAction_;
   QAction *removeAction_;
   QAction *cutAction_;
   QAction *copyAction_;

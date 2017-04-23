@@ -10,7 +10,7 @@
         <file alias="quit.png">icons/exit-1.png</file>
         <file alias="lockTab.png">icons/locked-6.png</file>
         <file alias="rename.png">icons/edit.png</file>
-        <file alias="remove.png">icons/garbage-1.png</file>
+        <file alias="trash.png">icons/garbage-1.png</file>
         <file alias="up.png">icons/folder-16.png</file>
         <file alias="settings.png">icons/controls-6.png</file>
         <file alias="extensive.png">icons/more-2.png</file>
@@ -18,5 +18,6 @@
         <file alias="listMode.png">icons/list-1.png</file>
         <file alias="showThumbs.png">icons/picture.png</file>
         <file alias="newFolder.png">icons/folder-4.png</file>
+        <file alias="remove.png">icons/trash.png</file>
     </qresource>
 </RCC>
