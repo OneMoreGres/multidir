@@ -16,10 +16,6 @@
 !define UNINSTALLER "uninstall.exe"
 !define BRANDING "${APP_BRAND_NAME} ver. ${VERSION}"
 !define OUT_README "readme.txt"
-!define VC_REDIST_VERSION "2015"
-!define VC_REDIST_REG "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
-!define VC_REDIST_LINK "https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x86.exe"
-!define VC_REDIST_TMP "$TEMP\vc_redist_2015_x86.exe"
 !define REG_ROOT "HKCU"
 !define REG_APP "Software\${COMPANY}\${APP_WORK_NAME}"
 !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_WORK_NAME}"
@@ -97,6 +93,12 @@ Section !$(SECT_APP) SECT_APP_ID
     File "${CONTENT_DIR}\app\*.dll"
     SetOutPath "$INSTDIR\platforms"
     File "${CONTENT_DIR}\app\platforms\*.dll"
+    SetOutPath "$INSTDIR\imageformats"
+    File "${CONTENT_DIR}\app\imageformats\*.dll"
+    SetOutPath "$INSTDIR\translations"
+    File "${CONTENT_DIR}\app\translations\*.qm"
+    SetOutPath "$INSTDIR\iconengines"
+    File "${CONTENT_DIR}\app\iconengines\*.dll"
 SectionEnd
 
 
@@ -129,21 +131,11 @@ Section -StartMenu
 SectionEnd
 
 
-Var GOT_VCREDIST 
-Section "" SECT_VCREDIST_ID
-    StrCmp $GOT_VCREDIST "-" done_vcredist
-        SetOutPath "$TEMP"
-	File ${CONTENT_DIR}\app\vcredist_x86.exe
-        ExecWait '"$TEMP\vcredist_x86.exe"'
-	Delete "$TEMP\vcredist_x86.exe"
-        ;NSISdl::download ${VC_REDIST_LINK} ${VC_REDIST_TMP}
-        ;Pop $R0
-        ;StrCmp $R0 "success" success_vcredist
-            ;MessageBox MB_OK|MB_ICONEXCLAMATION $(VC_DOWNLOAD_FAIL)
-            ;Goto done_vcredist
-        ;success_vcredist:
-            ;ExecWait '${VC_REDIST_TMP}'
-    done_vcredist:
+Section $(SECT_REDIST) SECT_REDIST_ID
+    SetOutPath "$TEMP"
+    File ${CONTENT_DIR}\app\vcredist_x86.exe
+    ExecWait '"$TEMP\vcredist_x86.exe"'
+    Delete "$TEMP\vcredist_x86.exe"
 SectionEnd
 
 
@@ -176,19 +168,13 @@ Section "Uninstall"
 SectionEnd
 
 ; functions
- 
+
 Function .onSelChange
     SectionGetFlags ${SECT_PORTABLE_ID} $IS_PORTABLE
 FunctionEnd
 
 Function onComponentsEnter
     SectionGetSize ${SECT_APP_ID} $APP_SIZE
-    
-    ReadRegStr $1 HKLM ${VC_REDIST_REG} "Installed"
-    StrCmp $1 "1" installed
-        SectionSetText ${SECT_VCREDIST_ID} $(SECT_VCREDIST)
-        StrCpy $GOT_VCREDIST "-"
-    installed:
 FunctionEnd
 
 
@@ -222,13 +208,10 @@ LangString SECT_PORTABLE ${LANG_RUSSIAN} "Portable"
 LangString SECT_PORTABLE_ID_I18N ${LANG_ENGLISH} "Do not make uninstaller and register in system."
 LangString SECT_PORTABLE_ID_I18N ${LANG_RUSSIAN} "Не создавать деинсталлятор и не регистрироваться в системе."
 
-LangString SECT_VCREDIST ${LANG_ENGLISH} "Libraries"
-LangString SECT_VCREDIST ${LANG_RUSSIAN} "Библиотеки"
-LangString SECT_VCREDIST_ID_I18N ${LANG_ENGLISH} "Download and install vc redist ${VC_REDIST_VERSION}."
-LangString SECT_VCREDIST_ID_I18N ${LANG_RUSSIAN} "Загрузить и установить vc redist ${VC_REDIST_VERSION}."
-
-LangString VC_DOWNLOAD_FAIL ${LANG_ENGLISH} "Unable to download vc redist ${VC_REDIST_VERSION} x86. Please, install it manually."
-LangString VC_DOWNLOAD_FAIL ${LANG_RUSSIAN} "Не удалось загрузить пакет vc redist ${VC_REDIST_VERSION} x86. Пожалуйста, установите его самостоятельно."
+LangString SECT_REDIST ${LANG_ENGLISH} "System libraries"
+LangString SECT_REDIST ${LANG_RUSSIAN} "Системные библиотеки"
+LangString SECT_REDIST_ID_I18N ${LANG_ENGLISH} "Install required system libraries (vcredist)."
+LangString SECT_REDIST_ID_I18N ${LANG_RUSSIAN} "Установить необходимые системные библиотеки (vcredist)."
 
 LangString UNINSTALL_LINK ${LANG_ENGLISH} "Uninstall"
 LangString UNINSTALL_LINK ${LANG_RUSSIAN} "Удалить"
@@ -238,5 +221,5 @@ LangString UNINSTALL_LINK ${LANG_RUSSIAN} "Удалить"
 !insertmacro MUI_DESCRIPTION_TEXT ${SECT_DESKTOP_ID} $(SECT_DESKTOP_ID_I18N)
 !insertmacro MUI_DESCRIPTION_TEXT ${SECT_AUTOSTART_ID} $(SECT_AUTOSTART_ID_I18N)
 !insertmacro MUI_DESCRIPTION_TEXT ${SECT_PORTABLE_ID} $(SECT_PORTABLE_ID_I18N)
-!insertmacro MUI_DESCRIPTION_TEXT ${SECT_VCREDIST_ID} $(SECT_VCREDIST_ID_I18N)
+!insertmacro MUI_DESCRIPTION_TEXT ${SECT_REDIST_ID} $(SECT_REDIST_ID_I18N)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
