@@ -71,7 +71,15 @@ void DirView::setRootIndex (const QModelIndex &index)
 
 QModelIndexList DirView::selectedRows () const
 {
-  return view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  auto items = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  for (const auto &i: items)
+  {
+    if (i.data () == constants::dotdot)
+    {
+      items.removeOne (i);
+    }
+  }
+  return items;
 }
 
 void DirView::renameCurrent ()
