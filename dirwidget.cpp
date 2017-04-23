@@ -46,6 +46,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showThumbs_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
+  openInTabAction_ (nullptr),
   renameAction_ (nullptr),
   trashAction_ (nullptr),
   removeAction_ (nullptr),
@@ -121,6 +122,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
+
+  openInTabAction_ = viewMenu_->addAction (tr ("Open in tab"));
+  connect (openInTabAction_, &QAction::triggered,
+           this, [this]() {emit newTabRequested (current ().absoluteFilePath ());});
 
   cutAction_ = viewMenu_->addAction (QIcon::fromTheme ("cut"), tr ("Cut"));
   cutAction_->setShortcut (QKeySequence::Cut);
@@ -486,6 +491,10 @@ QList<QFileInfo> DirWidget::selected () const
   return infos;
 }
 
+QFileInfo DirWidget::current () const
+{
+  return model_->fileInfo (proxy_->mapToSource (view_->currentIndex ()));
+}
 
 void DirWidget::cut ()
 {
@@ -515,7 +524,9 @@ void DirWidget::showViewContextMenu ()
 {
   const auto index = view_->currentIndex ();
   const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
+  const auto isDir = current ().isDir ();
   openAction_->setEnabled (index.isValid ());
+  openInTabAction_->setEnabled (isDir);
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   trashAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);

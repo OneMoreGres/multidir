@@ -29,6 +29,7 @@ protected:
 private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);
+  void add (const QString &path);
   DirWidget * addWidget ();
   void addToLayout (DirWidget *widget);
   void showContextMenu ();

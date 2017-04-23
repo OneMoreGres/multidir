@@ -130,6 +130,8 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::close);
   connect (w, &DirWidget::cloneRequested,
            this, &MultiDirWidget::clone);
+  connect (w, &DirWidget::newTabRequested,
+           this, &MultiDirWidget::add);
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
   w->setPath (QDir::homePath ());
@@ -226,4 +228,10 @@ void MultiDirWidget::clone (DirWidget *widget)
 {
   auto w = addWidget ();
   w->setPath (widget->path ());
+}
+
+void MultiDirWidget::add (const QString &path)
+{
+  auto w = addWidget ();
+  w->setPath (path);
 }

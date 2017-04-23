@@ -34,6 +34,7 @@ public:
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
+  void newTabRequested (const QString &path);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;
@@ -45,6 +46,7 @@ private:
 
   QString fittedPath () const;
   QList<QFileInfo> selected () const;
+  QFileInfo current () const;
 
   void togglePathEdition (bool isOn);
   void startRenaming ();
@@ -81,6 +83,7 @@ private:
 
   QMenu *viewMenu_;
   QAction *openAction_;
+  QAction *openInTabAction_;
   QAction *renameAction_;
   QAction *trashAction_;
   QAction *removeAction_;
