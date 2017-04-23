@@ -41,8 +41,7 @@ OTHER_FILES += \
     LICENSE.md \
     translations/LICENSE_ru.md \
     README.md \
-    utils/make_ubuntu.sh \
-    utils/make_appimage.sh
+    utils/*
 
 SOURCES += \
     main.cpp \
