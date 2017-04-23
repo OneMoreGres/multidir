@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file alias="cloneTab.png">icons/add-3.png</file>
-        <file alias="app.png">icons/app.png</file>
         <file alias="closeTab.png">icons/close.png</file>
         <file alias="folder.png">icons/folder-10.png</file>
         <file alias="add.png">icons/plus.png</file>
@@ -19,5 +18,6 @@
         <file alias="showThumbs.png">icons/picture.png</file>
         <file alias="newFolder.png">icons/folder-4.png</file>
         <file alias="remove.png">icons/trash.png</file>
+        <file alias="app.png">icons/multidir.png</file>
     </qresource>
 </RCC>

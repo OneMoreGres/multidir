@@ -40,7 +40,9 @@ OTHER_FILES += \
     icons/README.md \
     LICENSE.md \
     translations/LICENSE_ru.md \
-    README.md
+    README.md \
+    utils/make_ubuntu.sh \
+    utils/make_appimage.sh
 
 SOURCES += \
     main.cpp \
@@ -82,3 +84,17 @@ QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
 VERSION = $$APP_VERSION.0
 RC_ICONS = icons/icon.ico
 
+unix {
+    PREFIX = /usr
+
+    target.path = $$PREFIX/bin
+
+    shortcuts.files = utils/multidir.desktop
+    shortcuts.path = $$PREFIX/share/applications/
+    pixmaps.files += icons/multidir.png
+    pixmaps.path = $$PREFIX/share/pixmaps/
+    translations.files += translations/*.qm
+    translations.path = $$PREFIX/share/multidir/translations
+
+    INSTALLS += target shortcuts pixmaps translations
+}

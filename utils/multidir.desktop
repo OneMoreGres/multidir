@@ -1,0 +1,9 @@
+[Desktop Entry]
+Comment=Multiple directory management tool.
+Exec=multidir
+GenericName=MultiDir Manager
+Icon=multidir
+Name=MultiDir
+Terminal=false
+Type=Application
+Categories=Utility;Core;Qt
