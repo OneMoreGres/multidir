@@ -467,11 +467,22 @@ QFileInfo DirWidget::fileInfo (const QModelIndex &index) const
     return {};
   }
 
-  if (index.model () == model_)
+  auto result = (index.model () == model_)
+                ? model_->fileInfo (index)
+                : model_->fileInfo (proxy_->mapToSource (index));
+
+#ifdef Q_OS_WIN
+  if (result.isDir ())
   {
-    return model_->fileInfo (index);
+    const auto path = result.filePath ();
+    if (path.endsWith (QLatin1Char (':')) && path.length () == 2)
+    {
+      result = QFileInfo (path + QLatin1Char ('/'));
+    }
   }
-  return model_->fileInfo (proxy_->mapToSource (index));
+#endif
+
+  return result;
 }
 
 QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
