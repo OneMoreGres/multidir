@@ -84,6 +84,7 @@ private:
 
   QMenu *viewMenu_;
   QAction *openAction_;
+  QMenu *openWith_;
   QAction *openInTabAction_;
   QAction *renameAction_;
   QAction *trashAction_;

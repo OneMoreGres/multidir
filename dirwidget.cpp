@@ -5,6 +5,7 @@
 #include "dirview.h"
 #include "trash.h"
 #include "constants.h"
+#include "openwith.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -46,6 +47,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   showThumbs_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
+  openWith_ (nullptr),
   openInTabAction_ (nullptr),
   renameAction_ (nullptr),
   trashAction_ (nullptr),
@@ -123,6 +125,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openAction_ = viewMenu_->addAction (tr ("Open"));
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
+
+  openWith_ = viewMenu_->addMenu (tr ("Open with"));
 
   openInTabAction_ = viewMenu_->addAction (tr ("Open in tab"));
   connect (openInTabAction_, &QAction::triggered,
@@ -525,6 +529,11 @@ void DirWidget::showViewContextMenu ()
   const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
   const auto isDir = current ().isDir ();
   openAction_->setEnabled (index.isValid ());
+  openWith_->setEnabled (index.isValid () && !isDir);
+  if (openWith_->isEnabled ())
+  {
+    OpenWith::popupateMenu (*openWith_, current ());
+  }
   openInTabAction_->setEnabled (isDir);
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);

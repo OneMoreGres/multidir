@@ -55,7 +55,8 @@ SOURCES += \
     copypaste.cpp \
     dirview.cpp \
     delegate.cpp \
-    trash.cpp
+    trash.cpp \
+    openwith.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -69,7 +70,8 @@ HEADERS  += \
     dirview.h \
     constants.h \
     delegate.h \
-    trash.h
+    trash.h \
+    openwith.h
 
 RESOURCES += \
     resources.qrc

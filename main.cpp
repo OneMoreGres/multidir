@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "openwith.h"
 
 #include <QApplication>
 #include <QDir>
@@ -44,6 +45,8 @@ int main (int argc, char *argv[])
     qDebug () << "Another instance is running. Lock file is busy.";
     return 0;
   }
+
+  OpenWith::init ();
 
   Controller control;
   return a.exec ();
