@@ -13,6 +13,7 @@ ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
   showDirs_ (true),
+  showHidden_ (false),
   showThumbnails_ (false),
   nameFilter_ (),
   current_ ()
@@ -30,6 +31,18 @@ void ProxyModel::setShowDirs (bool showDirs)
   showDirs_ = showDirs;
   invalidateFilter ();
 }
+
+bool ProxyModel::showHidden () const
+{
+  return showHidden_;
+}
+
+void ProxyModel::setShowHidden (bool showHidden)
+{
+  showHidden_ = showHidden;
+  invalidateFilter ();
+}
+
 
 bool ProxyModel::showThumbnails () const
 {
@@ -59,14 +72,19 @@ bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParen
 {
   if (sourceParent == current_)
   {
-    if (!showDirs_ || !nameFilter_.isEmpty ())
+    const auto canFilter = !showDirs_ || !showHidden_ || !nameFilter_.isEmpty ();
+    if (canFilter)
     {
-      auto index = model_->index (sourceRow, 0, sourceParent);
-      if (!showDirs_ && model_->isDir (index))
+      const auto info = model_->fileInfo (model_->index (sourceRow, 0, sourceParent));
+      if (!showDirs_ && info.isDir ())
       {
         return false;
       }
-      if (!nameFilter_.isEmpty () && !QDir::match (nameFilter_, index.data ().toString ()))
+      if (!showHidden_ && info.isHidden () && info.fileName () != constants::dotdot)
+      {
+        return false;
+      }
+      if (!nameFilter_.isEmpty () && !QDir::match (nameFilter_, info.fileName ()))
       {
         return false;
       }

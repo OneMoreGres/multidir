@@ -19,5 +19,6 @@
         <file alias="newFolder.png">icons/folder-4.png</file>
         <file alias="remove.png">icons/trash.png</file>
         <file alias="app.png">icons/multidir.png</file>
+        <file alias="hidden.png">icons/view.png</file>
     </qresource>
 </RCC>

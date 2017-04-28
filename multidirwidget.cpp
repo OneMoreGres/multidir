@@ -33,7 +33,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   setWindowIcon (QIcon (":/app.png"));
 
   model_->setRootPath (QDir::homePath ());
-  model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs);
+  model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
   model_->setReadOnly (false);
 
 

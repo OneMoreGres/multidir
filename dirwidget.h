@@ -78,6 +78,7 @@ private:
   QMenu *menu_;
   QAction *isLocked_;
   QAction *showDirs_;
+  QAction *showHidden_;
   QAction *extensiveAction_;
   QAction *listMode_;
   QAction *showThumbs_;

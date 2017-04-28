@@ -12,6 +12,9 @@ public:
   bool showDirs () const;
   void setShowDirs (bool showDirs);
 
+  bool showHidden () const;
+  void setShowHidden (bool showHidden);
+
   void setNameFilter (const QString &name);
 
   void setCurrent (const QModelIndex &current);
@@ -31,6 +34,7 @@ protected:
 private:
   QFileSystemModel *model_;
   bool showDirs_;
+  bool showHidden_;
   bool showThumbnails_;
   QString nameFilter_;
   QPersistentModelIndex current_;
