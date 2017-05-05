@@ -48,6 +48,7 @@ void TiledView::add (QWidget &widget)
   reserveTile ();
   emplace (ptr);
   ptr->show ();
+  updateGeometry ();
 }
 
 void TiledView::reserveTile ()
@@ -213,6 +214,7 @@ void TiledView::remove (QWidget &widget)
   {
     updateTilesGeometry ();
   }
+  updateGeometry ();
 }
 
 void TiledView::removeRow (int index)
@@ -247,4 +249,35 @@ QSize TiledView::tilesSize () const
     return sum + i + spacing_;
   });
   return {width + 2 * margin_ - spacing_, height + 2 * margin_ - spacing_};
+}
+QSize TiledView::sizeHint () const
+{
+  return getSizeHint (&QWidget::sizeHint);
+}
+
+QSize TiledView::minimumSizeHint () const
+{
+  return getSizeHint (&QWidget::minimumSizeHint);
+}
+
+QSize TiledView::getSizeHint (QSize (QWidget::*type)() const) const
+{
+  if (tiles_.isEmpty ())
+  {
+    return {};
+  }
+
+  QMap<int, int> widths, heights;
+  for (const auto &i: tiles_)
+  {
+    if (!i.widget)
+    {
+      continue;
+    }
+    const auto hint = (i.widget->*type)();
+    heights[i.col] += hint.height () + spacing_;
+    widths[i.row] += hint.width () + spacing_;
+  }
+  return QSize (*max_element (cbegin (widths), cend (widths)) - spacing_ + 2 * margin_,
+                *max_element (cbegin (heights), cend (heights)) - spacing_ + 2 * margin_);
 }

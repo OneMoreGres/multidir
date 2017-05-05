@@ -13,6 +13,9 @@ public:
   void add (QWidget &widget);
   void remove (QWidget &widget);
 
+  QSize sizeHint () const override;
+  QSize minimumSizeHint () const override;
+
 protected:
   void resizeEvent (QResizeEvent *event) override;
 
@@ -36,6 +39,8 @@ private:
   void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
   //! Size currently occupied by tiles.
   QSize tilesSize () const;
+  //! Get size hint of given type.
+  QSize getSizeHint (QSize (QWidget::*type)() const) const;
 
 
   //! Row sizes,
