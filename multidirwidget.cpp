@@ -1,6 +1,7 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
 #include "filesystemmodel.h"
+#include "tiledview.h"
 
 #include <QGridLayout>
 #include <QBoxLayout>
@@ -25,7 +26,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
   widgets_ (),
-  layout_ (new QGridLayout),
+  view_ (new TiledView (this)),
   contextMenu_ (new QMenu (tr ("Context"), this)),
   findEdit_ (new QLineEdit (this))
 {
@@ -78,7 +79,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (menuBarLayout);
-  layout->addLayout (layout_);
+  layout->addWidget (view_);
 }
 
 MultiDirWidget::~MultiDirWidget ()
@@ -102,9 +103,10 @@ void MultiDirWidget::save (QSettings &settings) const
 void MultiDirWidget::restore (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
+  Q_ASSERT (widgets_.isEmpty ());
 
-  qDeleteAll (widgets_);
-  widgets_.clear ();
+  //  qDeleteAll (widgets_);
+  //  widgets_.clear ();
 
   auto size = settings.beginReadArray (qs_dirs);
   for (auto i = 0; i < size; ++i)
@@ -135,35 +137,8 @@ DirWidget * MultiDirWidget::addWidget ()
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
   w->setPath (QDir::homePath ());
-  addToLayout (w);
+  view_->add (*w);
   return w;
-}
-
-void MultiDirWidget::addToLayout (DirWidget *widget)
-{
-  const auto cols = layout_->columnCount ();
-  const auto rows = layout_->rowCount ();
-  for (auto row = 0; row < rows; ++row)
-  {
-    for (auto col = 0; col < cols; ++col)
-    {
-      auto item = layout_->itemAtPosition (row, col);
-      if (!item)
-      {
-        layout_->addWidget (widget, row, col);
-        return;
-      }
-    }
-  }
-
-  if (cols > rows)
-  {
-    layout_->addWidget (widget, rows, 0);
-  }
-  else
-  {
-    layout_->addWidget (widget, 0, cols);
-  }
 }
 
 void MultiDirWidget::showContextMenu ()
@@ -221,6 +196,7 @@ void MultiDirWidget::keyPressEvent (QKeyEvent *event)
 void MultiDirWidget::close (DirWidget *widget)
 {
   widgets_.removeAll (widget);
+  view_->remove (*widget);
   widget->deleteLater ();
 }
 

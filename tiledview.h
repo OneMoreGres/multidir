@@ -1,0 +1,49 @@
+#pragma once
+
+#include <QWidget>
+
+class Tile;
+
+class TiledView : public QWidget
+{
+public:
+  explicit TiledView (QWidget *parent = 0);
+  ~TiledView ();
+
+  void add (QWidget &widget);
+  void remove (QWidget &widget);
+
+protected:
+  void resizeEvent (QResizeEvent *event) override;
+
+private:
+  void reserveTile ();
+  void emplace (QWidget *widget);
+  void updateTilesGeometry ();
+
+  void addRow ();
+  void addColumn ();
+  void removeRow (int index);
+  void removeColumn (int index);
+
+  Tile * findTile (QWidget *widget) const;
+
+  //! Distribute given size over items (rows or cols).
+  void adjustSizes (QList<int> &sizes, int sizeToFill) const;
+  //! Add new row or col.
+  void addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize, bool isRow);
+  //! Remove given row or col.
+  void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
+  //! Size currently occupied by tiles.
+  QSize tilesSize () const;
+
+
+  //! Row sizes,
+  QList<int> rows_;
+  //! Column sizes.
+  QList<int> columns_;
+  QList<Tile> tiles_;
+  int spacing_;
+  int margin_;
+  QPoint dragStartPos_;
+};
