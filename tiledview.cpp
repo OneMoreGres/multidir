@@ -221,30 +221,7 @@ void TiledView::remove (QWidget &widget)
   auto tile = findTile (&widget);
   Q_ASSERT (tile);
   tile->widget = nullptr;
-
-  auto row = find_if (cbegin (tiles_), cend (tiles_), [tile](const Tile &i) {
-    return i.widget && i.row == tile->row;
-  });
-  const auto rowEmpty = (row == cend (tiles_));
-  if (rowEmpty)
-  {
-    removeRow (tile->row);
-  }
-
-
-  auto col = find_if (cbegin (tiles_), cend (tiles_), [tile](const Tile &i) {
-    return i.widget && i.col == tile->col;
-  });
-  const auto colEmpty = (col == cend (tiles_));
-  if (colEmpty)
-  {
-    removeColumn (tile->col);
-  }
-
-  if (rowEmpty || colEmpty)
-  {
-    updateTilesGeometry ();
-  }
+  cleanupDimensions ();
   updateGeometry ();
 }
 
@@ -256,6 +233,43 @@ void TiledView::removeRow (int index)
 void TiledView::removeColumn (int index)
 {
   removeDimesion (columns_, &Tile::col, index);
+}
+
+void TiledView::cleanupDimensions ()
+{
+  QSet<int> rows, cols;
+  for (const auto &i: tiles_)
+  {
+    if (i.widget)
+    {
+      rows << i.row;
+      cols << i.col;
+    }
+  }
+
+  auto edited = false;
+  for (auto i = rows_.size () - 1; i >= 0; --i)
+  {
+    if (!rows.contains (i))
+    {
+      edited = true;
+      removeRow (i);
+    }
+  }
+
+  for (auto i = columns_.size () - 1; i >= 0; --i)
+  {
+    if (!cols.contains (i))
+    {
+      edited = true;
+      removeColumn (i);
+    }
+  }
+
+  if (edited)
+  {
+    updateTilesGeometry ();
+  }
 }
 
 void TiledView::resizeEvent (QResizeEvent *event)
@@ -374,7 +388,21 @@ void TiledView::dropEvent (QDropEvent *event)
   auto source = mime->tile;
   Q_ASSERT (source);
 
-  auto target = findTile (event->pos ());
+  auto pos = event->pos ();
+  if (height () - pos.y () < margin_)
+  {
+    addRow ();
+    updateTilesGeometry ();
+    pos.ry () -= margin_;
+  }
+  else if (width () - pos.x () < margin_)
+  {
+    addColumn ();
+    updateTilesGeometry ();
+    pos.rx () -= margin_;
+  }
+
+  auto target = findTile (pos);
   if (!target)
   {
     return;
@@ -385,6 +413,7 @@ void TiledView::dropEvent (QDropEvent *event)
     auto targetWidget = target->widget;
     target->setWidget (source->widget);
     source->setWidget (targetWidget);
+    cleanupDimensions ();
     event->acceptProposedAction ();
   }
 }

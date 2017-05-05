@@ -34,6 +34,7 @@ private:
   void addColumn ();
   void removeRow (int index);
   void removeColumn (int index);
+  void cleanupDimensions ();
 
   Tile * findTile (QWidget *widget) const;
   Tile * findTile (const QPoint &pos) const;
