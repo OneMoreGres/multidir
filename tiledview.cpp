@@ -10,6 +10,15 @@
 
 using namespace std;
 
+//! Class for drag-n-drop support.
+class TileMime : public QMimeData
+{
+Q_OBJECT
+public:
+  Tile *tile;
+};
+
+
 
 //! Tile info.
 class Tile
@@ -20,8 +29,19 @@ public:
   int row = -1;
   int col = -1;
 
+  void setWidget (QWidget *widget);
   bool operator< (const Tile &r) const { return tie (row, col) < tie (r.row,r.col); }
 };
+
+void Tile::setWidget (QWidget *widget)
+{
+  this->widget = widget;
+  if (widget)
+  {
+    widget->setGeometry (geometry);
+  }
+}
+
 
 
 TiledView::TiledView (QWidget *parent) :
@@ -84,6 +104,18 @@ Tile * TiledView::findTile (QWidget *widget) const
 {
   auto it = find_if (cbegin (tiles_), cend (tiles_), [widget](const Tile &i) {
     return i.widget == widget;
+  });
+  if (it == cend (tiles_))
+  {
+    return nullptr;
+  }
+  return &const_cast<Tile &>(*it);
+}
+
+Tile * TiledView::findTile (const QPoint &pos) const
+{
+  auto it = find_if (cbegin (tiles_), cend (tiles_), [pos](const Tile &i) {
+    return i.geometry.contains (pos);
   });
   if (it == cend (tiles_))
   {
@@ -181,8 +213,7 @@ void TiledView::emplace (QWidget *widget)
 {
   auto tile = findTile (nullptr);
   Q_ASSERT (tile);
-  tile->widget = widget;
-  widget->setGeometry (tile->geometry);
+  tile->setWidget (widget);
 }
 
 void TiledView::remove (QWidget &widget)
@@ -250,6 +281,7 @@ QSize TiledView::tilesSize () const
   });
   return {width + 2 * margin_ - spacing_, height + 2 * margin_ - spacing_};
 }
+
 QSize TiledView::sizeHint () const
 {
   return getSizeHint (&QWidget::sizeHint);
@@ -281,3 +313,80 @@ QSize TiledView::getSizeHint (QSize (QWidget::*type)() const) const
   return QSize (*max_element (cbegin (widths), cend (widths)) - spacing_ + 2 * margin_,
                 *max_element (cbegin (heights), cend (heights)) - spacing_ + 2 * margin_);
 }
+
+void TiledView::mousePressEvent (QMouseEvent *event)
+{
+  if (event->button () == Qt::LeftButton)
+  {
+    dragStartPos_ = event->pos ();
+  }
+}
+
+void TiledView::mouseReleaseEvent (QMouseEvent *event)
+{
+  if (event->button () == Qt::LeftButton)
+  {
+    dragStartPos_ = {};
+  }
+}
+
+void TiledView::mouseMoveEvent (QMouseEvent *event)
+{
+  if (dragStartPos_.isNull ())
+  {
+    return;
+  }
+  if ((event->pos () - dragStartPos_).manhattanLength () < QApplication::startDragDistance ())
+  {
+    return;
+  }
+  const auto tile = findTile (dragStartPos_);
+  if (!tile)
+  {
+    return;
+  }
+
+  auto *drag = new QDrag (this);
+  drag->setPixmap (tile->widget->grab ());
+
+  auto *mime = new TileMime;
+  mime->tile = const_cast<Tile *>(tile);
+  drag->setMimeData (mime);
+
+  drag->exec (Qt::MoveAction);
+}
+
+void TiledView::dragEnterEvent (QDragEnterEvent *event)
+{
+  if (qobject_cast<const TileMime *>(event->mimeData ()))
+  {
+    event->acceptProposedAction ();
+  }
+}
+
+void TiledView::dropEvent (QDropEvent *event)
+{
+  auto *mime = qobject_cast<const TileMime *>(event->mimeData ());
+  if (!mime)
+  {
+    return;
+  }
+  auto source = mime->tile;
+  Q_ASSERT (source);
+
+  auto target = findTile (event->pos ());
+  if (!target)
+  {
+    return;
+  }
+
+  if (event->dropAction () == Qt::MoveAction)
+  {
+    auto targetWidget = target->widget;
+    target->setWidget (source->widget);
+    source->setWidget (targetWidget);
+    event->acceptProposedAction ();
+  }
+}
+
+#include "tiledview.moc"

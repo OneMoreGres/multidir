@@ -19,6 +19,12 @@ public:
 protected:
   void resizeEvent (QResizeEvent *event) override;
 
+  void mousePressEvent (QMouseEvent *event) override;
+  void mouseReleaseEvent (QMouseEvent *event) override;
+  void mouseMoveEvent (QMouseEvent *event) override;
+  void dragEnterEvent (QDragEnterEvent *event) override;
+  void dropEvent (QDropEvent *event) override;
+
 private:
   void reserveTile ();
   void emplace (QWidget *widget);
@@ -30,6 +36,7 @@ private:
   void removeColumn (int index);
 
   Tile * findTile (QWidget *widget) const;
+  Tile * findTile (const QPoint &pos) const;
 
   //! Distribute given size over items (rows or cols).
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
