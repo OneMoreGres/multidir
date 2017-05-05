@@ -81,7 +81,7 @@ void TiledView::reserveTile ()
 
 Tile * TiledView::findTile (QWidget *widget) const
 {
-  auto it = std::find_if (cbegin (tiles_), cend (tiles_), [widget](const Tile &i) {
+  auto it = find_if (cbegin (tiles_), cend (tiles_), [widget](const Tile &i) {
     return i.widget == widget;
   });
   if (it == cend (tiles_))
@@ -190,31 +190,20 @@ void TiledView::remove (QWidget &widget)
   Q_ASSERT (tile);
   tile->widget = nullptr;
 
-  auto rowEmpty = true;
-  for (const auto &i: tiles_)
-  {
-    if (i.row == tile->row && i.widget)
-    {
-      rowEmpty = false;
-      break;
-    }
-  }
+  auto row = find_if (cbegin (tiles_), cend (tiles_), [tile](const Tile &i) {
+    return i.widget && i.row == tile->row;
+  });
+  const auto rowEmpty = (row == cend (tiles_));
   if (rowEmpty)
   {
     removeRow (tile->row);
   }
 
 
-
-  auto colEmpty = true;
-  for (const auto &i: tiles_)
-  {
-    if (i.col == tile->col && i.widget)
-    {
-      colEmpty = false;
-      break;
-    }
-  }
+  auto col = find_if (cbegin (tiles_), cend (tiles_), [tile](const Tile &i) {
+    return i.widget && i.col == tile->col;
+  });
+  const auto colEmpty = (col == cend (tiles_));
   if (colEmpty)
   {
     removeColumn (tile->col);
