@@ -73,7 +73,8 @@ HEADERS  += \
     delegate.h \
     trash.h \
     openwith.h \
-    tiledview.h
+    tiledview.h \
+    backport.h
 
 RESOURCES += \
     resources.qrc

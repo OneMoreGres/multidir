@@ -1,4 +1,5 @@
 #include "tiledview.h"
+#include "backport.h"
 
 #include <QResizeEvent>
 #include <QApplication>
@@ -19,17 +20,27 @@ public:
 };
 
 
+enum class Border
+{
+  None, Right, Bottom, BottomRight
+};
 
 //! Tile info.
 class Tile
 {
 public:
   QWidget *widget = nullptr;
-  QRect geometry;
+  QRect geometry = {};
   int row = -1;
   int col = -1;
+  QMap<Border, QWidget *> borders = {};
 
   void setWidget (QWidget *widget);
+  void setGeometry (const QRect &rect, int spacing);
+  void createBorder (Border border, QWidget *parent);
+  void removeBorder (Border border);
+  void removeBorders ();
+  Border borderAt (const QPoint &pos) const;
   bool operator< (const Tile &r) const { return tie (row, col) < tie (r.row,r.col); }
 };
 
@@ -42,6 +53,71 @@ void Tile::setWidget (QWidget *widget)
   }
 }
 
+void Tile::setGeometry (const QRect &rect, int spacing)
+{
+  geometry = rect;
+  if (widget)
+  {
+    widget->setGeometry (rect);
+  }
+  if (borders.contains (Border::Right))
+  {
+    borders[Border::Right]->setGeometry (rect.right (), rect.top (), spacing, rect.height ());
+  }
+  if (borders.contains (Border::Bottom))
+  {
+    borders[Border::Bottom]->setGeometry (rect.left (), rect.bottom (), rect.width (), spacing);
+  }
+  if (borders.contains (Border::BottomRight))
+  {
+    borders[Border::BottomRight]->setGeometry (rect.right (), rect.bottom (), spacing, spacing);
+  }
+}
+
+void Tile::createBorder (Border border, QWidget *parent)
+{
+  if (borders.contains (border))
+  {
+    return;
+  }
+
+  auto w = new QWidget (parent);
+  w->setCursor (QMap<Border,Qt::CursorShape>
+                {{Border::Right, Qt::SizeHorCursor},{Border::Bottom, Qt::SizeVerCursor},
+                 {Border::BottomRight, Qt::SizeAllCursor}}
+                .value (border, Qt::ArrowCursor));
+  borders[border] = w;
+  w->show ();
+}
+
+void Tile::removeBorder (Border border)
+{
+  if (auto i = borders.take (border))
+  {
+    i->deleteLater ();
+  }
+}
+
+void Tile::removeBorders ()
+{
+  for (auto i: borders)
+  {
+    i->deleteLater ();
+  }
+}
+
+Border Tile::borderAt (const QPoint &pos) const
+{
+  for (auto i = cbegin (borders), end = cend (borders); i != end; ++i)
+  {
+    if (i.value ()->geometry ().contains (pos))
+    {
+      return i.key ();
+    }
+  }
+  return Border::None;
+}
+
 
 
 TiledView::TiledView (QWidget *parent) :
@@ -51,7 +127,10 @@ TiledView::TiledView (QWidget *parent) :
   tiles_ (),
   spacing_ (2),
   margin_ (2),
-  dragStartPos_ ()
+  dragStartPos_ (),
+  resizeRow_ (-1),
+  resizeCol_ (-1),
+  resizeDir_ (0)
 {
   setAcceptDrops (true);
   setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -124,6 +203,18 @@ Tile * TiledView::findTile (const QPoint &pos) const
   return &const_cast<Tile &>(*it);
 }
 
+Tile * TiledView::findTileBorders (const QPoint &pos) const
+{
+  auto it = find_if (cbegin (tiles_), cend (tiles_), [pos](const Tile &i) {
+    return i.borderAt (pos) != Border::None;
+  });
+  if (it == cend (tiles_))
+  {
+    return nullptr;
+  }
+  return &const_cast<Tile &>(*it);
+}
+
 void TiledView::addRow ()
 {
   addDimesion (rows_, columns_, height (), true);
@@ -147,10 +238,20 @@ void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int 
   const auto size = max (0, (fullSize - 2 * margin_ - index * spacing_) / (index + 1));
   adjustSizes (sizes, -size - spacing_);
   sizes << size;
+
+  updateTilesBorders ();
 }
 
 void TiledView::removeDimesion (QList<int> &sizes, int Tile::*field, int index)
 {
+  for (auto &i :tiles_)
+  {
+    if (i.*field == index)
+    {
+      i.removeBorders ();
+    }
+  }
+
   tiles_.erase (remove_if (begin (tiles_), end (tiles_), [index, field](const Tile &i) {
     return i.*field == index;
   }), end (tiles_));
@@ -164,6 +265,8 @@ void TiledView::removeDimesion (QList<int> &sizes, int Tile::*field, int index)
   const auto size = sizes[index] + (sizes.size () > 1 ? spacing_ : 0);
   sizes.removeAt (index);
   adjustSizes (sizes, size);
+
+  updateTilesBorders ();
 }
 
 void TiledView::adjustSizes (QList<int> &sizes, int sizeToFill) const
@@ -200,12 +303,28 @@ void TiledView::updateTilesGeometry ()
     }
     const auto width = columns_[i.col];
     const auto height = rows_[i.row];
-    i.geometry = {left, top, width, height};
+    i.setGeometry ({left, top, width, height}, spacing_);
     left += width + spacing_;
-    if (i.widget)
-    {
-      i.widget->setGeometry (i.geometry);
-    }
+  }
+}
+
+void TiledView::updateTilesBorders ()
+{
+  if (tiles_.isEmpty ())
+  {
+    return;
+  }
+
+  const auto lastRow = rows_.size () - 1;
+  const auto lastCol = columns_.size () - 1;
+  for (auto &i: tiles_)
+  {
+    i.col < lastCol ? i.createBorder (Border::Right, this) : i.removeBorder (Border::Right);
+
+    i.row < lastRow ? i.createBorder (Border::Bottom, this) : i.removeBorder (Border::Bottom);
+
+    i.col < lastCol && i.row < lastRow
+    ? i.createBorder (Border::BottomRight, this) : i.removeBorder (Border::BottomRight);
   }
 }
 
@@ -328,11 +447,50 @@ QSize TiledView::getSizeHint (QSize (QWidget::*type)() const) const
                 *max_element (cbegin (heights), cend (heights)) - spacing_ + 2 * margin_);
 }
 
+void TiledView::setResize (int col, int row, Qt::Orientations dir)
+{
+  resizeCol_ = col;
+  resizeRow_ = row;
+  resizeDir_ = dir;
+}
+
+void TiledView::handleResize (const QPoint &old, const QPoint &current)
+{
+  const auto diff = current - old;
+  if (resizeDir_ & Qt::Horizontal && resizeCol_ < columns_.size () - 1)
+  {
+    const auto change = nonstd::clamp (diff.x (), -columns_[resizeCol_], columns_[resizeCol_ + 1]);
+    columns_[resizeCol_] += change;
+    columns_[resizeCol_ + 1] -= change;
+  }
+
+  if (resizeDir_ & Qt::Vertical && resizeRow_ < rows_.size () - 1)
+  {
+    const auto change = nonstd::clamp (diff.y (), -rows_[resizeRow_], rows_[resizeRow_ + 1]);
+    rows_[resizeRow_] += change;
+    rows_[resizeRow_ + 1] -= change;
+  }
+
+  updateTilesGeometry ();
+}
+
 void TiledView::mousePressEvent (QMouseEvent *event)
 {
   if (event->button () == Qt::LeftButton)
   {
     dragStartPos_ = event->pos ();
+
+    auto borders = findTileBorders (event->pos ());
+    if (borders)
+    {
+      auto type = borders->borderAt (event->pos ());
+      auto dir = QMap<Border,Qt::Orientations>
+      {{Border::Right, Qt::Horizontal},{Border::Bottom, Qt::Vertical},
+       {Border::BottomRight, Qt::Horizontal | Qt::Vertical}}
+      .value (type, 0);
+      setResize (borders->col, borders->row, dir);
+    }
+    event->accept ();
   }
 }
 
@@ -341,6 +499,7 @@ void TiledView::mouseReleaseEvent (QMouseEvent *event)
   if (event->button () == Qt::LeftButton)
   {
     dragStartPos_ = {};
+    setResize (-1, -1, 0);
   }
 }
 
@@ -350,11 +509,21 @@ void TiledView::mouseMoveEvent (QMouseEvent *event)
   {
     return;
   }
+
+
+  if (resizeDir_)
+  {
+    handleResize (dragStartPos_, event->pos ());
+    dragStartPos_ = event->pos ();
+    event->accept ();
+  }
+
+
   if ((event->pos () - dragStartPos_).manhattanLength () < QApplication::startDragDistance ())
   {
     return;
   }
-  const auto tile = findTile (dragStartPos_);
+  auto tile = findTile (dragStartPos_);
   if (!tile || !tile->widget)
   {
     return;
@@ -364,7 +533,7 @@ void TiledView::mouseMoveEvent (QMouseEvent *event)
   drag->setPixmap (tile->widget->grab ());
 
   auto *mime = new TileMime;
-  mime->tile = const_cast<Tile *>(tile);
+  mime->tile = tile;
   drag->setMimeData (mime);
 
   drag->exec (Qt::MoveAction);

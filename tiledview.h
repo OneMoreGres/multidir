@@ -29,6 +29,7 @@ private:
   void reserveTile ();
   void emplace (QWidget *widget);
   void updateTilesGeometry ();
+  void updateTilesBorders ();
 
   void addRow ();
   void addColumn ();
@@ -38,6 +39,7 @@ private:
 
   Tile * findTile (QWidget *widget) const;
   Tile * findTile (const QPoint &pos) const;
+  Tile * findTileBorders (const QPoint &pos) const;
 
   //! Distribute given size over items (rows or cols).
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
@@ -50,6 +52,9 @@ private:
   //! Get size hint of given type.
   QSize getSizeHint (QSize (QWidget::*type)() const) const;
 
+  void setResize (int col, int row, Qt::Orientations dir);
+  void handleResize (const QPoint &old, const QPoint &current);
+
 
   //! Row sizes,
   QList<int> rows_;
@@ -59,4 +64,8 @@ private:
   int spacing_;
   int margin_;
   QPoint dragStartPos_;
+
+  int resizeRow_;
+  int resizeCol_;
+  Qt::Orientations resizeDir_;
 };
