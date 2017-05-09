@@ -387,20 +387,26 @@ void TiledView::dropEvent (QDropEvent *event)
   }
   auto source = mime->tile;
   Q_ASSERT (source);
+  Q_ASSERT (source->widget);
 
   auto pos = event->pos ();
+  auto sourceWidget = source->widget;
   if (height () - pos.y () < margin_)
   {
     addRow ();
+    source = findTile (sourceWidget); // addRow can alter it
     updateTilesGeometry ();
     pos.ry () -= margin_;
   }
   else if (width () - pos.x () < margin_)
   {
     addColumn ();
+    source = findTile (sourceWidget); // addColumn can alter it
     updateTilesGeometry ();
     pos.rx () -= margin_;
   }
+  Q_ASSERT (source);
+  Q_ASSERT (source->widget);
 
   auto target = findTile (pos);
   if (!target)
@@ -410,9 +416,8 @@ void TiledView::dropEvent (QDropEvent *event)
 
   if (event->dropAction () == Qt::MoveAction)
   {
-    auto targetWidget = target->widget;
-    target->setWidget (source->widget);
-    source->setWidget (targetWidget);
+    source->setWidget (target->widget);
+    target->setWidget (sourceWidget);
     cleanupDimensions ();
     event->acceptProposedAction ();
   }
