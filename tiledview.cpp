@@ -355,7 +355,7 @@ void TiledView::mouseMoveEvent (QMouseEvent *event)
     return;
   }
   const auto tile = findTile (dragStartPos_);
-  if (!tile)
+  if (!tile || !tile->widget)
   {
     return;
   }
