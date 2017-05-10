@@ -49,8 +49,6 @@ private:
   void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
   //! Size currently occupied by tiles.
   QSize tilesSize () const;
-  //! Get size hint of given type.
-  QSize getSizeHint (QSize (QWidget::*type)() const) const;
 
   void setResize (int col, int row, Qt::Orientations dir);
   void handleResize (const QPoint &old, const QPoint &current);

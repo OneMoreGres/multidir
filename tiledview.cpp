@@ -11,6 +11,11 @@
 
 using namespace std;
 
+namespace
+{
+const auto minTileSize = 100;
+}
+
 //! Class for drag-n-drop support.
 class TileMime : public QMimeData
 {
@@ -417,16 +422,6 @@ QSize TiledView::tilesSize () const
 
 QSize TiledView::sizeHint () const
 {
-  return getSizeHint (&QWidget::sizeHint);
-}
-
-QSize TiledView::minimumSizeHint () const
-{
-  return getSizeHint (&QWidget::minimumSizeHint);
-}
-
-QSize TiledView::getSizeHint (QSize (QWidget::*type)() const) const
-{
   if (tiles_.isEmpty ())
   {
     return {};
@@ -439,12 +434,22 @@ QSize TiledView::getSizeHint (QSize (QWidget::*type)() const) const
     {
       continue;
     }
-    const auto hint = (i.widget->*type)();
+    const auto hint = i.widget->sizeHint ();
     heights[i.col] += hint.height () + spacing_;
     widths[i.row] += hint.width () + spacing_;
   }
   return QSize (*max_element (cbegin (widths), cend (widths)) - spacing_ + 2 * margin_,
                 *max_element (cbegin (heights), cend (heights)) - spacing_ + 2 * margin_);
+}
+
+QSize TiledView::minimumSizeHint () const
+{
+  if (tiles_.isEmpty ())
+  {
+    return QSize (2 * margin_, 2 * margin_);
+  }
+  return QSize ((minTileSize  + spacing_) * columns_.size () - spacing_ + 2 * margin_,
+                (minTileSize  + spacing_) * rows_.size () - spacing_ + 2 * margin_);
 }
 
 void TiledView::setResize (int col, int row, Qt::Orientations dir)
@@ -459,14 +464,16 @@ void TiledView::handleResize (const QPoint &old, const QPoint &current)
   const auto diff = current - old;
   if (resizeDir_ & Qt::Horizontal && resizeCol_ < columns_.size () - 1)
   {
-    const auto change = nonstd::clamp (diff.x (), -columns_[resizeCol_], columns_[resizeCol_ + 1]);
+    const auto change = nonstd::clamp (diff.x (), -columns_[resizeCol_] + minTileSize,
+                                       columns_[resizeCol_ + 1] - minTileSize);
     columns_[resizeCol_] += change;
     columns_[resizeCol_ + 1] -= change;
   }
 
   if (resizeDir_ & Qt::Vertical && resizeRow_ < rows_.size () - 1)
   {
-    const auto change = nonstd::clamp (diff.y (), -rows_[resizeRow_], rows_[resizeRow_ + 1]);
+    const auto change = nonstd::clamp (diff.y (), -rows_[resizeRow_] + minTileSize,
+                                       rows_[resizeRow_ + 1] - minTileSize);
     rows_[resizeRow_] += change;
     rows_[resizeRow_ + 1] -= change;
   }
@@ -589,6 +596,7 @@ void TiledView::dropEvent (QDropEvent *event)
     target->setWidget (sourceWidget);
     cleanupDimensions ();
     event->acceptProposedAction ();
+    updateGeometry ();
   }
 }
 
