@@ -6,6 +6,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QLayout>
+#include <QSettings>
 #include <QDebug>
 
 
@@ -14,6 +15,9 @@ using namespace std;
 namespace
 {
 const auto minTileSize = 100;
+const QString qs_rows = "rows";
+const QString qs_cols = "cols";
+const QString qs_occupied = "occupied";
 }
 
 //! Class for drag-n-drop support.
@@ -346,6 +350,110 @@ void TiledView::remove (QWidget &widget)
   Q_ASSERT (tile);
   tile->widget = nullptr;
   cleanupDimensions ();
+  updateGeometry ();
+}
+
+void TiledView::save (QSettings &settings) const
+{
+  const auto toString = [](const QList<int> &list) {
+                          QString result = "";
+                          for (auto i: list)
+                          {
+                            result += ',' + QString::number (i);
+                          }
+                          return result.mid (1);
+                        };
+
+  settings.setValue (qs_rows, toString (rows_));
+  settings.setValue (qs_cols, toString (columns_));
+
+  QStringList occupied;
+  for (const auto &i: qAsConst (tiles_))
+  {
+    occupied << (i.widget ? i.widget->objectName () : QString ());
+  }
+  settings.setValue (qs_occupied, occupied.join (','));
+}
+
+void TiledView::restore (QSettings &settings)
+{
+  const auto toInts = [](const QString &str) {
+                        QList<int> result;
+                        for (auto i: str.split (','))
+                        {
+                          auto ok = true;
+                          result << i.toInt (&ok);
+                          if (!ok)
+                          {
+                            return QList<int>();
+                          }
+                        }
+                        return result;
+                      };
+
+  const auto rows = toInts (settings.value (qs_rows).toString ());
+  const auto cols = toInts (settings.value (qs_cols).toString ());
+  if (rows.isEmpty () || cols.isEmpty ())
+  {
+    return;
+  }
+
+
+  QMap<QString, QWidget *> widgets;
+  for (const auto &i: tiles_)
+  {
+    if (i.widget)
+    {
+      widgets[i.widget->objectName ()] = i.widget;
+    }
+  }
+
+
+  for (auto i: rows_)
+  {
+    Q_UNUSED (i);
+    removeRow (0);
+  }
+  columns_.clear ();
+
+
+  for (auto i: rows)
+  {
+    Q_UNUSED (i);
+    addRow ();
+  }
+  rows_ = rows;
+
+  for (auto i: cols)
+  {
+    Q_UNUSED (i);
+    addColumn ();
+  }
+  columns_ = cols;
+
+
+  const auto occupied = settings.value (qs_occupied).toString ().split (',');
+  const auto tilesCount = tiles_.size ();
+  auto isOccupationValid = occupied.size () == tilesCount;
+  for (auto i = 0, end = occupied.size (); i < end && isOccupationValid; ++i)
+  {
+    isOccupationValid &= (occupied[i].isEmpty () || widgets.contains (occupied[i]));
+  }
+
+  if (isOccupationValid)
+  {
+    auto index = -1;
+    for (const auto &i: occupied)
+    {
+      tiles_[++index].setWidget (!i.isEmpty () ? widgets.take (i) : nullptr);
+    }
+  }
+  // not valid or unspecified (wrong input)
+  for (auto *i: qAsConst (widgets))
+  {
+    add (*i);
+  }
+
   updateGeometry ();
 }
 

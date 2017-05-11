@@ -18,6 +18,7 @@
 namespace
 {
 const QString qs_dirs = "dirs";
+const QString qs_view = "view";
 const QString qs_geometry = "geometry";
 }
 
@@ -98,6 +99,8 @@ void MultiDirWidget::save (QSettings &settings) const
     widgets_[i]->save (settings);
   }
   settings.endArray ();
+
+  view_->save (settings);
 }
 
 void MultiDirWidget::restore (QSettings &settings)
@@ -119,6 +122,8 @@ void MultiDirWidget::restore (QSettings &settings)
     auto widget = addWidget ();
     widget->setPath (QDir::homePath ());
   }
+
+  view_->restore (settings);
 }
 
 DirWidget * MultiDirWidget::addWidget ()
@@ -135,6 +140,7 @@ DirWidget * MultiDirWidget::addWidget ()
            w, &DirWidget::setNameFilter);
   w->setPath (QDir::homePath ());
   view_->add (*w);
+  updateWidgetNames ();
   return w;
 }
 
@@ -173,6 +179,15 @@ void MultiDirWidget::showAbout ()
 #undef STR
 }
 
+void MultiDirWidget::updateWidgetNames ()
+{
+  auto i = 0;
+  for (auto &w: qAsConst (widgets_))
+  {
+    w->setObjectName (QString::number (++i));
+  }
+}
+
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Escape)
@@ -195,6 +210,7 @@ void MultiDirWidget::close (DirWidget *widget)
   widgets_.removeAll (widget);
   view_->remove (*widget);
   widget->deleteLater ();
+  updateWidgetNames ();
 }
 
 void MultiDirWidget::clone (DirWidget *widget)

@@ -35,6 +35,7 @@ private:
   void showContextMenu ();
   void activateFindMode ();
   void showAbout ();
+  void updateWidgetNames ();
 
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;

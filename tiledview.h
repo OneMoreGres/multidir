@@ -4,6 +4,8 @@
 
 class Tile;
 
+class QSettings;
+
 class TiledView : public QWidget
 {
 public:
@@ -12,6 +14,9 @@ public:
 
   void add (QWidget &widget);
   void remove (QWidget &widget);
+
+  void save (QSettings &settings) const;
+  void restore (QSettings &settings);
 
   QSize sizeHint () const override;
   QSize minimumSizeHint () const override;
