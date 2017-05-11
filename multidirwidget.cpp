@@ -105,9 +105,6 @@ void MultiDirWidget::restore (QSettings &settings)
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
   Q_ASSERT (widgets_.isEmpty ());
 
-  //  qDeleteAll (widgets_);
-  //  widgets_.clear ();
-
   auto size = settings.beginReadArray (qs_dirs);
   for (auto i = 0; i < size; ++i)
   {
