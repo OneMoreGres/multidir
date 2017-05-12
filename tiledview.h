@@ -55,8 +55,13 @@ private:
   //! Size currently occupied by tiles.
   QSize tilesSize () const;
 
-  void setResize (int col, int row, Qt::Orientations dir);
-  void handleResize (const QPoint &old, const QPoint &current);
+  void setResize (int index, Qt::Orientations dir);
+  void handleResizing (const QPoint &current);
+  void resizeDimension (int index, QList<int> &sizes, int diff);
+  void handleSpanning (const QPoint &current);
+  bool spanTile (Tile &tile, const QPoint &diff, bool isRow);
+  bool spanDimension (int index, QList<int> &sizes, int diff, int &span, int oppositeSpan,
+                      int &position, int oppositeIndex, bool isRow);
 
 
   //! Row sizes,
@@ -68,7 +73,6 @@ private:
   int margin_;
   QPoint dragStartPos_;
 
-  int resizeRow_;
-  int resizeCol_;
+  int resizeIndex_;
   Qt::Orientations resizeDir_;
 };
