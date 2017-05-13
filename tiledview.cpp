@@ -17,7 +17,7 @@ namespace
 const auto minTileSize = 100;
 const QString qs_rows = "rows";
 const QString qs_cols = "cols";
-const QString qs_occupied = "occupied";
+const QString qs_tiles = "tiles";
 }
 
 //! Class for drag-n-drop support.
@@ -381,12 +381,13 @@ void TiledView::save (QSettings &settings) const
   settings.setValue (qs_rows, toString (rows_));
   settings.setValue (qs_cols, toString (columns_));
 
-  QStringList occupied;
+  QStringList tiles;
   for (const auto &i: qAsConst (tiles_))
   {
-    occupied << (i.widget ? i.widget->objectName () : QString ());
+    tiles << QString ("%1:%2:%3").arg (i.widget ? i.widget->objectName () : QString ())
+      .arg (i.rowSpan).arg (i.colSpan);
   }
-  settings.setValue (qs_occupied, occupied.join (','));
+  settings.setValue (qs_tiles, tiles.join (','));
 }
 
 void TiledView::restore (QSettings &settings)
@@ -446,28 +447,53 @@ void TiledView::restore (QSettings &settings)
   columns_ = cols;
 
 
-  const auto occupied = settings.value (qs_occupied).toString ().split (',');
-  const auto tilesCount = tiles_.size ();
-  auto isOccupationValid = occupied.size () == tilesCount;
-  for (auto i = 0, end = occupied.size (); i < end && isOccupationValid; ++i)
+  const auto tiles = settings.value (qs_tiles).toString ().split (',');
+  auto index = -1;
+  for (const auto &i: tiles)
   {
-    isOccupationValid &= (occupied[i].isEmpty () || widgets.contains (occupied[i]));
-  }
-
-  if (isOccupationValid)
-  {
-    auto index = -1;
-    for (const auto &i: occupied)
+    auto parts = i.split (':');
+    if (parts.size () != 3)
     {
-      tiles_[++index].setWidget (!i.isEmpty () ? widgets.take (i) : nullptr);
+      break;
+    }
+    ++index;
+    if (index >= tiles_.size ())
+    {
+      break;
+    }
+    const auto &name = parts[0];
+    auto &tile = tiles_[index];
+    tile.setWidget (!name.isEmpty () ? widgets.take (name) : nullptr);
+    const auto &rowSpan = parts[1];
+    tile.rowSpan = max (1, rowSpan.toInt ());
+    const auto &colSpan = parts[2];
+    tile.colSpan = max (1, colSpan.toInt ());
+
+    for (auto r = 0; r < tile.rowSpan; ++r)
+    {
+      for (auto c = 0; c < tile.colSpan; ++c)
+      {
+        if (r == 0 && c == 0)
+        {
+          continue;
+        }
+        auto smashedIndex = tiles_.indexOf ({nullptr, {}, tile.row + r, tile.col + c});
+        if (smashedIndex != -1)
+        {
+          auto smashed = tiles_.takeAt (smashedIndex);
+          smashed.removeBorders ();
+        }
+      }
     }
   }
-  // not valid or unspecified (wrong input)
+
   for (auto *i: qAsConst (widgets))
   {
     add (*i);
   }
 
+  updateTilesGeometry ();
+  updateTilesBorders ();
   updateGeometry ();
 }
 
