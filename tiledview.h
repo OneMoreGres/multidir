@@ -60,8 +60,6 @@ private:
   void resizeDimension (int index, QList<int> &sizes, int diff);
   void handleSpanning (const QPoint &current);
   bool spanTile (Tile &tile, const QPoint &diff, bool isRow);
-  bool spanDimension (int index, QList<int> &sizes, int diff, int &span, int oppositeSpan,
-                      int &position, int oppositeIndex, bool isRow);
 
 
   //! Row sizes,

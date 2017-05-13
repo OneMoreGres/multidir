@@ -640,8 +640,8 @@ void TiledView::handleSpanning (const QPoint &current)
 
   if (changed)
   {
-    updateTilesBorders ();
     cleanupDimensions ();
+    updateTilesBorders ();
     updateTilesGeometry ();
   }
 }
@@ -657,7 +657,7 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
   const auto change = (isRow ? diff.y () : diff.x ());
 
   auto changed = false;
-  if (index < sizes.size () - 1 && change >= sizes[index] / 2 + spacing_)
+  if (index < sizes.size () - 1 && change >= sizes[index + 1] / 2 + spacing_)
   {
     ++span;
     for (auto i = 0; i < otherSpan; ++i)
@@ -674,10 +674,10 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
         }
       }
     }
-    position += sizes[index] + spacing_;
+    position += sizes[index + 1] + spacing_;
     changed = true;
   }
-  else if (index > 0 && change < -sizes[index] / 2 - spacing_)
+  else if (span > 1 && change < -sizes[index] / 2 - spacing_)
   {
     --span;
     for (auto i = 0; i < otherSpan; ++i)
