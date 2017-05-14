@@ -177,6 +177,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_->addSeparator ();
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
+  renameAction_->setShortcut (QKeySequence (Qt::Key_F2));
+  renameAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  this->addAction (renameAction_);
   connect (renameAction_, &QAction::triggered,
            view_, &DirView::renameCurrent);
 
