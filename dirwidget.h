@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QFileInfo>
 
 class ProxyModel;
 class FileSystemModel;
@@ -66,11 +67,14 @@ private:
   void setShowDirs (bool on);
 
   void updateActions ();
+  void checkDirExistence ();
+  void handleDirRename (const QString &path, const QString &old, const QString &now);
 
 
   FileSystemModel *model_;
   ProxyModel *proxy_;
   DirView *view_;
+  QFileInfo path_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QLineEdit *pathEdit_;

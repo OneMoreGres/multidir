@@ -37,6 +37,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   view_ (new DirView (*proxy_, this)),
+  path_ (),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   pathEdit_ (new QLineEdit (this)),
@@ -62,6 +63,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_ (new QHBoxLayout)
 {
   proxy_->setDynamicSortFilter (true);
+
+  connect (model, &QAbstractItemModel::rowsRemoved,
+           this, &DirWidget::checkDirExistence);
+  connect (model, &QFileSystemModel::fileRenamed,
+           this, &DirWidget::handleDirRename);
 
 
   // menu
@@ -254,7 +260,7 @@ void DirWidget::restore (QSettings &settings)
 
 QFileInfo DirWidget::path () const
 {
-  return fileInfo (view_->rootIndex ());
+  return path_;
 }
 
 void DirWidget::setPath (const QFileInfo &path)
@@ -273,6 +279,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     // do not change proxy current path to disable possible dir filtering
     view_->setRootIndex ({});
+    path_ = fileInfo (view_->rootIndex ());
     pathLabel_->clear ();
     dirLabel_->setText (tr ("Drives"));
     return;
@@ -298,6 +305,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     view_->setRootIndex (index);
     proxy_->setCurrent (index);
+    path_ = fileInfo (view_->rootIndex ());
 
     pathLabel_->setText (fittedPath ());
     const auto absolutePath = info.absoluteFilePath ();
@@ -578,4 +586,37 @@ void DirWidget::updateActions ()
 
   pasteAction_->setEnabled (!lock);
   cutAction_->setEnabled (!lock);
+}
+
+void DirWidget::checkDirExistence ()
+{
+  const auto path = this->path ().absoluteFilePath ();
+  if (QFileInfo::exists (path))
+  {
+    return;
+  }
+
+  auto parts = path.split ('/');
+  if (parts.isEmpty ())
+  {
+    setPath (QDir::homePath ());
+    return;
+  }
+
+  parts.pop_back ();
+  auto newPath = parts.join ('/');
+  while (!parts.isEmpty () && !QFileInfo::exists (newPath))
+  {
+    parts.pop_back ();
+    newPath = parts.join ('/');
+  }
+  setPath (newPath);
+}
+
+void DirWidget::handleDirRename (const QString &path, const QString &old, const QString &now)
+{
+  if (this->path ().absoluteFilePath () == (path + '/' + old))
+  {
+    setPath (path + '/' + now);
+  }
 }
