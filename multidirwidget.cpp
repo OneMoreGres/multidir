@@ -136,6 +136,8 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::clone);
   connect (w, &DirWidget::newTabRequested,
            this, &MultiDirWidget::add);
+  connect (w, &DirWidget::consoleRequested,
+           this, &MultiDirWidget::consoleRequested);
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
   w->setPath (QDir::homePath ());

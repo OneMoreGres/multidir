@@ -87,6 +87,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
 
+  auto openConsole = menu_->addAction (tr ("Open console"));
+  connect (openConsole, &QAction::triggered,
+           this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
+
 
   menu_->addSeparator ();
 

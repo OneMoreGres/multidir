@@ -36,6 +36,7 @@ signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
+  void consoleRequested (const QString &path);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;

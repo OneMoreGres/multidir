@@ -23,6 +23,7 @@ public:
 
 signals:
   void settingsRequested ();
+  void consoleRequested (const QString &path);
 
 protected:
   void keyPressEvent (QKeyEvent *event) override;
