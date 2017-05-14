@@ -18,6 +18,8 @@
 #include <QFontMetrics>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QApplication>
+#include <QClipboard>
 
 #include <QDebug>
 
@@ -58,6 +60,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   cutAction_ (nullptr),
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
+  copyPathAction_ (nullptr),
   up_ (new QToolButton (this)),
   newFolder_ (new QToolButton (this)),
   controlsLayout_ (new QHBoxLayout)
@@ -166,6 +169,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   this->addAction (pasteAction_);
   connect (pasteAction_, &QAction::triggered,
            this, &DirWidget::paste);
+
+  copyPathAction_ = viewMenu_->addAction (tr ("Copy path"));
+  connect (copyPathAction_, &QAction::triggered,
+           this, &DirWidget::copyPath);
 
   viewMenu_->addSeparator ();
 
@@ -541,6 +548,12 @@ void DirWidget::paste ()
   CopyPaste::paste (fileInfo (index));
 }
 
+void DirWidget::copyPath ()
+{
+  const auto info = fileInfo (view_->currentIndex ());
+  QApplication::clipboard ()->setText (info.absoluteFilePath ());
+}
+
 void DirWidget::showViewContextMenu ()
 {
   const auto index = view_->currentIndex ();
@@ -552,6 +565,7 @@ void DirWidget::showViewContextMenu ()
   {
     OpenWith::popupateMenu (*openWith_, current ());
   }
+  copyPathAction_->setEnabled (index.isValid ());
   openInTabAction_->setEnabled (isDir);
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);

@@ -58,6 +58,7 @@ private:
   void cut ();
   void copy ();
   void paste ();
+  void copyPath ();
 
   void showViewContextMenu ();
 
@@ -97,6 +98,7 @@ private:
   QAction *cutAction_;
   QAction *copyAction_;
   QAction *pasteAction_;
+  QAction *copyPathAction_;
 
   QToolButton *up_;
   QToolButton *newFolder_;
