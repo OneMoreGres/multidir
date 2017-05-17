@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -57,7 +57,8 @@ SOURCES += \
     delegate.cpp \
     trash.cpp \
     openwith.cpp \
-    tiledview.cpp
+    tiledview.cpp \
+    updatechecker.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -74,7 +75,8 @@ HEADERS  += \
     trash.h \
     openwith.h \
     tiledview.h \
-    backport.h
+    backport.h \
+    updatechecker.h
 
 RESOURCES += \
     resources.qrc

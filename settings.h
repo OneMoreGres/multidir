@@ -5,6 +5,7 @@
 
 class QKeySequenceEdit;
 class QLineEdit;
+class QCheckBox;
 
 class Settings : public QDialog
 {
@@ -18,7 +19,11 @@ public:
   QString console () const;
   void setConsole (const QString &console);
 
+  bool checkUpdates () const;
+  void setCheckUpdates (bool isOn);
+
 private:
   QKeySequenceEdit *hotkey_;
   QLineEdit *console_;
+  QCheckBox *checkUpdates_;
 };

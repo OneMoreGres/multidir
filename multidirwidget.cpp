@@ -2,6 +2,7 @@
 #include "dirwidget.h"
 #include "filesystemmodel.h"
 #include "tiledview.h"
+#include "constants.h"
 
 #include <QGridLayout>
 #include <QBoxLayout>
@@ -159,10 +160,8 @@ void MultiDirWidget::activateFindMode ()
 
 void MultiDirWidget::showAbout ()
 {
-#define STR2(XXX) #XXX
-#define STR(XXX) STR2 (XXX)
   QStringList lines {
-    tr ("<b>%1</b> version %2").arg (windowTitle (), STR (APP_VERSION)),
+    tr ("<b>%1</b> version %2").arg (windowTitle (), constants::version),
     tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
     tr ("Homepage: <a href='%1'>%1</a>").arg ("https://gres.biz/multidir"),
     tr ("Sources: <a href='%1'>%1</a>").arg ("https://github.com/onemoregres/multidir"),
@@ -177,8 +176,6 @@ void MultiDirWidget::showAbout ()
                      lines.join ("<br>"), QMessageBox::Ok);
   about.setIconPixmap (QPixmap (":/app.png").scaledToHeight (100, Qt::SmoothTransformation));
   about.exec ();
-#undef STR
-#undef STR
 }
 
 void MultiDirWidget::updateWidgetNames ()

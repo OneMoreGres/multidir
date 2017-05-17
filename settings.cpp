@@ -5,11 +5,13 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QCheckBox>
 
 Settings::Settings (QWidget *parent) :
   QDialog (parent),
   hotkey_ (new QKeySequenceEdit (this)),
-  console_ (new QLineEdit (this))
+  console_ (new QLineEdit (this)),
+  checkUpdates_ (new QCheckBox (tr ("Check for updates"), this))
 {
   setWindowTitle (tr ("Settings"));
   auto layout = new QGridLayout (this);
@@ -22,6 +24,9 @@ Settings::Settings (QWidget *parent) :
   layout->addWidget (new QLabel (tr ("Console command")), row, 0);
   layout->addWidget (console_, row, 1);
   console_->setToolTip (tr ("%d will be replaced with opening folder"));
+
+  ++row;
+  layout->addWidget (checkUpdates_, row, 0);
 
   ++row;
   layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
@@ -53,4 +58,14 @@ QString Settings::console () const
 void Settings::setConsole (const QString &console)
 {
   console_->setText (console);
+}
+
+bool Settings::checkUpdates () const
+{
+  return checkUpdates_->isChecked ();
+}
+
+void Settings::setCheckUpdates (bool isOn)
+{
+  checkUpdates_->setChecked (isOn);
 }

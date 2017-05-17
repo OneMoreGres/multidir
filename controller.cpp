@@ -2,12 +2,14 @@
 #include "multidirwidget.h"
 #include "globalaction.h"
 #include "settings.h"
+#include "updatechecker.h"
 
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QApplication>
 #include <QSettings>
 #include <QProcess>
+#include <QTimer>
 
 #include <QDebug>
 
@@ -15,6 +17,7 @@ namespace
 {
 const QString qs_hotkey = "hotkey";
 const QString qs_console = "console";
+const QString qs_updates = "checkUpdates";
 }
 
 Controller::Controller (QObject *parent) :
@@ -22,7 +25,8 @@ Controller::Controller (QObject *parent) :
   tray_ (new QSystemTrayIcon (this)),
   widget_ (new MultiDirWidget),
   toggleAction_ (nullptr),
-  consoleCommand_ ()
+  consoleCommand_ (),
+  checkUpdates_ (false)
 {
   connect (widget_.data (), &MultiDirWidget::settingsRequested,
            this, &Controller::editSettings);
@@ -66,6 +70,7 @@ void Controller::save (QSettings &settings) const
 {
   settings.setValue (qs_hotkey, toggleAction_->shortcut ().toString ());
   settings.setValue (qs_console, consoleCommand_);
+  settings.setValue (qs_updates, checkUpdates_);
 
   widget_->save (settings);
 }
@@ -83,6 +88,8 @@ void Controller::restore (QSettings &settings)
   const auto console = QString ("cmd");
 #endif
   consoleCommand_ = settings.value (qs_console, console).toString ();
+
+  setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
 
   widget_->restore (settings);
   widget_->show ();
@@ -124,12 +131,14 @@ void Controller::editSettings ()
   Settings settings;
   settings.setHotkey (toggleAction_->shortcut ());
   settings.setConsole (consoleCommand_);
+  settings.setCheckUpdates (checkUpdates_);
 
   if (settings.exec () == QDialog::Accepted)
   {
     GlobalAction::removeGlobal (toggleAction_);
     toggleAction_->setShortcut (settings.hotkey ());
     consoleCommand_ = settings.console ();
+    setCheckUpdates (settings.checkUpdates ());
     GlobalAction::makeGlobal (toggleAction_);
   }
 }
@@ -160,5 +169,29 @@ void Controller::openConsole (const QString &path)
       }
     }
     QProcess::startDetached (parts[0], parts.mid (1), path);
+  }
+}
+
+void Controller::setCheckUpdates (bool isOn)
+{
+  if (checkUpdates_ == isOn)
+  {
+    return;
+  }
+  checkUpdates_ = isOn;
+
+  if (isOn)
+  {
+    auto updater = new UpdateChecker (this);
+
+    connect (updater, &UpdateChecker::updateAvailable,
+             this, [this](const QString &version) {
+      tray_->showMessage (tr ("Multidir update available"), tr ("New version: %1").arg (version));
+    });
+    connect (updater, &UpdateChecker::updateAvailable,
+             updater, &QObject::deleteLater);
+    connect (updater, &UpdateChecker::noUpdates,
+             updater, &QObject::deleteLater);
+    QTimer::singleShot (3000, updater, &UpdateChecker::check);
   }
 }
