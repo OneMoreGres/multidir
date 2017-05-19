@@ -58,7 +58,8 @@ SOURCES += \
     openwith.cpp \
     tiledview.cpp \
     updatechecker.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    debugmode.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -76,7 +77,8 @@ HEADERS  += \
     tiledview.h \
     backport.h \
     updatechecker.h \
-    mainwindow.h
+    mainwindow.h \
+    debugmode.h
 
 RESOURCES += \
     resources.qrc

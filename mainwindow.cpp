@@ -5,6 +5,7 @@
 #include "updatechecker.h"
 #include "filesystemmodel.h"
 #include "constants.h"
+#include "debugmode.h"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -94,6 +95,11 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
+
+  auto debug = helpMenu->addAction (tr ("Debug mode"));
+  debug->setCheckable (true);
+  connect (debug, &QAction::toggled, this, [](bool isOn) {debug_mode::setEnabled (isOn);});
+
   auto about = helpMenu->addAction (QIcon::fromTheme ("about"), tr ("About"));
   connect (about, &QAction::triggered, this, &MainWindow::showAbout);
 
