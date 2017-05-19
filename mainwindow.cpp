@@ -7,6 +7,7 @@
 #include "constants.h"
 
 #include <QSystemTrayIcon>
+#include <QStackedWidget>
 #include <QBoxLayout>
 #include <QMenu>
 #include <QApplication>
@@ -27,6 +28,8 @@ const QString qs_geometry = "geometry";
 const QString qs_hotkey = "hotkey";
 const QString qs_console = "console";
 const QString qs_updates = "checkUpdates";
+const QString qs_groups = "groups";
+const QString qs_currentGroup = "currentGroup";
 }
 
 MainWindow::MainWindow (QWidget *parent) :
@@ -34,8 +37,11 @@ MainWindow::MainWindow (QWidget *parent) :
   model_ (new FileSystemModel (this)),
   findEdit_ (new QLineEdit (this)),
   tray_ (new QSystemTrayIcon (this)),
-  widget_ (new MultiDirWidget (*model_, this)),
+  groups_ (new QStackedWidget (this)),
   toggleAction_ (nullptr),
+  groupsMenu_ (nullptr),
+  closeGroupAction_ (nullptr),
+  groupsActions_ (new QActionGroup (this)),
   consoleCommand_ (),
   checkUpdates_ (false)
 {
@@ -45,6 +51,10 @@ MainWindow::MainWindow (QWidget *parent) :
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
   model_->setReadOnly (false);
+
+
+  connect (groupsActions_, &QActionGroup::triggered,
+           this, &MainWindow::updateCurrentGroup);
 
 
   //menu bar
@@ -67,6 +77,20 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto quit = fileMenu->addAction (QIcon (":/quit.png"), tr ("Quit"));
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
+
+
+  groupsMenu_ = menuBar->addMenu (tr ("Groups"));
+
+  auto addGroup = groupsMenu_->addAction (tr ("Add"));
+  connect (addGroup, &QAction::triggered, this, [this] {
+    auto group = this->addGroup ();
+    group->addWidget ();
+  });
+
+  closeGroupAction_ = groupsMenu_->addAction (tr ("Close..."));
+  connect (closeGroupAction_, &QAction::triggered, this, &MainWindow::removeGroup);
+
+  groupsMenu_->addSeparator ();
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
@@ -101,18 +125,14 @@ MainWindow::MainWindow (QWidget *parent) :
   updateTrayMenu ();
 
 
-  auto layout = new QVBoxLayout (this);
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
   menuBarLayout->addWidget (findEdit_);
+
+  auto layout = new QVBoxLayout (this);
   layout->addLayout (menuBarLayout);
-  layout->addWidget (widget_.data ());
+  layout->addWidget (groups_);
 
-
-  connect (widget_.data (), &MultiDirWidget::consoleRequested,
-           this, &MainWindow::openConsole);
-  connect (findEdit_, &QLineEdit::textChanged,
-           widget_.data (), &MultiDirWidget::setNameFilter);
 
   QSettings qsettings;
   restore (qsettings);
@@ -132,7 +152,15 @@ void MainWindow::save (QSettings &settings) const
   settings.setValue (qs_console, consoleCommand_);
   settings.setValue (qs_updates, checkUpdates_);
 
-  widget_->save (settings);
+  settings.beginWriteArray (qs_groups, groups_->count ());
+  for (auto i = 0, end = groups_->count (); i < end; ++i)
+  {
+    settings.setArrayIndex (i);
+    group (i)->save (settings);
+  }
+  settings.endArray ();
+
+  settings.setValue (qs_currentGroup, groups_->currentIndex ());
 }
 
 void MainWindow::restore (QSettings &settings)
@@ -153,20 +181,35 @@ void MainWindow::restore (QSettings &settings)
 
   setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
 
-  widget_->restore (settings);
-  widget_->show ();
-  widget_->activateWindow ();
+  auto size = settings.beginReadArray (qs_groups);
+  for (auto i = 0; i < size; ++i)
+  {
+    settings.setArrayIndex (i);
+    auto group = addGroup ();
+    group->restore (settings);
+  }
+  settings.endArray ();
+
+  if (groups_->count () == 0)
+  {
+    addGroup ();
+  }
+  else
+  {
+    auto action = groupAction (settings.value (qs_currentGroup, 0).toInt ());
+    action->setChecked (true);
+    action->trigger ();
+  }
 }
 
 void MainWindow::updateTrayMenu ()
 {
   disconnect (toggleAction_, &QAction::toggled,
               this, &MainWindow::toggleVisible);
-  toggleAction_->setChecked (widget_->isVisible ());
+  toggleAction_->setChecked (groups_->isVisible ());
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
-
 void MainWindow::trayClicked (QSystemTrayIcon::ActivationReason reason)
 {
   if (reason == QSystemTrayIcon::ActivationReason::Trigger)
@@ -260,7 +303,7 @@ void MainWindow::setCheckUpdates (bool isOn)
 
 void MainWindow::addWidget ()
 {
-  widget_->addWidget ();
+  group (groups_->currentIndex ())->addWidget ();
 }
 
 void MainWindow::keyPressEvent (QKeyEvent *event)
@@ -304,4 +347,85 @@ void MainWindow::showAbout ()
                      lines.join ("<br>"), QMessageBox::Ok);
   about.setIconPixmap (QPixmap (":/app.png").scaledToHeight (100, Qt::SmoothTransformation));
   about.exec ();
+}
+
+void MainWindow::updateGroupsMenu ()
+{
+  closeGroupAction_->setEnabled (groups_->count () > 1);
+}
+
+MultiDirWidget * MainWindow::addGroup ()
+{
+  auto group = new MultiDirWidget (*model_, this);
+  connect (group, &MultiDirWidget::consoleRequested,
+           this, &MainWindow::openConsole);
+  connect (findEdit_, &QLineEdit::textChanged,
+           group, &MultiDirWidget::setNameFilter);
+
+  const auto index = groups_->addWidget (group);
+  groups_->setCurrentIndex (index);
+
+  auto action = groupsMenu_->addAction (tr ("Group %1").arg (index + 1));
+  action->setCheckable (true);
+  action->setData (index);
+  groupsActions_->addAction (action);
+  action->setChecked (true);
+  action->trigger ();
+
+  updateGroupsMenu ();
+
+  return group;
+}
+
+void MainWindow::updateCurrentGroup (QAction *groupAction)
+{
+  Q_ASSERT (groupAction);
+  auto index = groupAction->data ().toInt ();
+  Q_ASSERT (index < groups_->count ());
+  groups_->setCurrentIndex (index);
+}
+
+MultiDirWidget * MainWindow::group (int index) const
+{
+  Q_ASSERT (index > -1);
+  Q_ASSERT (index < groups_->count ());
+
+  return static_cast<MultiDirWidget *>(groups_->widget (index));
+}
+
+QAction * MainWindow::groupAction (int index) const
+{
+  const auto actions = groupsMenu_->actions ();
+  const auto menuIndex = actions.size () - (groups_->count () - index);
+  Q_ASSERT (menuIndex >= 0);
+  Q_ASSERT (menuIndex < actions.size ());
+  return actions[menuIndex];
+}
+
+void MainWindow::removeGroup ()
+{
+  Q_ASSERT (groups_->count () > 1);
+  const auto index = groups_->currentIndex ();
+  const auto res = QMessageBox::question (this, {}, tr ("Close group \"%1\"?").arg (index + 1),
+                                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (res == QMessageBox::No)
+  {
+    return;
+  }
+
+  auto w = groups_->currentWidget ();
+  Q_ASSERT (w);
+
+  auto firstAction = groupAction (0);
+  firstAction->setChecked (true);
+  firstAction->trigger ();
+
+  auto action = groupAction (index);
+  groups_->removeWidget (w);
+  groupsMenu_->removeAction (action);
+  groupsActions_->removeAction (action);
+
+
+  w->deleteLater ();
+  updateGroupsMenu ();
 }

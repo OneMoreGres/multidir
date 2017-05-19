@@ -8,7 +8,10 @@ class FileSystemModel;
 
 class QSettings;
 class QAction;
+class QMenu;
 class QLineEdit;
+class QStackedWidget;
+class QActionGroup;
 
 class MainWindow : public QWidget
 {
@@ -34,11 +37,22 @@ private:
   void activateFindMode ();
   void showAbout ();
 
+  void updateGroupsMenu ();
+  MultiDirWidget * addGroup ();
+  void removeGroup ();
+  void updateCurrentGroup (QAction *groupAction);
+  MultiDirWidget * group (int index) const;
+  QAction * groupAction (int index) const;
+
+
   FileSystemModel *model_;
   QLineEdit *findEdit_;
   QSystemTrayIcon *tray_;
-  QScopedPointer<MultiDirWidget> widget_;
+  QStackedWidget *groups_;
   QAction *toggleAction_;
+  QMenu *groupsMenu_;
+  QAction *closeGroupAction_;
+  QActionGroup *groupsActions_;
   QString consoleCommand_;
   bool checkUpdates_;
 };
