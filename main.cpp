@@ -1,4 +1,4 @@
-#include "controller.h"
+#include "mainwindow.h"
 #include "openwith.h"
 
 #include <QApplication>
@@ -48,6 +48,7 @@ int main (int argc, char *argv[])
 
   OpenWith::init ();
 
-  Controller control;
+  MainWindow window;
+  window.show ();
   return a.exec ();
 }

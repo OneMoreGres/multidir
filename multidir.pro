@@ -46,7 +46,6 @@ OTHER_FILES += \
 SOURCES += \
     main.cpp \
     dirwidget.cpp \
-    controller.cpp \
     multidirwidget.cpp \
     globalaction.cpp \
     proxymodel.cpp \
@@ -58,12 +57,12 @@ SOURCES += \
     trash.cpp \
     openwith.cpp \
     tiledview.cpp \
-    updatechecker.cpp
+    updatechecker.cpp \
+    mainwindow.cpp
 
 HEADERS  += \
     dirwidget.h \
     multidirwidget.h \
-    controller.h \
     globalaction.h \
     proxymodel.h \
     filesystemmodel.h \
@@ -76,7 +75,8 @@ HEADERS  += \
     openwith.h \
     tiledview.h \
     backport.h \
-    updatechecker.h
+    updatechecker.h \
+    mainwindow.h
 
 RESOURCES += \
     resources.qrc
