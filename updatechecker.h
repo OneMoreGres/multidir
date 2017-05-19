@@ -9,7 +9,7 @@ class UpdateChecker : public QObject
 {
 Q_OBJECT
 public:
-  UpdateChecker (QObject *parent = nullptr);
+  explicit UpdateChecker (QObject *parent = nullptr);
 
   void check ();
 
