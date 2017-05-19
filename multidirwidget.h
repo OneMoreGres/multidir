@@ -4,9 +4,9 @@
 
 class DirWidget;
 class FileSystemModel;
+class TiledView;
 
 class QSettings;
-class QGridLayout;
 class QMenu;
 class QLineEdit;
 class QFileInfo;
@@ -23,6 +23,7 @@ public:
 
 signals:
   void settingsRequested ();
+  void consoleRequested (const QString &path);
 
 protected:
   void keyPressEvent (QKeyEvent *event) override;
@@ -32,14 +33,14 @@ private:
   void clone (DirWidget *widget);
   void add (const QFileInfo &path);
   DirWidget * addWidget ();
-  void addToLayout (DirWidget *widget);
   void showContextMenu ();
   void activateFindMode ();
   void showAbout ();
+  void updateWidgetNames ();
 
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;
-  QGridLayout *layout_;
+  TiledView *view_;
   QMenu *contextMenu_;
   QLineEdit *findEdit_;
 };

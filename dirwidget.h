@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QFileInfo>
 
 class ProxyModel;
 class FileSystemModel;
@@ -35,6 +36,7 @@ signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
+  void consoleRequested (const QString &path);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;
@@ -57,6 +59,7 @@ private:
   void cut ();
   void copy ();
   void paste ();
+  void copyPath ();
 
   void showViewContextMenu ();
 
@@ -66,11 +69,14 @@ private:
   void setShowDirs (bool on);
 
   void updateActions ();
+  void checkDirExistence ();
+  void handleDirRename (const QString &path, const QString &old, const QString &now);
 
 
   FileSystemModel *model_;
   ProxyModel *proxy_;
   DirView *view_;
+  QFileInfo path_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QLineEdit *pathEdit_;
@@ -93,6 +99,7 @@ private:
   QAction *cutAction_;
   QAction *copyAction_;
   QAction *pasteAction_;
+  QAction *copyPathAction_;
 
   QToolButton *up_;
   QToolButton *newFolder_;

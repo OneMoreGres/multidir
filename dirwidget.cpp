@@ -18,6 +18,8 @@
 #include <QFontMetrics>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QApplication>
+#include <QClipboard>
 
 #include <QDebug>
 
@@ -37,6 +39,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   view_ (new DirView (*proxy_, this)),
+  path_ (),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   pathEdit_ (new QLineEdit (this)),
@@ -57,11 +60,17 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   cutAction_ (nullptr),
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
+  copyPathAction_ (nullptr),
   up_ (new QToolButton (this)),
   newFolder_ (new QToolButton (this)),
   controlsLayout_ (new QHBoxLayout)
 {
   proxy_->setDynamicSortFilter (true);
+
+  connect (model, &QAbstractItemModel::rowsRemoved,
+           this, &DirWidget::checkDirExistence);
+  connect (model, &QFileSystemModel::fileRenamed,
+           this, &DirWidget::handleDirRename);
 
 
   // menu
@@ -77,6 +86,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   auto editPath = menu_->addAction (QIcon (":/rename.png"), tr ("Change path"));
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
+
+  auto openConsole = menu_->addAction (tr ("Open console"));
+  connect (openConsole, &QAction::triggered,
+           this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
 
 
   menu_->addSeparator ();
@@ -161,9 +174,16 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (pasteAction_, &QAction::triggered,
            this, &DirWidget::paste);
 
+  copyPathAction_ = viewMenu_->addAction (tr ("Copy path"));
+  connect (copyPathAction_, &QAction::triggered,
+           this, &DirWidget::copyPath);
+
   viewMenu_->addSeparator ();
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
+  renameAction_->setShortcut (QKeySequence (Qt::Key_F2));
+  renameAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  this->addAction (renameAction_);
   connect (renameAction_, &QAction::triggered,
            view_, &DirView::renameCurrent);
 
@@ -254,7 +274,7 @@ void DirWidget::restore (QSettings &settings)
 
 QFileInfo DirWidget::path () const
 {
-  return fileInfo (view_->rootIndex ());
+  return path_;
 }
 
 void DirWidget::setPath (const QFileInfo &path)
@@ -273,6 +293,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     // do not change proxy current path to disable possible dir filtering
     view_->setRootIndex ({});
+    path_ = fileInfo (view_->rootIndex ());
     pathLabel_->clear ();
     dirLabel_->setText (tr ("Drives"));
     return;
@@ -298,6 +319,7 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     view_->setRootIndex (index);
     proxy_->setCurrent (index);
+    path_ = fileInfo (view_->rootIndex ());
 
     pathLabel_->setText (fittedPath ());
     const auto absolutePath = info.absoluteFilePath ();
@@ -533,6 +555,12 @@ void DirWidget::paste ()
   CopyPaste::paste (fileInfo (index));
 }
 
+void DirWidget::copyPath ()
+{
+  const auto info = fileInfo (view_->currentIndex ());
+  QApplication::clipboard ()->setText (info.absoluteFilePath ());
+}
+
 void DirWidget::showViewContextMenu ()
 {
   const auto index = view_->currentIndex ();
@@ -544,6 +572,7 @@ void DirWidget::showViewContextMenu ()
   {
     OpenWith::popupateMenu (*openWith_, current ());
   }
+  copyPathAction_->setEnabled (index.isValid ());
   openInTabAction_->setEnabled (isDir);
   renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
   removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
@@ -578,4 +607,37 @@ void DirWidget::updateActions ()
 
   pasteAction_->setEnabled (!lock);
   cutAction_->setEnabled (!lock);
+}
+
+void DirWidget::checkDirExistence ()
+{
+  const auto path = this->path ().absoluteFilePath ();
+  if (QFileInfo::exists (path))
+  {
+    return;
+  }
+
+  auto parts = path.split ('/');
+  if (parts.isEmpty ())
+  {
+    setPath (QDir::homePath ());
+    return;
+  }
+
+  parts.pop_back ();
+  auto newPath = parts.join ('/');
+  while (!parts.isEmpty () && !QFileInfo::exists (newPath))
+  {
+    parts.pop_back ();
+    newPath = parts.join ('/');
+  }
+  setPath (newPath);
+}
+
+void DirWidget::handleDirRename (const QString &path, const QString &old, const QString &now)
+{
+  if (this->path ().absoluteFilePath () == (path + '/' + old))
+  {
+    setPath (path + '/' + now);
+  }
 }

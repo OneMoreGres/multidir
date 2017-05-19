@@ -1,6 +1,8 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
 #include "filesystemmodel.h"
+#include "tiledview.h"
+#include "constants.h"
 
 #include <QGridLayout>
 #include <QBoxLayout>
@@ -17,6 +19,7 @@
 namespace
 {
 const QString qs_dirs = "dirs";
+const QString qs_view = "view";
 const QString qs_geometry = "geometry";
 }
 
@@ -25,7 +28,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
   widgets_ (),
-  layout_ (new QGridLayout),
+  view_ (new TiledView (this)),
   contextMenu_ (new QMenu (tr ("Context"), this)),
   findEdit_ (new QLineEdit (this))
 {
@@ -78,7 +81,7 @@ MultiDirWidget::MultiDirWidget (QWidget *parent) :
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (menuBarLayout);
-  layout->addLayout (layout_);
+  layout->addWidget (view_);
 }
 
 MultiDirWidget::~MultiDirWidget ()
@@ -97,14 +100,14 @@ void MultiDirWidget::save (QSettings &settings) const
     widgets_[i]->save (settings);
   }
   settings.endArray ();
+
+  view_->save (settings);
 }
 
 void MultiDirWidget::restore (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
-
-  qDeleteAll (widgets_);
-  widgets_.clear ();
+  Q_ASSERT (widgets_.isEmpty ());
 
   auto size = settings.beginReadArray (qs_dirs);
   for (auto i = 0; i < size; ++i)
@@ -120,6 +123,8 @@ void MultiDirWidget::restore (QSettings &settings)
     auto widget = addWidget ();
     widget->setPath (QDir::homePath ());
   }
+
+  view_->restore (settings);
 }
 
 DirWidget * MultiDirWidget::addWidget ()
@@ -132,38 +137,14 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::clone);
   connect (w, &DirWidget::newTabRequested,
            this, &MultiDirWidget::add);
+  connect (w, &DirWidget::consoleRequested,
+           this, &MultiDirWidget::consoleRequested);
   connect (findEdit_, &QLineEdit::textChanged,
            w, &DirWidget::setNameFilter);
   w->setPath (QDir::homePath ());
-  addToLayout (w);
+  view_->add (*w);
+  updateWidgetNames ();
   return w;
-}
-
-void MultiDirWidget::addToLayout (DirWidget *widget)
-{
-  const auto cols = layout_->columnCount ();
-  const auto rows = layout_->rowCount ();
-  for (auto row = 0; row < rows; ++row)
-  {
-    for (auto col = 0; col < cols; ++col)
-    {
-      auto item = layout_->itemAtPosition (row, col);
-      if (!item)
-      {
-        layout_->addWidget (widget, row, col);
-        return;
-      }
-    }
-  }
-
-  if (cols > rows)
-  {
-    layout_->addWidget (widget, rows, 0);
-  }
-  else
-  {
-    layout_->addWidget (widget, 0, cols);
-  }
 }
 
 void MultiDirWidget::showContextMenu ()
@@ -179,10 +160,8 @@ void MultiDirWidget::activateFindMode ()
 
 void MultiDirWidget::showAbout ()
 {
-#define STR2(XXX) #XXX
-#define STR(XXX) STR2 (XXX)
   QStringList lines {
-    tr ("<b>%1</b> version %2").arg (windowTitle (), STR (APP_VERSION)),
+    tr ("<b>%1</b> version %2").arg (windowTitle (), constants::version),
     tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
     tr ("Homepage: <a href='%1'>%1</a>").arg ("https://gres.biz/multidir"),
     tr ("Sources: <a href='%1'>%1</a>").arg ("https://github.com/onemoregres/multidir"),
@@ -197,8 +176,15 @@ void MultiDirWidget::showAbout ()
                      lines.join ("<br>"), QMessageBox::Ok);
   about.setIconPixmap (QPixmap (":/app.png").scaledToHeight (100, Qt::SmoothTransformation));
   about.exec ();
-#undef STR
-#undef STR
+}
+
+void MultiDirWidget::updateWidgetNames ()
+{
+  auto i = 0;
+  for (auto &w: qAsConst (widgets_))
+  {
+    w->setObjectName (QString::number (++i));
+  }
 }
 
 void MultiDirWidget::keyPressEvent (QKeyEvent *event)
@@ -221,7 +207,9 @@ void MultiDirWidget::keyPressEvent (QKeyEvent *event)
 void MultiDirWidget::close (DirWidget *widget)
 {
   widgets_.removeAll (widget);
+  view_->remove (*widget);
   widget->deleteLater ();
+  updateWidgetNames ();
 }
 
 void MultiDirWidget::clone (DirWidget *widget)

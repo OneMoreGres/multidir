@@ -22,8 +22,12 @@ private:
   void trayClicked (QSystemTrayIcon::ActivationReason reason);
   void toggleWidget ();
   void editSettings ();
+  void openConsole (const QString &path);
+  void setCheckUpdates (bool isOn);
 
   QSystemTrayIcon *tray_;
   QScopedPointer<MultiDirWidget> widget_;
   QAction *toggleAction_;
+  QString consoleCommand_;
+  bool checkUpdates_;
 };
