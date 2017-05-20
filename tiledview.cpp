@@ -1,6 +1,6 @@
 #include "tiledview.h"
 #include "backport.h"
-#include "debugmode.h"
+#include "debug.h"
 
 #include <QResizeEvent>
 #include <QApplication>

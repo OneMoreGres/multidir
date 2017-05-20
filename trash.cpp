@@ -1,5 +1,5 @@
 #include "trash.h"
-#include "debugmode.h"
+#include "debug.h"
 
 #include <QDir>
 #include <QDateTime>

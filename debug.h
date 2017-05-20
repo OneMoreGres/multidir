@@ -15,9 +15,9 @@
     assert (XXX); \
 }
 
-namespace debug_mode
+namespace debug
 {
 
-void setEnabled (bool isOn);
+void setDebugMode (bool isOn);
 
 }

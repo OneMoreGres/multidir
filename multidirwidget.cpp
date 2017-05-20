@@ -1,7 +1,7 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
 #include "tiledview.h"
-#include "debugmode.h"
+#include "debug.h"
 
 #include <QBoxLayout>
 #include <QSettings>

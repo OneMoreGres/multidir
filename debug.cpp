@@ -1,4 +1,4 @@
-#include "debugmode.h"
+#include "debug.h"
 
 #include <QFile>
 #include <QDir>
@@ -36,10 +36,10 @@ void handler (QtMsgType type, const QMessageLogContext &context, const QString &
 }
 }
 
-namespace debug_mode
+namespace debug
 {
 
-void setEnabled (bool isOn)
+void setDebugMode (bool isOn)
 {
   if (isOn)
   {
