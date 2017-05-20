@@ -385,16 +385,16 @@ MultiDirWidget * MainWindow::addGroup ()
 
 void MainWindow::updateCurrentGroup (QAction *groupAction)
 {
-  Q_ASSERT (groupAction);
+  ASSERT (groupAction);
   auto index = groupAction->data ().toInt ();
-  Q_ASSERT (index < groups_->count ());
+  ASSERT (index < groups_->count ());
   groups_->setCurrentIndex (index);
 }
 
 MultiDirWidget * MainWindow::group (int index) const
 {
-  Q_ASSERT (index > -1);
-  Q_ASSERT (index < groups_->count ());
+  ASSERT (index > -1);
+  ASSERT (index < groups_->count ());
 
   return static_cast<MultiDirWidget *>(groups_->widget (index));
 }
@@ -403,14 +403,14 @@ QAction * MainWindow::groupAction (int index) const
 {
   const auto actions = groupsMenu_->actions ();
   const auto menuIndex = actions.size () - (groups_->count () - index);
-  Q_ASSERT (menuIndex >= 0);
-  Q_ASSERT (menuIndex < actions.size ());
+  ASSERT (menuIndex >= 0);
+  ASSERT (menuIndex < actions.size ());
   return actions[menuIndex];
 }
 
 void MainWindow::removeGroup ()
 {
-  Q_ASSERT (groups_->count () > 1);
+  ASSERT (groups_->count () > 1);
   const auto index = groups_->currentIndex ();
   const auto res = QMessageBox::question (this, {}, tr ("Close group \"%1\"?").arg (index + 1),
                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
@@ -420,7 +420,7 @@ void MainWindow::removeGroup ()
   }
 
   auto w = groups_->currentWidget ();
-  Q_ASSERT (w);
+  ASSERT (w);
 
   auto firstAction = groupAction (0);
   firstAction->setChecked (true);

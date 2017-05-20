@@ -1,5 +1,6 @@
 #include "tiledview.h"
 #include "backport.h"
+#include "debugmode.h"
 
 #include <QResizeEvent>
 #include <QApplication>
@@ -7,7 +8,6 @@
 #include <QMimeData>
 #include <QLayout>
 #include <QSettings>
-#include <QDebug>
 
 
 using namespace std;
@@ -354,14 +354,14 @@ void TiledView::updateTilesBorders ()
 void TiledView::emplace (QWidget *widget)
 {
   auto tile = findTile (nullptr);
-  Q_ASSERT (tile);
+  ASSERT (tile);
   tile->setWidget (widget);
 }
 
 void TiledView::remove (QWidget &widget)
 {
   auto tile = findTile (&widget);
-  Q_ASSERT (tile);
+  ASSERT (tile);
   tile->widget = nullptr;
   cleanupDimensions ();
   updateGeometry ();
@@ -614,8 +614,8 @@ void TiledView::setResize (int index, Qt::Orientations dir)
 
 void TiledView::handleResizing (const QPoint &current)
 {
-  Q_ASSERT (resizeIndex_ >= 0);
-  Q_ASSERT (resizeIndex_ < tiles_.size ());
+  ASSERT (resizeIndex_ >= 0);
+  ASSERT (resizeIndex_ < tiles_.size ());
   const auto diff = current - dragStartPos_;
   const auto &tile = tiles_[resizeIndex_];
 
@@ -648,8 +648,8 @@ void TiledView::resizeDimension (int index, QList<int> &sizes, int diff)
 
 void TiledView::handleSpanning (const QPoint &current)
 {
-  Q_ASSERT (resizeIndex_ >= 0);
-  Q_ASSERT (resizeIndex_ < tiles_.size ());
+  ASSERT (resizeIndex_ >= 0);
+  ASSERT (resizeIndex_ < tiles_.size ());
   const auto diff = current - dragStartPos_;
   auto changed = false;
   auto &tile = tiles_[resizeIndex_];
@@ -806,8 +806,8 @@ void TiledView::dropEvent (QDropEvent *event)
     return;
   }
   auto source = mime->tile;
-  Q_ASSERT (source);
-  Q_ASSERT (source->widget);
+  ASSERT (source);
+  ASSERT (source->widget);
 
   auto pos = event->pos ();
   auto sourceWidget = source->widget;
@@ -825,8 +825,8 @@ void TiledView::dropEvent (QDropEvent *event)
     updateTilesGeometry ();
     pos.rx () -= margin_;
   }
-  Q_ASSERT (source);
-  Q_ASSERT (source->widget);
+  ASSERT (source);
+  ASSERT (source->widget);
 
   auto target = findTile (pos);
   if (!target)

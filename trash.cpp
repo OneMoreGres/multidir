@@ -1,4 +1,5 @@
 #include "trash.h"
+#include "debugmode.h"
 
 #include <QDir>
 #include <QDateTime>
@@ -18,7 +19,7 @@ bool Trash::trash (const QFileInfo &file)
   WCHAR from [MAX_PATH];
   memset (from, 0, sizeof (from));
   int len = file.absoluteFilePath ().toWCharArray (from);
-  Q_ASSERT (0 <= len && len < MAX_PATH);
+  ASSERT (0 <= len && len < MAX_PATH);
   from [len] = '\0';
   SHFILEOPSTRUCT fileop;
   memset (&fileop, 0, sizeof (fileop));

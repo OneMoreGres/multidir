@@ -1,12 +1,11 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
 #include "tiledview.h"
+#include "debugmode.h"
 
 #include <QBoxLayout>
 #include <QSettings>
 #include <QDir>
-
-#include <QDebug>
 
 namespace
 {
@@ -45,7 +44,7 @@ void MultiDirWidget::save (QSettings &settings) const
 
 void MultiDirWidget::restore (QSettings &settings)
 {
-  Q_ASSERT (widgets_.isEmpty ());
+  ASSERT (widgets_.isEmpty ());
 
   auto size = settings.beginReadArray (qs_dirs);
   for (auto i = 0; i < size; ++i)

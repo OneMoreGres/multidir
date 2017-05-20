@@ -28,7 +28,7 @@ void handler (QtMsgType type, const QMessageLogContext &context, const QString &
                  ' ' + QByteArray (context.file) + ':' + QByteArray::number (context.line) +
                  ' ' + typeName + ": " + msg.toUtf8 () + '\n';
 
-  Q_ASSERT (original);
+  ASSERT (original);
   original (type, context, msg);
 
   QMutexLocker locker (&mutex);
@@ -43,7 +43,7 @@ void setEnabled (bool isOn)
 {
   if (isOn)
   {
-    Q_ASSERT (!original);
+    ASSERT (!original);
     file.setFileName (QDir::home ().absoluteFilePath (QString ("multidir-%1.log")
                                                       .arg (QDateTime::currentDateTime ().toString ("yyyy-MM-dd-hh-mm-ss"))));
     if (!file.open (QFile::WriteOnly))
