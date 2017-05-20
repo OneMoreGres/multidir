@@ -20,6 +20,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QApplication>
+#include <QPixmapCache>
 
 #include <QDebug>
 
@@ -31,6 +32,7 @@ const QString qs_console = "console";
 const QString qs_updates = "checkUpdates";
 const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
+const QString qs_imageCacheSize = "imageCacheSize";
 }
 
 MainWindow::MainWindow (QWidget *parent) :
@@ -157,6 +159,7 @@ void MainWindow::save (QSettings &settings) const
   settings.setValue (qs_hotkey, toggleAction_->shortcut ().toString ());
   settings.setValue (qs_console, consoleCommand_);
   settings.setValue (qs_updates, checkUpdates_);
+  settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
 
   settings.beginWriteArray (qs_groups, groups_->count ());
   for (auto i = 0, end = groups_->count (); i < end; ++i)
@@ -186,6 +189,9 @@ void MainWindow::restore (QSettings &settings)
   consoleCommand_ = settings.value (qs_console, console).toString ();
 
   setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
+
+  auto cacheSize = settings.value (qs_imageCacheSize, QPixmapCache::cacheLimit ()).toInt ();
+  QPixmapCache::setCacheLimit (std::max (1, cacheSize));
 
   auto size = settings.beginReadArray (qs_groups);
   for (auto i = 0; i < size; ++i)
@@ -243,6 +249,7 @@ void MainWindow::editSettings ()
   settings.setHotkey (toggleAction_->shortcut ());
   settings.setConsole (consoleCommand_);
   settings.setCheckUpdates (checkUpdates_);
+  settings.setImageCacheSize (QPixmapCache::cacheLimit ());
 
   if (settings.exec () == QDialog::Accepted)
   {
@@ -250,6 +257,7 @@ void MainWindow::editSettings ()
     toggleAction_->setShortcut (settings.hotkey ());
     consoleCommand_ = settings.console ();
     setCheckUpdates (settings.checkUpdates ());
+    QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
     GlobalAction::makeGlobal (toggleAction_);
   }
 }

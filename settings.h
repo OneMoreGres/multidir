@@ -6,6 +6,7 @@
 class QKeySequenceEdit;
 class QLineEdit;
 class QCheckBox;
+class QSpinBox;
 
 class Settings : public QDialog
 {
@@ -22,8 +23,12 @@ public:
   bool checkUpdates () const;
   void setCheckUpdates (bool isOn);
 
+  int imageCacheSizeKb () const;
+  void setImageCacheSize (int sizeKb);
+
 private:
   QKeySequenceEdit *hotkey_;
   QLineEdit *console_;
   QCheckBox *checkUpdates_;
+  QSpinBox *imageCache_;
 };

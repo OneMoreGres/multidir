@@ -6,12 +6,14 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
+#include <QSpinBox>
 
 Settings::Settings (QWidget *parent) :
   QDialog (parent),
   hotkey_ (new QKeySequenceEdit (this)),
   console_ (new QLineEdit (this)),
-  checkUpdates_ (new QCheckBox (tr ("Check for updates"), this))
+  checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
+  imageCache_ (new QSpinBox (this))
 {
   setWindowTitle (tr ("Settings"));
   auto layout = new QGridLayout (this);
@@ -24,6 +26,12 @@ Settings::Settings (QWidget *parent) :
   layout->addWidget (new QLabel (tr ("Console command")), row, 0);
   layout->addWidget (console_, row, 1);
   console_->setToolTip (tr ("%d will be replaced with opening folder"));
+
+  ++row;
+  layout->addWidget (new QLabel (tr ("Image cache size")), row, 0);
+  layout->addWidget (imageCache_, row, 1);
+  imageCache_->setRange (1, 100);
+  imageCache_->setSuffix (tr (" Mb"));
 
   ++row;
   layout->addWidget (checkUpdates_, row, 0);
@@ -68,4 +76,14 @@ bool Settings::checkUpdates () const
 void Settings::setCheckUpdates (bool isOn)
 {
   checkUpdates_->setChecked (isOn);
+}
+
+int Settings::imageCacheSizeKb () const
+{
+  return imageCache_->value () * 1024;;
+}
+
+void Settings::setImageCacheSize (int sizeKb)
+{
+  imageCache_->setValue (sizeKb / 1024);
 }
