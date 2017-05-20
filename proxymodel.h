@@ -6,8 +6,10 @@ class QFileSystemModel;
 
 class ProxyModel : public QSortFilterProxyModel
 {
+Q_OBJECT
 public:
   ProxyModel (QFileSystemModel *model, QObject *parent = nullptr);
+  ~ProxyModel ();
 
   bool showDirs () const;
   void setShowDirs (bool showDirs);
@@ -27,15 +29,21 @@ public:
   bool showThumbnails () const;
   void setShowThumbnails (bool isOn);
 
+signals:
+  void iconRequested (const QString &fileName);
+
 protected:
   bool filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const override;
   bool lessThan (const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
+  void updateIcon (const QString &fileName, const QPixmap &pixmap);
+
   QFileSystemModel *model_;
   bool showDirs_;
   bool showHidden_;
   bool showThumbnails_;
   QString nameFilter_;
   QPersistentModelIndex current_;
+  QThread *iconReaderThread_;
 };

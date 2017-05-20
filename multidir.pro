@@ -59,7 +59,8 @@ SOURCES += \
     tiledview.cpp \
     updatechecker.cpp \
     mainwindow.cpp \
-    debugmode.cpp
+    debugmode.cpp \
+    backgroundreader.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -78,7 +79,8 @@ HEADERS  += \
     backport.h \
     updatechecker.h \
     mainwindow.h \
-    debugmode.h
+    debugmode.h \
+    backgroundreader.h
 
 RESOURCES += \
     resources.qrc

@@ -1,10 +1,12 @@
 #include "proxymodel.h"
 #include "filesystemmodel.h"
 #include "constants.h"
+#include "backgroundreader.h"
 
 #include <QDateTime>
 #include <QPixmapCache>
 #include <QImageReader>
+#include <QThread>
 
 #include <QDebug>
 
@@ -16,9 +18,27 @@ ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   showHidden_ (false),
   showThumbnails_ (false),
   nameFilter_ (),
-  current_ ()
+  current_ (),
+  iconReaderThread_ (new QThread (this))
 {
   setSourceModel (model);
+
+  auto *reader = new BackgroundReader;
+  connect (this, &ProxyModel::iconRequested,
+           reader, &BackgroundReader::readIcon);
+  connect (reader, &BackgroundReader::iconRead,
+           this, &ProxyModel::updateIcon);
+
+  reader->moveToThread (iconReaderThread_);
+  connect (iconReaderThread_, &QThread::finished,
+           reader, &QObject::deleteLater);
+  iconReaderThread_->start ();
+}
+
+ProxyModel::~ProxyModel ()
+{
+  iconReaderThread_->quit ();
+  iconReaderThread_->wait (2000);
 }
 
 bool ProxyModel::showDirs () const
@@ -120,15 +140,7 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
       {
         return QIcon (*cached);
       }
-      QImageReader reader (path);
-      reader.setScaledSize ({constants::iconSize, constants::iconSize});
-      const auto image = reader.read ();
-      if (!image.isNull ())
-      {
-        const auto pixmap = QPixmap::fromImage (image);
-        QPixmapCache::insert (path, pixmap);
-        return QIcon (pixmap);
-      }
+      emit const_cast<ProxyModel *>(this)->iconRequested (path);
     }
     return QSortFilterProxyModel::data (index, role);
   }
@@ -139,6 +151,17 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
   }
 
   return QSortFilterProxyModel::data (index, role);
+}
+
+
+void ProxyModel::updateIcon (const QString &fileName, const QPixmap &pixmap)
+{
+  auto index = mapFromSource (model_->index (fileName));
+  if (index.isValid ())
+  {
+    QPixmapCache::insert (fileName, pixmap);
+    emit dataChanged (index, index, {Qt::DecorationRole});
+  }
 }
 
 
