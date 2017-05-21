@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDrag>
+#include <QUrl>
 
 #include <QDebug>
 

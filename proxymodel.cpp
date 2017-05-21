@@ -180,7 +180,7 @@ Qt::ItemFlags ProxyModel::flags (const QModelIndex &index) const
   auto flags = QSortFilterProxyModel::flags (index);
   if (index.column () != 0 || index.data ().toString () == constants::dotdot)
   {
-    flags.setFlag (Qt::ItemIsEditable, false);
+    flags &= ~Qt::ItemIsEditable;
   }
   return flags;
 }

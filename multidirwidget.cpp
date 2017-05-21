@@ -1,11 +1,14 @@
 #include "multidirwidget.h"
 #include "dirwidget.h"
 #include "tiledview.h"
+#include "backport.h"
 #include "debug.h"
 
 #include <QBoxLayout>
 #include <QSettings>
 #include <QDir>
+
+using namespace nonstd;
 
 namespace
 {
@@ -66,7 +69,7 @@ void MultiDirWidget::restore (QSettings &settings)
 
 void MultiDirWidget::setNameFilter (const QString &filter)
 {
-  for (auto &i: qAsConst (widgets_))
+  for (auto &i: as_const (widgets_))
   {
     i->setNameFilter (filter);
   }
@@ -93,7 +96,7 @@ DirWidget * MultiDirWidget::addWidget ()
 void MultiDirWidget::updateWidgetNames ()
 {
   auto i = 0;
-  for (auto &w: qAsConst (widgets_))
+  for (auto &w: as_const (widgets_))
   {
     w->setObjectName (QString::number (++i));
   }

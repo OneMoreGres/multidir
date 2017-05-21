@@ -3,6 +3,7 @@
 #include <QList>
 
 class QFileInfo;
+class QUrl;
 
 class CopyPaste
 {

@@ -11,6 +11,7 @@
 
 
 using namespace std;
+using namespace nonstd;
 
 namespace
 {
@@ -38,6 +39,8 @@ enum class Border
 class Tile
 {
 public:
+  Tile (QWidget *widget, int row, int col);
+
   QWidget *widget = nullptr;
   QRect geometry = {};
   int row = -1;
@@ -55,6 +58,14 @@ public:
   bool operator< (const Tile &r) const { return tie (row, col) < tie (r.row,r.col); }
   bool operator== (const Tile &r) const { return tie (row, col) == tie (r.row,r.col); }
 };
+
+Tile::Tile (QWidget *widget, int row, int col) :
+  widget (widget),
+  row (row),
+  col (col)
+{
+
+}
 
 void Tile::setWidget (QWidget *widget)
 {
@@ -241,7 +252,7 @@ void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int 
   const auto index = sizes.size ();
   for (auto i = 0, end = opposite.size (); i < end; ++i)
   {
-    tiles_.append ({nullptr, {}, (isRow ? index : i), (isRow ? i : index)});
+    tiles_.append ({nullptr, (isRow ? index : i), (isRow ? i : index)});
   }
 
   sort (begin (tiles_), end (tiles_));
@@ -382,7 +393,7 @@ void TiledView::save (QSettings &settings) const
   settings.setValue (qs_cols, toString (columns_));
 
   QStringList tiles;
-  for (const auto &i: qAsConst (tiles_))
+  for (const auto &i: as_const (tiles_))
   {
     tiles << QString ("%1:%2:%3").arg (i.widget ? i.widget->objectName () : QString ())
       .arg (i.rowSpan).arg (i.colSpan);
@@ -477,7 +488,7 @@ void TiledView::restore (QSettings &settings)
         {
           continue;
         }
-        auto smashedIndex = tiles_.indexOf ({nullptr, {}, tile.row + r, tile.col + c});
+        auto smashedIndex = tiles_.indexOf ({nullptr, tile.row + r, tile.col + c});
         if (smashedIndex != -1)
         {
           auto smashed = tiles_.takeAt (smashedIndex);
@@ -487,7 +498,7 @@ void TiledView::restore (QSettings &settings)
     }
   }
 
-  for (auto *i: qAsConst (widgets))
+  for (auto *i: as_const (widgets))
   {
     add (*i);
   }
@@ -639,8 +650,8 @@ void TiledView::resizeDimension (int index, QList<int> &sizes, int diff)
 {
   if (index < sizes.size () - 1)
   {
-    const auto change = nonstd::clamp (diff, -sizes[index] + minTileSize,
-                                       sizes[index + 1] - minTileSize);
+    const auto change = clamp (diff, -sizes[index] + minTileSize,
+                               sizes[index + 1] - minTileSize);
     sizes[index] += change;
     sizes[index + 1] -= change;
   }
@@ -688,7 +699,7 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
     ++span;
     for (auto i = 0; i < otherSpan; ++i)
     {
-      auto smashedIndex = tiles_.indexOf ({nullptr, {}, (isRow ? index + 1 : otherIndex + i),
+      auto smashedIndex = tiles_.indexOf ({nullptr, (isRow ? index + 1 : otherIndex + i),
                                            (isRow ? otherIndex + i : index + 1)});
       if (smashedIndex != -1)
       {
@@ -708,7 +719,7 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
     --span;
     for (auto i = 0; i < otherSpan; ++i)
     {
-      tiles_.append ({nullptr, {}, (isRow ? index : otherIndex + i),
+      tiles_.append ({nullptr, (isRow ? index : otherIndex + i),
                       (isRow ? otherIndex + i : index)});
     }
     sort (begin (tiles_), end (tiles_));

@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QFileIconProvider>
+#include <QtConcurrentRun>
 
 namespace
 {
@@ -37,8 +38,6 @@ public:
 }
 
 #ifdef Q_OS_LINUX
-
-#  include <thread>
 
 namespace
 {
@@ -137,8 +136,7 @@ void fillApps ()
 
 void OpenWith::init ()
 {
-  std::thread run (fillApps);
-  run.detach ();
+  QtConcurrent::run (fillApps);
 }
 
 QList<ExternalApp> applications (const QFileInfo &file)
