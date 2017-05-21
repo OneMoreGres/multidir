@@ -12,7 +12,9 @@ int main (int argc, char *argv[])
   QApplication a (argc, argv);
   a.setOrganizationName (QLatin1String ("Gres"));
   a.setApplicationName (QLatin1String ("MultiDir"));
+#ifndef DEVELOPMENT
   a.setQuitOnLastWindowClosed (false);
+#endif
 
   {
     QStringList dirs {

@@ -148,8 +148,10 @@ MainWindow::MainWindow (QWidget *parent) :
 
 MainWindow::~MainWindow ()
 {
+#ifndef DEVELOPMENT
   QSettings settings;
   save (settings);
+#endif
 }
 
 void MainWindow::save (QSettings &settings) const
