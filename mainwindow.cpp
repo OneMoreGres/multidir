@@ -204,7 +204,8 @@ void MainWindow::restore (QSettings &settings)
 
   if (groups_->count () == 0)
   {
-    addGroup ();
+    auto group = addGroup ();
+    group->addWidget ();
   }
   else
   {
