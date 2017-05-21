@@ -3,7 +3,7 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class MultiDirWidget;
+class GroupWidget;
 class FileSystemModel;
 class FileOperation;
 class FileOperationWidget;
@@ -41,10 +41,10 @@ private:
   void showFileOperation (QSharedPointer<FileOperation> operation);
 
   void updateGroupsMenu ();
-  MultiDirWidget * addGroup ();
+  GroupWidget * addGroup ();
   void removeGroup ();
   void updateCurrentGroup (QAction *groupAction);
-  MultiDirWidget * group (int index) const;
+  GroupWidget * group (int index) const;
   QAction * groupAction (int index) const;
 
 

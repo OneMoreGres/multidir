@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "multidirwidget.h"
+#include "groupwidget.h"
 #include "globalaction.h"
 #include "settings.h"
 #include "updatechecker.h"
@@ -391,14 +391,14 @@ void MainWindow::updateGroupsMenu ()
   closeGroupAction_->setEnabled (groups_->count () > 1);
 }
 
-MultiDirWidget * MainWindow::addGroup ()
+GroupWidget * MainWindow::addGroup ()
 {
-  auto group = new MultiDirWidget (*model_, this);
-  connect (group, &MultiDirWidget::consoleRequested,
+  auto group = new GroupWidget (*model_, this);
+  connect (group, &GroupWidget::consoleRequested,
            this, &MainWindow::openConsole);
   connect (findEdit_, &QLineEdit::textChanged,
-           group, &MultiDirWidget::setNameFilter);
-  connect (group, &MultiDirWidget::fileOperation,
+           group, &GroupWidget::setNameFilter);
+  connect (group, &GroupWidget::fileOperation,
            this, &MainWindow::showFileOperation);
 
   const auto index = groups_->addWidget (group);
@@ -424,12 +424,12 @@ void MainWindow::updateCurrentGroup (QAction *groupAction)
   groups_->setCurrentIndex (index);
 }
 
-MultiDirWidget * MainWindow::group (int index) const
+GroupWidget * MainWindow::group (int index) const
 {
   ASSERT (index > -1);
   ASSERT (index < groups_->count ());
 
-  return static_cast<MultiDirWidget *>(groups_->widget (index));
+  return static_cast<GroupWidget *>(groups_->widget (index));
 }
 
 QAction * MainWindow::groupAction (int index) const

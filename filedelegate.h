@@ -2,10 +2,10 @@
 
 #include <QStyledItemDelegate>
 
-class Delegate : public QStyledItemDelegate
+class FileDelegate : public QStyledItemDelegate
 {
 public:
-  explicit Delegate (QObject *parent = nullptr);
+  explicit FileDelegate (QObject *parent = nullptr);
 
   QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };

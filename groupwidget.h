@@ -10,12 +10,12 @@ class FileOperation;
 class QSettings;
 class QFileInfo;
 
-class MultiDirWidget : public QWidget
+class GroupWidget : public QWidget
 {
 Q_OBJECT
 public:
-  MultiDirWidget (FileSystemModel &model, QWidget *parent = nullptr);
-  ~MultiDirWidget ();
+  GroupWidget (FileSystemModel &model, QWidget *parent = nullptr);
+  ~GroupWidget ();
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);

@@ -1,4 +1,4 @@
-#include "multidirwidget.h"
+#include "groupwidget.h"
 #include "dirwidget.h"
 #include "tiledview.h"
 #include "backport.h"
@@ -18,7 +18,7 @@ const QString qs_view = "view";
 }
 
 
-MultiDirWidget::MultiDirWidget (FileSystemModel &model, QWidget *parent) :
+GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
   QWidget (parent),
   model_ (&model),
   widgets_ (),
@@ -28,12 +28,12 @@ MultiDirWidget::MultiDirWidget (FileSystemModel &model, QWidget *parent) :
   layout->addWidget (view_);
 }
 
-MultiDirWidget::~MultiDirWidget ()
+GroupWidget::~GroupWidget ()
 {
 
 }
 
-void MultiDirWidget::save (QSettings &settings) const
+void GroupWidget::save (QSettings &settings) const
 {
   settings.beginWriteArray (qs_dirs, widgets_.size ());
   for (auto i = 0, end = widgets_.size (); i < end; ++i)
@@ -46,7 +46,7 @@ void MultiDirWidget::save (QSettings &settings) const
   view_->save (settings);
 }
 
-void MultiDirWidget::restore (QSettings &settings)
+void GroupWidget::restore (QSettings &settings)
 {
   ASSERT (widgets_.isEmpty ());
 
@@ -68,7 +68,7 @@ void MultiDirWidget::restore (QSettings &settings)
   view_->restore (settings);
 }
 
-void MultiDirWidget::setNameFilter (const QString &filter)
+void GroupWidget::setNameFilter (const QString &filter)
 {
   for (auto &i: as_const (widgets_))
   {
@@ -76,27 +76,27 @@ void MultiDirWidget::setNameFilter (const QString &filter)
   }
 }
 
-DirWidget * MultiDirWidget::addWidget ()
+DirWidget * GroupWidget::addWidget ()
 {
   auto *w = new DirWidget (model_, this);
   widgets_ << w;
   connect (w, &DirWidget::closeRequested,
-           this, &MultiDirWidget::close);
+           this, &GroupWidget::close);
   connect (w, &DirWidget::cloneRequested,
-           this, &MultiDirWidget::clone);
+           this, &GroupWidget::clone);
   connect (w, &DirWidget::newTabRequested,
-           this, &MultiDirWidget::add);
+           this, &GroupWidget::add);
   connect (w, &DirWidget::consoleRequested,
-           this, &MultiDirWidget::consoleRequested);
+           this, &GroupWidget::consoleRequested);
   connect (w, &DirWidget::fileOperation,
-           this, &MultiDirWidget::fileOperation);
+           this, &GroupWidget::fileOperation);
   w->setPath (QDir::homePath ());
   view_->add (*w);
   updateWidgetNames ();
   return w;
 }
 
-void MultiDirWidget::updateWidgetNames ()
+void GroupWidget::updateWidgetNames ()
 {
   auto i = 0;
   for (auto &w: as_const (widgets_))
@@ -105,7 +105,7 @@ void MultiDirWidget::updateWidgetNames ()
   }
 }
 
-void MultiDirWidget::close (DirWidget *widget)
+void GroupWidget::close (DirWidget *widget)
 {
   widgets_.removeAll (widget);
   view_->remove (*widget);
@@ -113,13 +113,13 @@ void MultiDirWidget::close (DirWidget *widget)
   updateWidgetNames ();
 }
 
-void MultiDirWidget::clone (DirWidget *widget)
+void GroupWidget::clone (DirWidget *widget)
 {
   auto w = addWidget ();
   w->setPath (widget->path ());
 }
 
-void MultiDirWidget::add (const QFileInfo &path)
+void GroupWidget::add (const QFileInfo &path)
 {
   auto w = addWidget ();
   w->setPath (path);

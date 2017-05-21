@@ -46,14 +46,12 @@ OTHER_FILES += \
 SOURCES += \
     main.cpp \
     dirwidget.cpp \
-    multidirwidget.cpp \
     globalaction.cpp \
     proxymodel.cpp \
     filesystemmodel.cpp \
     settings.cpp \
     copypaste.cpp \
     dirview.cpp \
-    delegate.cpp \
     trash.cpp \
     openwith.cpp \
     tiledview.cpp \
@@ -62,11 +60,12 @@ SOURCES += \
     backgroundreader.cpp \
     debug.cpp \
     fileoperationwidget.cpp \
-    fileoperation.cpp
+    fileoperation.cpp \
+    groupwidget.cpp \
+    filedelegate.cpp
 
 HEADERS  += \
     dirwidget.h \
-    multidirwidget.h \
     globalaction.h \
     proxymodel.h \
     filesystemmodel.h \
@@ -74,7 +73,6 @@ HEADERS  += \
     copypaste.h \
     dirview.h \
     constants.h \
-    delegate.h \
     trash.h \
     openwith.h \
     tiledview.h \
@@ -84,7 +82,9 @@ HEADERS  += \
     backgroundreader.h \
     debug.h \
     fileoperationwidget.h \
-    fileoperation.h
+    fileoperation.h \
+    groupwidget.h \
+    filedelegate.h
 
 RESOURCES += \
     resources.qrc

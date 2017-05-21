@@ -1,7 +1,7 @@
 #include "dirview.h"
 #include "filesystemmodel.h"
 #include "constants.h"
-#include "delegate.h"
+#include "filedelegate.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -132,7 +132,7 @@ void DirView::setIsList (bool isList)
     }
     if (!delegate_)
     {
-      delegate_ = new Delegate (this);
+      delegate_ = new FileDelegate (this);
       list_->setItemDelegate (delegate_);
     }
   }
