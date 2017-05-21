@@ -60,7 +60,9 @@ SOURCES += \
     updatechecker.cpp \
     mainwindow.cpp \
     backgroundreader.cpp \
-    debug.cpp
+    debug.cpp \
+    fileoperationwidget.cpp \
+    fileoperation.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -80,7 +82,9 @@ HEADERS  += \
     updatechecker.h \
     mainwindow.h \
     backgroundreader.h \
-    debug.h
+    debug.h \
+    fileoperationwidget.h \
+    fileoperation.h
 
 RESOURCES += \
     resources.qrc

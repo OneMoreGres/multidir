@@ -1,5 +1,5 @@
 #include "filesystemmodel.h"
-#include "copypaste.h"
+#include "fileoperation.h"
 
 #include <QMimeData>
 #include <QUrl>
@@ -23,7 +23,8 @@ bool FileSystemModel::dropMimeData (const QMimeData *data, Qt::DropAction action
     return false;
   }
 
-  return CopyPaste::paste (data->urls (), fileInfo (parent), action);
+  emit fileOperation (FileOperation::paste (data->urls (), fileInfo (parent), action));
+  return true;
 }
 
 bool FileSystemModel::setData (const QModelIndex &index, const QVariant &value, int role)

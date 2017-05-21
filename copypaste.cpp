@@ -106,12 +106,22 @@ void CopyPaste::cut (const QList<QFileInfo> &sources)
   QApplication::clipboard ()->setMimeData (mime);
 }
 
-void CopyPaste::paste (const QFileInfo &target)
+Qt::DropAction CopyPaste::clipboardAction ()
 {
   if (auto mime = QApplication::clipboard ()->mimeData (QClipboard::Clipboard))
   {
-    paste (mime->urls (), target, isCut (*mime) ? Qt::MoveAction : Qt::CopyAction);
+    return isCut (*mime) ? Qt::MoveAction : Qt::CopyAction;
   }
+  return Qt::CopyAction;
+}
+
+QList<QUrl> CopyPaste::clipboardUrls ()
+{
+  if (auto mime = QApplication::clipboard ()->mimeData (QClipboard::Clipboard))
+  {
+    return mime->urls ();
+  }
+  return {};
 }
 
 bool CopyPaste::paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action)

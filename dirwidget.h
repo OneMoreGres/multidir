@@ -6,6 +6,7 @@
 class ProxyModel;
 class FileSystemModel;
 class DirView;
+class FileOperation;
 
 class QLabel;
 class QMenu;
@@ -37,6 +38,7 @@ signals:
   void cloneRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
   void consoleRequested (const QString &path);
+  void fileOperation (QSharedPointer<FileOperation> operation);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;

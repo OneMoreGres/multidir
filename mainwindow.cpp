@@ -4,6 +4,8 @@
 #include "settings.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
+#include "fileoperation.h"
+#include "fileoperationwidget.h"
 #include "constants.h"
 #include "debug.h"
 
@@ -39,6 +41,7 @@ MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
   findEdit_ (new QLineEdit (this)),
+  fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   groups_ (new QStackedWidget (this)),
   toggleAction_ (nullptr),
@@ -54,6 +57,8 @@ MainWindow::MainWindow (QWidget *parent) :
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
   model_->setReadOnly (false);
+  connect (model_, &FileSystemModel::fileOperation,
+           this, &MainWindow::showFileOperation);
 
 
   connect (groupsActions_, &QActionGroup::triggered,
@@ -135,6 +140,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
+  menuBarLayout->addLayout (fileOperationsLayout_);
   menuBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
@@ -366,6 +372,20 @@ void MainWindow::showAbout ()
   about.exec ();
 }
 
+void MainWindow::showFileOperation (QSharedPointer<FileOperation> operation)
+{
+  ASSERT (operation);
+  if (operation->isFinished ())
+  {
+    return;
+  }
+
+  auto widget = new FileOperationWidget (operation);
+  widget->hide ();
+  fileOperationsLayout_->addWidget (widget);
+  QTimer::singleShot (1000, widget, &QWidget::show);
+}
+
 void MainWindow::updateGroupsMenu ()
 {
   closeGroupAction_->setEnabled (groups_->count () > 1);
@@ -378,6 +398,8 @@ MultiDirWidget * MainWindow::addGroup ()
            this, &MainWindow::openConsole);
   connect (findEdit_, &QLineEdit::textChanged,
            group, &MultiDirWidget::setNameFilter);
+  connect (group, &MultiDirWidget::fileOperation,
+           this, &MainWindow::showFileOperation);
 
   const auto index = groups_->addWidget (group);
   groups_->setCurrentIndex (index);

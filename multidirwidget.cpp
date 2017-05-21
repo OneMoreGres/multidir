@@ -2,6 +2,7 @@
 #include "dirwidget.h"
 #include "tiledview.h"
 #include "backport.h"
+#include "fileoperation.h"
 #include "debug.h"
 
 #include <QBoxLayout>
@@ -87,6 +88,8 @@ DirWidget * MultiDirWidget::addWidget ()
            this, &MultiDirWidget::add);
   connect (w, &DirWidget::consoleRequested,
            this, &MultiDirWidget::consoleRequested);
+  connect (w, &DirWidget::fileOperation,
+           this, &MultiDirWidget::fileOperation);
   w->setPath (QDir::homePath ());
   view_->add (*w);
   updateWidgetNames ();

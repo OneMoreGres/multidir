@@ -5,6 +5,8 @@
 
 class MultiDirWidget;
 class FileSystemModel;
+class FileOperation;
+class FileOperationWidget;
 
 class QSettings;
 class QAction;
@@ -36,6 +38,7 @@ private:
   void addWidget ();
   void activateFindMode ();
   void showAbout ();
+  void showFileOperation (QSharedPointer<FileOperation> operation);
 
   void updateGroupsMenu ();
   MultiDirWidget * addGroup ();
@@ -47,6 +50,7 @@ private:
 
   FileSystemModel *model_;
   QLineEdit *findEdit_;
+  QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QStackedWidget *groups_;
   QAction *toggleAction_;

@@ -5,6 +5,7 @@
 class DirWidget;
 class TiledView;
 class FileSystemModel;
+class FileOperation;
 
 class QSettings;
 class QFileInfo;
@@ -24,6 +25,7 @@ public:
 
 signals:
   void consoleRequested (const QString &path);
+  void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:
   void close (DirWidget *widget);

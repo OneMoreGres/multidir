@@ -3,7 +3,7 @@
 #include "filesystemmodel.h"
 #include "copypaste.h"
 #include "dirview.h"
-#include "trash.h"
+#include "fileoperation.h"
 #include "constants.h"
 #include "openwith.h"
 
@@ -455,10 +455,12 @@ void DirWidget::promptTrash ()
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
+    QList<QFileInfo> infos;
     for (const auto &i: indexes)
     {
-      Trash::trash (fileInfo (i));
+      infos << model_->fileInfo (proxy_->mapToSource (i));
     }
+    emit fileOperation (FileOperation::trash (infos));
   }
 }
 
@@ -474,10 +476,12 @@ void DirWidget::promptRemove ()
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::Yes)
   {
+    QList<QFileInfo> infos;
     for (const auto &i: indexes)
     {
-      model_->remove (proxy_->mapToSource (i));
+      infos << model_->fileInfo (proxy_->mapToSource (i));
     }
+    emit fileOperation (FileOperation::remove (infos));
   }
 }
 
@@ -548,11 +552,13 @@ void DirWidget::paste ()
   {
     index = view_->rootIndex ();
   }
-  if (!index.isValid ())
+  const auto urls = CopyPaste::clipboardUrls ();
+  if (!index.isValid () || urls.isEmpty ())
   {
     return;
   }
-  CopyPaste::paste (fileInfo (index));
+  const auto action = CopyPaste::clipboardAction ();
+  emit fileOperation (FileOperation::paste (urls, fileInfo (index), action));
 }
 
 void DirWidget::copyPath ()
