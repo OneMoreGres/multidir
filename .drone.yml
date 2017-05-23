@@ -1,0 +1,19 @@
+build:
+  test:
+    image: multidir/precise
+    commands:
+      - cd .. && mkdir build && cd build
+      - ../multidir/utils/make_ubuntu.sh
+
+  pack:
+    image: multidir/precise
+    environment:
+      - DISTDIR=/drone/dist/$$BRANCH-$$BUILD_NUMBER
+    volumes:
+      - /home/gres/Projects/filemanager/dist:/drone/dist
+    commands:
+      - cd ../build
+      - ../multidir/utils/make_appimage.sh
+      - mv *.AppImage /drone/dist
+    when:
+      branch: [release/*, master, feature/ci-*]
