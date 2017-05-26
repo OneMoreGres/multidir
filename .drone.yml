@@ -1,9 +1,13 @@
-build:
+workspace:
+  base: /base
+  path: src
+  
+pipeline:
   test:
     image: multidir/precise
     commands:
-      - cd .. && mkdir build && cd build
-      - ../multidir/utils/make_ubuntu.sh
+      - mkdir /base/build && cd /base/build
+      - /base/src/utils/make_ubuntu.sh
 
   pack:
     image: multidir/precise
@@ -12,8 +16,8 @@ build:
     volumes:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
-      - cd ../build
-      - ../multidir/utils/make_appimage.sh
+      - cd /base/build
+      - /base/src/utils/make_appimage.sh
       - mv *.AppImage /drone/dist
     when:
       branch: [release/*, master, feature/ci-*]
