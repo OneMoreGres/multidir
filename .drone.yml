@@ -11,8 +11,9 @@ pipeline:
 
   pack:
     image: multidir/precise
-    environment:
-      - DISTDIR=/drone/dist/$$BRANCH-$$BUILD_NUMBER
+    privileged: true
+    devices:
+      - /dev/fuse
     volumes:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
