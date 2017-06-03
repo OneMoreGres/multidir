@@ -20,6 +20,7 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QClipboard>
+#include <QProcess>
 
 #include <QDebug>
 
@@ -302,7 +303,14 @@ void DirWidget::openPath (const QModelIndex &index)
   const auto info = fileInfo (index);
   if (!info.isDir ())
   {
-    QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
+    if (info.permission (QFile::ExeUser))
+    {
+      QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ());
+    }
+    else
+    {
+      QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
+    }
     return;
   }
 
