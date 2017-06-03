@@ -406,7 +406,6 @@ GroupWidget * MainWindow::addGroup ()
 
   auto action = groupsMenu_->addAction (tr ("Group %1").arg (index + 1));
   action->setCheckable (true);
-  action->setData (index);
   groupsActions_->addAction (action);
   action->setChecked (true);
   action->trigger ();
@@ -419,7 +418,7 @@ GroupWidget * MainWindow::addGroup ()
 void MainWindow::updateCurrentGroup (QAction *groupAction)
 {
   ASSERT (groupAction);
-  auto index = groupAction->data ().toInt ();
+  auto index = groupsActions_->actions ().indexOf (groupAction);
   ASSERT (index < groups_->count ());
   groups_->setCurrentIndex (index);
 }
