@@ -55,6 +55,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   openWith_ (nullptr),
+  openInEditorAction_ (nullptr),
   openInTabAction_ (nullptr),
   renameAction_ (nullptr),
   trashAction_ (nullptr),
@@ -154,6 +155,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openInTabAction_ = viewMenu_->addAction (tr ("Open in tab"));
   connect (openInTabAction_, &QAction::triggered,
            this, [this]() {emit newTabRequested (current ().absoluteFilePath ());});
+
+  openInEditorAction_ = viewMenu_->addAction (tr ("Open in editor"));
+  connect (openInEditorAction_, &QAction::triggered,
+           this, [this]() {emit editorRequested (current ().absoluteFilePath ());});
 
   cutAction_ = viewMenu_->addAction (QIcon::fromTheme ("cut"), tr ("Cut"));
   cutAction_->setShortcut (QKeySequence::Cut);

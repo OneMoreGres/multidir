@@ -25,6 +25,7 @@ public:
 
 signals:
   void consoleRequested (const QString &path);
+  void editorRequested (const QString &path);
   void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:

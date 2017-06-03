@@ -88,6 +88,8 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::add);
   connect (w, &DirWidget::consoleRequested,
            this, &GroupWidget::consoleRequested);
+  connect (w, &DirWidget::editorRequested,
+           this, &GroupWidget::editorRequested);
   connect (w, &DirWidget::fileOperation,
            this, &GroupWidget::fileOperation);
   w->setPath (QDir::homePath ());

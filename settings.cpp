@@ -12,6 +12,7 @@ Settings::Settings (QWidget *parent) :
   QDialog (parent),
   hotkey_ (new QKeySequenceEdit (this)),
   console_ (new QLineEdit (this)),
+  editor_ (new QLineEdit (this)),
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
   imageCache_ (new QSpinBox (this))
 {
@@ -26,6 +27,11 @@ Settings::Settings (QWidget *parent) :
   layout->addWidget (new QLabel (tr ("Console command")), row, 0);
   layout->addWidget (console_, row, 1);
   console_->setToolTip (tr ("%d will be replaced with opening folder"));
+
+  ++row;
+  layout->addWidget (new QLabel (tr ("Default editor")), row, 0);
+  layout->addWidget (editor_, row, 1);
+  editor_->setToolTip (tr ("%p will be replaced with opening path"));
 
   ++row;
   layout->addWidget (new QLabel (tr ("Image cache size")), row, 0);
@@ -86,4 +92,14 @@ int Settings::imageCacheSizeKb () const
 void Settings::setImageCacheSize (int sizeKb)
 {
   imageCache_->setValue (sizeKb / 1024);
+}
+
+QString Settings::editor () const
+{
+  return editor_->text ();
+}
+
+void Settings::setEditor (const QString &editor)
+{
+  editor_->setText (editor);
 }

@@ -33,6 +33,7 @@ namespace
 const QString qs_geometry = "geometry";
 const QString qs_hotkey = "hotkey";
 const QString qs_console = "console";
+const QString qs_editor = "editor";
 const QString qs_updates = "checkUpdates";
 const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
@@ -51,6 +52,7 @@ MainWindow::MainWindow (QWidget *parent) :
   closeGroupAction_ (nullptr),
   groupsActions_ (new QActionGroup (this)),
   consoleCommand_ (),
+  editorCommand_ (),
   checkUpdates_ (false)
 {
   setWindowTitle (tr ("MultiDir"));
@@ -174,6 +176,7 @@ void MainWindow::save (QSettings &settings) const
 
   settings.setValue (qs_hotkey, toggleAction_->shortcut ().toString ());
   settings.setValue (qs_console, consoleCommand_);
+  settings.setValue (qs_editor, editorCommand_);
   settings.setValue (qs_updates, checkUpdates_);
   settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
 
@@ -198,11 +201,14 @@ void MainWindow::restore (QSettings &settings)
 
 #ifdef Q_OS_LINUX
   const auto console = QString ("xterm");
+  const auto editor = QString ("gedit");
 #endif
 #ifdef Q_OS_WIN
   const auto console = QString ("cmd");
+  const auto editor = QString ("notepad.exe");
 #endif
   consoleCommand_ = settings.value (qs_console, console).toString ();
+  editorCommand_ = settings.value (qs_editor, editor).toString ();
 
   setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
 
@@ -266,6 +272,7 @@ void MainWindow::editSettings ()
   settings.setHotkey (toggleAction_->shortcut ());
   settings.setConsole (consoleCommand_);
   settings.setCheckUpdates (checkUpdates_);
+  settings.setEditor (editorCommand_);
   settings.setImageCacheSize (QPixmapCache::cacheLimit ());
 
   if (settings.exec () == QDialog::Accepted)
@@ -273,6 +280,7 @@ void MainWindow::editSettings ()
     GlobalAction::removeGlobal (toggleAction_);
     toggleAction_->setShortcut (settings.hotkey ());
     consoleCommand_ = settings.console ();
+    editorCommand_ = settings.editor ();
     setCheckUpdates (settings.checkUpdates ());
     QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
     GlobalAction::makeGlobal (toggleAction_);
@@ -305,6 +313,23 @@ void MainWindow::openConsole (const QString &path)
       }
     }
     QProcess::startDetached (parts[0], parts.mid (1), path);
+  }
+}
+
+void MainWindow::openInEditor (const QString &path)
+{
+  if (!editorCommand_.isEmpty () && !path.isEmpty ())
+  {
+    auto command = editorCommand_ + ' ';
+    if (command.contains ("%p"))
+    {
+      command.replace ("%p", path);
+    }
+    else
+    {
+      command += path;
+    }
+    QProcess::startDetached (command);
   }
 }
 
@@ -404,6 +429,8 @@ GroupWidget * MainWindow::addGroup ()
   auto group = new GroupWidget (*model_, this);
   connect (group, &GroupWidget::consoleRequested,
            this, &MainWindow::openConsole);
+  connect (group, &GroupWidget::editorRequested,
+           this, &MainWindow::openInEditor);
   connect (findEdit_, &QLineEdit::textChanged,
            group, &GroupWidget::setNameFilter);
   connect (group, &GroupWidget::fileOperation,

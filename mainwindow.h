@@ -34,6 +34,7 @@ private:
   void toggleVisible ();
   void editSettings ();
   void openConsole (const QString &path);
+  void openInEditor (const QString &path);
   void setCheckUpdates (bool isOn);
   void addWidget ();
   void activateFindMode ();
@@ -58,5 +59,6 @@ private:
   QAction *closeGroupAction_;
   QActionGroup *groupsActions_;
   QString consoleCommand_;
+  QString editorCommand_;
   bool checkUpdates_;
 };

@@ -26,9 +26,13 @@ public:
   int imageCacheSizeKb () const;
   void setImageCacheSize (int sizeKb);
 
+  QString editor () const;
+  void setEditor (const QString &editor);
+
 private:
   QKeySequenceEdit *hotkey_;
   QLineEdit *console_;
+  QLineEdit *editor_;
   QCheckBox *checkUpdates_;
   QSpinBox *imageCache_;
 };

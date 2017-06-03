@@ -38,6 +38,7 @@ signals:
   void cloneRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
   void consoleRequested (const QString &path);
+  void editorRequested (const QString &path);
   void fileOperation (QSharedPointer<FileOperation> operation);
 
 protected:
@@ -94,6 +95,7 @@ private:
   QMenu *viewMenu_;
   QAction *openAction_;
   QMenu *openWith_;
+  QAction *openInEditorAction_;
   QAction *openInTabAction_;
   QAction *renameAction_;
   QAction *trashAction_;
