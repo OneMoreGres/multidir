@@ -242,6 +242,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   // defaults
   auto layout = new QVBoxLayout (this);
+  layout->setMargin (0);
   layout->addLayout (controlsLayout_);
   layout->addWidget (view_);
 
