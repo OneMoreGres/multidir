@@ -216,7 +216,12 @@ Tile * TiledView::findTile (QWidget *widget) const
 Tile * TiledView::findTile (const QPoint &pos) const
 {
   auto it = find_if (cbegin (tiles_), cend (tiles_), [pos](const Tile &i) {
-    return i.geometry.contains (pos);
+    if (i.geometry.contains (pos))
+    {
+      return true;
+    }
+    auto border = i.borderAt (pos);
+    return border != Border::None;
   });
   if (it == cend (tiles_))
   {
