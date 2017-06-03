@@ -40,7 +40,7 @@ public:
   void setExtensive (bool isExtensive);
 
 signals:
-  void doubleClicked (const QModelIndex &index);
+  void activated (const QModelIndex &index);
   void contextMenuRequested ();
 
 private:

@@ -152,8 +152,8 @@ void DirView::initTable ()
   table_->setDragDropOverwriteMode (false);
   table_->setDefaultDropAction (Qt::MoveAction);
   table_->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (table_, &QTableView::doubleClicked,
-           this, &DirView::doubleClicked);
+  connect (table_, &QTableView::activated,
+           this, &DirView::activated);
   connect (table_, &QWidget::customContextMenuRequested,
            this, &DirView::contextMenuRequested);
 
@@ -178,8 +178,8 @@ void DirView::initList ()
   list_->setDragDropOverwriteMode (false);
   list_->setDefaultDropAction (Qt::MoveAction);
   list_->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (list_, &QListView::doubleClicked,
-           this, &DirView::doubleClicked);
+  connect (list_, &QListView::activated,
+           this, &DirView::activated);
   connect (list_, &QWidget::customContextMenuRequested,
            this, &DirView::contextMenuRequested);
 

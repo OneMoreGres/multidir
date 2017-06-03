@@ -243,7 +243,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   connect (view_, &DirView::contextMenuRequested,
            this, &DirWidget::showViewContextMenu);
-  connect (view_, &DirView::doubleClicked,
+  connect (view_, &DirView::activated,
            this, &DirWidget::openPath);
 }
 
