@@ -6,6 +6,7 @@
 #include "fileoperation.h"
 #include "constants.h"
 #include "openwith.h"
+#include "notifier.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -305,7 +306,10 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     if (info.permission (QFile::ExeUser))
     {
-      QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ());
+      if (!QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ()))
+      {
+        Notifier::error (tr ("Failed to open '%1'").arg (info.absoluteFilePath ()));
+      }
     }
     else
     {

@@ -8,6 +8,7 @@
 #include "fileoperationwidget.h"
 #include "constants.h"
 #include "debug.h"
+#include "notifier.h"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -23,6 +24,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QPixmapCache>
+#include <QStatusBar>
 
 #include <QDebug>
 
@@ -53,6 +55,9 @@ MainWindow::MainWindow (QWidget *parent) :
 {
   setWindowTitle (tr ("MultiDir"));
   setWindowIcon (QIcon (":/app.png"));
+
+  auto status = new QStatusBar (this);
+  Notifier::setMain (status);
 
   model_->setRootPath (QDir::homePath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
@@ -146,6 +151,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto layout = new QVBoxLayout (this);
   layout->addLayout (menuBarLayout);
   layout->addWidget (groups_);
+  layout->addWidget (status);
 
 
   QSettings qsettings;
@@ -154,6 +160,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
 MainWindow::~MainWindow ()
 {
+  Notifier::setMain (nullptr);
+
 #ifndef DEVELOPMENT
   QSettings settings;
   save (settings);
