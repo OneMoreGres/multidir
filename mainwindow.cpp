@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QPixmapCache>
 #include <QStatusBar>
+#include <QInputDialog>
 
 #include <QDebug>
 
@@ -49,6 +50,7 @@ MainWindow::MainWindow (QWidget *parent) :
   groups_ (new QStackedWidget (this)),
   toggleAction_ (nullptr),
   groupsMenu_ (nullptr),
+  renameGroupAction_ (nullptr),
   closeGroupAction_ (nullptr),
   groupsActions_ (new QActionGroup (this)),
   consoleCommand_ (),
@@ -101,6 +103,9 @@ MainWindow::MainWindow (QWidget *parent) :
     auto group = this->addGroup ();
     group->addWidget ();
   });
+
+  renameGroupAction_ = groupsMenu_->addAction (tr ("Rename..."));
+  connect (renameGroupAction_, &QAction::triggered, this, &MainWindow::renameGroup);
 
   closeGroupAction_ = groupsMenu_->addAction (tr ("Close..."));
   connect (closeGroupAction_, &QAction::triggered, this, &MainWindow::removeGroup);
@@ -221,6 +226,8 @@ void MainWindow::restore (QSettings &settings)
     settings.setArrayIndex (i);
     auto group = addGroup ();
     group->restore (settings);
+    auto action = groupsActions_->actions ().back ();
+    action->setText (group->name ());
   }
   settings.endArray ();
 
@@ -445,8 +452,9 @@ GroupWidget * MainWindow::addGroup ()
 
   const auto index = groups_->addWidget (group);
   groups_->setCurrentIndex (index);
+  group->setName (tr ("Group %1").arg (index + 1));
 
-  auto action = groupsMenu_->addAction (tr ("Group %1").arg (index + 1));
+  auto action = groupsMenu_->addAction (group->name ());
   action->setCheckable (true);
   groupsActions_->addAction (action);
   action->setChecked (true);
@@ -485,8 +493,8 @@ QAction * MainWindow::groupAction (int index) const
 void MainWindow::removeGroup ()
 {
   ASSERT (groups_->count () > 1);
-  const auto index = groups_->currentIndex ();
-  const auto res = QMessageBox::question (this, {}, tr ("Close group \"%1\"?").arg (index + 1),
+  const auto name = groupsActions_->checkedAction ()->text ();
+  const auto res = QMessageBox::question (this, {}, tr ("Close group \"%1\"?").arg (name),
                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
   if (res == QMessageBox::No)
   {
@@ -496,6 +504,7 @@ void MainWindow::removeGroup ()
   auto w = groups_->currentWidget ();
   ASSERT (w);
 
+  const auto index = groups_->currentIndex ();
   auto firstAction = groupAction (0);
   firstAction->setChecked (true);
   firstAction->trigger ();
@@ -508,4 +517,18 @@ void MainWindow::removeGroup ()
 
   w->deleteLater ();
   updateGroupsMenu ();
+}
+
+void MainWindow::renameGroup ()
+{
+  ASSERT (groups_->count () > 1);
+  const auto name = groupsActions_->checkedAction ()->text ();
+  const auto newName = QInputDialog::getText (this, {}, tr ("Group title"),
+                                              QLineEdit::Normal, name);
+  if (!newName.isEmpty ())
+  {
+    const auto index = groups_->currentIndex ();
+    group (index)->setName (newName);
+    groupsActions_->checkedAction ()->setText (newName);
+  }
 }

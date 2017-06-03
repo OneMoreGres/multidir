@@ -23,6 +23,9 @@ public:
   void setNameFilter (const QString &filter);
   DirWidget * addWidget ();
 
+  QString name () const;
+  void setName (const QString &name);
+
 signals:
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);
@@ -34,6 +37,7 @@ private:
   void add (const QFileInfo &path);
   void updateWidgetNames ();
 
+  QString name_;
   FileSystemModel *model_;
   QList<DirWidget *> widgets_;
   TiledView *view_;

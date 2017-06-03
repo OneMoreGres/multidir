@@ -15,11 +15,13 @@ namespace
 {
 const QString qs_dirs = "dirs";
 const QString qs_view = "view";
+const QString qs_name = "name";
 }
 
 
 GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
   QWidget (parent),
+  name_ (),
   model_ (&model),
   widgets_ (),
   view_ (new TiledView (this))
@@ -35,6 +37,7 @@ GroupWidget::~GroupWidget ()
 
 void GroupWidget::save (QSettings &settings) const
 {
+  settings.setValue (qs_name, name_);
   settings.beginWriteArray (qs_dirs, widgets_.size ());
   for (auto i = 0, end = widgets_.size (); i < end; ++i)
   {
@@ -49,6 +52,8 @@ void GroupWidget::save (QSettings &settings) const
 void GroupWidget::restore (QSettings &settings)
 {
   ASSERT (widgets_.isEmpty ());
+
+  name_ = settings.value (qs_name, name_).toString ();
 
   auto size = settings.beginReadArray (qs_dirs);
   for (auto i = 0; i < size; ++i)
@@ -105,6 +110,16 @@ void GroupWidget::updateWidgetNames ()
   {
     w->setObjectName (QString::number (++i));
   }
+}
+
+QString GroupWidget::name () const
+{
+  return name_;
+}
+
+void GroupWidget::setName (const QString &name)
+{
+  name_ = name;
 }
 
 void GroupWidget::close (DirWidget *widget)

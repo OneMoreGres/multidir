@@ -44,6 +44,7 @@ private:
   void updateGroupsMenu ();
   GroupWidget * addGroup ();
   void removeGroup ();
+  void renameGroup ();
   void updateCurrentGroup (QAction *groupAction);
   GroupWidget * group (int index) const;
   QAction * groupAction (int index) const;
@@ -56,6 +57,7 @@ private:
   QStackedWidget *groups_;
   QAction *toggleAction_;
   QMenu *groupsMenu_;
+  QAction *renameGroupAction_;
   QAction *closeGroupAction_;
   QActionGroup *groupsActions_;
   QString consoleCommand_;
