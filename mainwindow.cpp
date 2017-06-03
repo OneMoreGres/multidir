@@ -312,7 +312,11 @@ void MainWindow::openConsole (const QString &path)
         }
       }
     }
-    QProcess::startDetached (parts[0], parts.mid (1), path);
+    if (!QProcess::startDetached (parts[0], parts.mid (1), path))
+    {
+      Notifier::error (tr ("Failed to open console '%1' in '%2'")
+                       .arg (consoleCommand_, path));
+    }
   }
 }
 
@@ -329,7 +333,10 @@ void MainWindow::openInEditor (const QString &path)
     {
       command += path;
     }
-    QProcess::startDetached (command);
+    if (QProcess::startDetached (command))
+    {
+      Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
+    }
   }
 }
 
