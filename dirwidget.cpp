@@ -337,9 +337,12 @@ void DirWidget::openPath (const QModelIndex &index)
   }
   else
   {
-    auto nameSibling = index.sibling (index.row (), FileSystemModel::Name);
-    view_->setRootIndex (nameSibling);
-    proxy_->setCurrent (nameSibling);
+    auto newIndex = index.sibling (index.row (), FileSystemModel::Name);
+    const auto previous = view_->rootIndex ();
+    const auto moveUp = previous.parent () == newIndex;
+    view_->setRootIndex (newIndex);
+    view_->setCurrentIndex (moveUp ? previous : QModelIndex ());
+    proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
 
     pathLabel_->setText (fittedPath ());
