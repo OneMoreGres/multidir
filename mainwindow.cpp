@@ -477,10 +477,19 @@ void MainWindow::updateCurrentGroup (QAction *groupAction)
 
 void MainWindow::updateGroupShortcuts ()
 {
-  auto index = 0;
+  auto index = -1;
+  const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
+  const auto count = chars.length ();
   for (auto &i: groupsActions_->actions ())
   {
-    i->setShortcut (QString ("Alt+G,%1").arg (++index));
+    if (++index < count)
+    {
+      i->setShortcut (QString ("Alt+G,%1").arg (chars.at (index)));
+    }
+    else
+    {
+      i->setShortcut ({});
+    }
   }
 }
 

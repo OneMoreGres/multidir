@@ -124,10 +124,19 @@ void GroupWidget::updateWidgetNames ()
 
 void GroupWidget::updateWidgetShortcuts ()
 {
-  auto index = 0;
+  auto index = -1;
+  const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
+  const auto count = chars.length ();
   for (auto &i: widgets_)
   {
-    i.action->setShortcut (QString ("Alt+T,%1").arg (++index));
+    if (++index < count)
+    {
+      i.action->setShortcut (QString ("Alt+T,%1").arg (chars.at (index)));
+    }
+    else
+    {
+      i.action->setShortcut ({});
+    }
   }
 }
 
