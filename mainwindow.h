@@ -46,6 +46,7 @@ private:
   void removeGroup ();
   void renameGroup ();
   void updateCurrentGroup (QAction *groupAction);
+  void updateGroupShortcuts ();
   GroupWidget * group (int index) const;
   QAction * groupAction (int index) const;
 

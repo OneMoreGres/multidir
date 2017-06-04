@@ -460,6 +460,7 @@ GroupWidget * MainWindow::addGroup ()
   action->setChecked (true);
   action->trigger ();
 
+  updateGroupShortcuts ();
   updateGroupsMenu ();
 
   return group;
@@ -471,6 +472,15 @@ void MainWindow::updateCurrentGroup (QAction *groupAction)
   auto index = groupsActions_->actions ().indexOf (groupAction);
   ASSERT (index < groups_->count ());
   groups_->setCurrentIndex (index);
+}
+
+void MainWindow::updateGroupShortcuts ()
+{
+  auto index = 0;
+  for (auto &i: groupsActions_->actions ())
+  {
+    i->setShortcut (QString ("Alt+G,%1").arg (++index));
+  }
 }
 
 GroupWidget * MainWindow::group (int index) const
@@ -514,6 +524,7 @@ void MainWindow::removeGroup ()
   groupsMenu_->removeAction (action);
   groupsActions_->removeAction (action);
 
+  updateGroupShortcuts ();
 
   w->deleteLater ();
   updateGroupsMenu ();
