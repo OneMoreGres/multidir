@@ -41,7 +41,10 @@ public:
   bool isExtensive () const;
   void setExtensive (bool isExtensive);
 
+  bool eventFilter (QObject *watched, QEvent *event) override;
+
 signals:
+  void movedBackward ();
   void activated (const QModelIndex &index);
   void contextMenuRequested ();
 

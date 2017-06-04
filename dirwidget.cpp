@@ -251,6 +251,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::showViewContextMenu);
   connect (view_, &DirView::activated,
            this, &DirWidget::openPath);
+  connect (view_, &DirView::movedBackward,
+           up_, &QToolButton::pressed);
 }
 
 DirWidget::~DirWidget ()
@@ -335,8 +337,9 @@ void DirWidget::openPath (const QModelIndex &index)
   }
   else
   {
-    view_->setRootIndex (index);
-    proxy_->setCurrent (index);
+    auto nameSibling = index.sibling (index.row (), FileSystemModel::Name);
+    view_->setRootIndex (nameSibling);
+    proxy_->setCurrent (nameSibling);
     path_ = fileInfo (view_->rootIndex ());
 
     pathLabel_->setText (fittedPath ());

@@ -9,6 +9,7 @@
 #include <QBoxLayout>
 #include <QSettings>
 #include <QMenu>
+#include <QKeyEvent>
 
 #include <QDebug>
 
@@ -166,6 +167,8 @@ void DirView::initTable ()
   connect (table_->horizontalHeader (), &QWidget::customContextMenuRequested,
            this, &DirView::showHeaderContextMenu);
 
+  table_->installEventFilter (this);
+
   layout ()->addWidget (table_);
 }
 
@@ -251,4 +254,23 @@ QAbstractItemView * DirView::view () const
   return (table_
           ? static_cast<QAbstractItemView *>(table_)
           : static_cast<QAbstractItemView *>(list_) );
+}
+
+bool DirView::eventFilter (QObject *watched, QEvent *event)
+{
+  if (watched == table_ && event->type () == QEvent::KeyPress)
+  {
+    auto casted = static_cast<QKeyEvent *>(event);
+    if (casted->key () == Qt::Key_Left ||
+        casted->key () == Qt::Key_Backspace)
+    {
+      emit movedBackward ();
+    }
+    else if (casted->key () == Qt::Key_Right ||
+             casted->key () == Qt::Key_Space)
+    {
+      emit activated (currentIndex ());
+    }
+  }
+  return false;
 }
