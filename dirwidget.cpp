@@ -225,7 +225,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   pathEdit_->installEventFilter (this);
   connect (pathEdit_, &QLineEdit::editingFinished,
-           this, [this] {togglePathEdition (false);});
+           this, &DirWidget::handleEditedPath);
 
   togglePathEdition (false);
 
@@ -447,6 +447,14 @@ void DirWidget::togglePathEdition (bool isOn)
     {
       setPath (newPath);
     }
+  }
+}
+
+void DirWidget::handleEditedPath ()
+{
+  if (QFile::exists (pathEdit_->text ()))
+  {
+    togglePathEdition (false);
   }
 }
 

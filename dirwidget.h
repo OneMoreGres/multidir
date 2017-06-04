@@ -55,6 +55,7 @@ private:
   QStringList names (const QList<QModelIndex> &indexes) const;
 
   void togglePathEdition (bool isOn);
+  void handleEditedPath ();
   void startRenaming ();
   void promptClose ();
   void promptTrash ();
