@@ -472,6 +472,7 @@ void MainWindow::updateCurrentGroup (QAction *groupAction)
   auto index = groupsActions_->actions ().indexOf (groupAction);
   ASSERT (index < groups_->count ());
   groups_->setCurrentIndex (index);
+  setWindowTitle (tr ("Multidir - ") + group (index)->name ());
 }
 
 void MainWindow::updateGroupShortcuts ()
