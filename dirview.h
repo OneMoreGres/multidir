@@ -20,6 +20,8 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+  void activate ();
+
   QModelIndex currentIndex () const;
   void setCurrentIndex (const QModelIndex &index);
 

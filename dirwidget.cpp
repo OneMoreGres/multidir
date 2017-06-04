@@ -428,6 +428,11 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
   return false;
 }
 
+void DirWidget::activate ()
+{
+  view_->activate ();
+}
+
 void DirWidget::togglePathEdition (bool isOn)
 {
   pathEdit_->setVisible (isOn);

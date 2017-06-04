@@ -36,9 +36,18 @@ private:
   void clone (DirWidget *widget);
   void add (const QFileInfo &path);
   void updateWidgetNames ();
+  void updateWidgetShortcuts ();
+
+  struct Widget
+  {
+    DirWidget *widget;
+    QAction *action;
+
+    bool operator== (const Widget &r) const;
+  };
 
   QString name_;
   FileSystemModel *model_;
-  QList<DirWidget *> widgets_;
+  QList<Widget> widgets_;
   TiledView *view_;
 };

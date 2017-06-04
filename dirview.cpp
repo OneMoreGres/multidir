@@ -49,6 +49,11 @@ void DirView::restore (QSettings &settings)
   }
 }
 
+void DirView::activate ()
+{
+  view ()->setFocus ();
+}
+
 QModelIndex DirView::currentIndex () const
 {
   return view ()->currentIndex ();

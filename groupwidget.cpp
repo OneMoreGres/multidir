@@ -8,6 +8,7 @@
 #include <QBoxLayout>
 #include <QSettings>
 #include <QDir>
+#include <QAction>
 
 using namespace nonstd;
 
@@ -42,7 +43,7 @@ void GroupWidget::save (QSettings &settings) const
   for (auto i = 0, end = widgets_.size (); i < end; ++i)
   {
     settings.setArrayIndex (i);
-    widgets_[i]->save (settings);
+    widgets_[i].widget->save (settings);
   }
   settings.endArray ();
 
@@ -77,14 +78,16 @@ void GroupWidget::setNameFilter (const QString &filter)
 {
   for (auto &i: as_const (widgets_))
   {
-    i->setNameFilter (filter);
+    i.widget->setNameFilter (filter);
   }
 }
 
 DirWidget * GroupWidget::addWidget ()
 {
   auto *w = new DirWidget (model_, this);
-  widgets_ << w;
+  auto *action = new QAction (this);
+  widgets_ << Widget {w, action};
+
   connect (w, &DirWidget::closeRequested,
            this, &GroupWidget::close);
   connect (w, &DirWidget::cloneRequested,
@@ -97,9 +100,16 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::editorRequested);
   connect (w, &DirWidget::fileOperation,
            this, &GroupWidget::fileOperation);
+
   w->setPath (QDir::homePath ());
   view_->add (*w);
   updateWidgetNames ();
+  updateWidgetShortcuts ();
+
+  this->addAction (action);
+  connect (action, &QAction::triggered,
+           this, [w] {w->activate ();});
+
   return w;
 }
 
@@ -108,7 +118,16 @@ void GroupWidget::updateWidgetNames ()
   auto i = 0;
   for (auto &w: as_const (widgets_))
   {
-    w->setObjectName (QString::number (++i));
+    w.widget->setObjectName (QString::number (++i));
+  }
+}
+
+void GroupWidget::updateWidgetShortcuts ()
+{
+  auto index = 0;
+  for (auto &i: widgets_)
+  {
+    i.action->setShortcut (QString ("Alt+T,%1").arg (++index));
   }
 }
 
@@ -124,10 +143,11 @@ void GroupWidget::setName (const QString &name)
 
 void GroupWidget::close (DirWidget *widget)
 {
-  widgets_.removeAll (widget);
+  widgets_.removeAll ({widget, nullptr});
   view_->remove (*widget);
   widget->deleteLater ();
   updateWidgetNames ();
+  updateWidgetShortcuts ();
 }
 
 void GroupWidget::clone (DirWidget *widget)
@@ -140,4 +160,9 @@ void GroupWidget::add (const QFileInfo &path)
 {
   auto w = addWidget ();
   w->setPath (path);
+}
+
+bool GroupWidget::Widget::operator== (const GroupWidget::Widget &r) const
+{
+  return widget == r.widget;
 }

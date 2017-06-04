@@ -33,6 +33,8 @@ public:
 
   bool eventFilter (QObject *watched, QEvent *event) override;
 
+  void activate ();
+
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
