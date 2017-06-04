@@ -383,6 +383,19 @@ void TiledView::remove (QWidget &widget)
   updateGeometry ();
 }
 
+QList<QWidget *> TiledView::widgets () const
+{
+  QList<QWidget *> result;
+  for (const auto &i: tiles_)
+  {
+    if (i.widget)
+    {
+      result << i.widget;
+    }
+  }
+  return result;
+}
+
 void TiledView::save (QSettings &settings) const
 {
   const auto toString = [](const QList<int> &list) {
@@ -857,6 +870,7 @@ void TiledView::dropEvent (QDropEvent *event)
     cleanupDimensions ();
     event->acceptProposedAction ();
     updateGeometry ();
+    emit tileSwapped ();
   }
 }
 

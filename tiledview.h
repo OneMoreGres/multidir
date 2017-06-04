@@ -8,18 +8,23 @@ class QSettings;
 
 class TiledView : public QWidget
 {
+Q_OBJECT
 public:
   explicit TiledView (QWidget *parent = 0);
   ~TiledView ();
 
   void add (QWidget &widget);
   void remove (QWidget &widget);
+  QList<QWidget *> widgets () const;
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
   QSize sizeHint () const override;
   QSize minimumSizeHint () const override;
+
+signals:
+  void tileSwapped ();
 
 protected:
   void resizeEvent (QResizeEvent *event) override;

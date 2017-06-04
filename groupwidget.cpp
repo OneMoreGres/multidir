@@ -29,6 +29,9 @@ GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
 {
   auto layout = new QVBoxLayout (this);
   layout->addWidget (view_);
+
+  connect (view_, &TiledView::tileSwapped,
+           this, &GroupWidget::updateWidgetShortcuts);
 }
 
 GroupWidget::~GroupWidget ()
@@ -124,12 +127,13 @@ void GroupWidget::updateWidgetNames ()
 
 void GroupWidget::updateWidgetShortcuts ()
 {
-  auto index = -1;
   const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
   const auto count = chars.length ();
+  const auto order = view_->widgets ();
   for (auto &i: widgets_)
   {
-    if (++index < count)
+    const auto index = order.indexOf (i.widget);
+    if (index < count)
     {
       i.action->setShortcut (QString ("Alt+T,%1").arg (chars.at (index)));
     }
