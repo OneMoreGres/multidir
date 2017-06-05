@@ -191,6 +191,8 @@ void DirView::initList ()
   connect (list_, &QWidget::customContextMenuRequested,
            this, &DirView::contextMenuRequested);
 
+  list_->installEventFilter (this);
+
   layout ()->addWidget (list_);
 }
 
@@ -258,16 +260,16 @@ QAbstractItemView * DirView::view () const
 
 bool DirView::eventFilter (QObject *watched, QEvent *event)
 {
-  if (watched == table_ && event->type () == QEvent::KeyPress)
+  if (event->type () == QEvent::KeyPress)
   {
     auto casted = static_cast<QKeyEvent *>(event);
-    if (casted->key () == Qt::Key_Left ||
-        casted->key () == Qt::Key_Backspace)
+    if (casted->key () == Qt::Key_Backspace ||
+        (watched == table_ && casted->key () == Qt::Key_Left))
     {
       emit movedBackward ();
     }
-    else if (casted->key () == Qt::Key_Right ||
-             casted->key () == Qt::Key_Space)
+    else if (casted->key () == Qt::Key_Space ||
+             (watched == table_ && casted->key () == Qt::Key_Right))
     {
       emit activated (currentIndex ());
     }
