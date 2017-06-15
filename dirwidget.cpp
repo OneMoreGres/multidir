@@ -269,6 +269,7 @@ void DirWidget::save (QSettings &settings) const
   settings.setValue (qs_showDirs, proxy_->showDirs ());
   settings.setValue (qs_showHidden, proxy_->showHidden ());
   settings.setValue (qs_showThumbs, showThumbs_->isChecked ());
+  view_->save (settings);
 }
 
 void DirWidget::restore (QSettings &settings)
@@ -280,6 +281,7 @@ void DirWidget::restore (QSettings &settings)
   showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
   showHidden_->setChecked (settings.value (qs_showHidden, false).toBool ());
   showThumbs_->setChecked (settings.value (qs_showThumbs, false).toBool ());
+  view_->restore (settings);
 }
 
 QFileInfo DirWidget::path () const
