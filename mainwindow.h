@@ -3,17 +3,14 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class GroupWidget;
+class GroupView;
+class GroupControl;
 class FileSystemModel;
 class FileOperation;
-class FileOperationWidget;
 
 class QSettings;
 class QAction;
-class QMenu;
 class QLineEdit;
-class QStackedWidget;
-class QActionGroup;
 
 class MainWindow : public QWidget
 {
@@ -40,27 +37,15 @@ private:
   void activateFindMode ();
   void showAbout ();
   void showFileOperation (QSharedPointer<FileOperation> operation);
-
-  void updateGroupsMenu ();
-  GroupWidget * addGroup ();
-  void removeGroup ();
-  void renameGroup ();
-  void updateCurrentGroup (QAction *groupAction);
-  void updateGroupShortcuts ();
-  GroupWidget * group (int index) const;
-  QAction * groupAction (int index) const;
-
+  void updateWindowTitle (const QString &groupName);
 
   FileSystemModel *model_;
+  GroupView *groupView_;
+  GroupControl *groupControl_;
   QLineEdit *findEdit_;
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
-  QStackedWidget *groups_;
   QAction *toggleAction_;
-  QMenu *groupsMenu_;
-  QAction *renameGroupAction_;
-  QAction *closeGroupAction_;
-  QActionGroup *groupsActions_;
   QString consoleCommand_;
   QString editorCommand_;
   bool checkUpdates_;

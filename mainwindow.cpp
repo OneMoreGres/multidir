@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-#include "groupwidget.h"
+#include "groupview.h"
+#include "groupcontrol.h"
 #include "globalaction.h"
 #include "settings.h"
 #include "updatechecker.h"
@@ -11,9 +12,7 @@
 #include "notifier.h"
 
 #include <QSystemTrayIcon>
-#include <QStackedWidget>
 #include <QBoxLayout>
-#include <QMenu>
 #include <QApplication>
 #include <QSettings>
 #include <QProcess>
@@ -22,12 +21,8 @@
 #include <QMenuBar>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QApplication>
 #include <QPixmapCache>
 #include <QStatusBar>
-#include <QInputDialog>
-
-#include <QDebug>
 
 namespace
 {
@@ -36,28 +31,22 @@ const QString qs_hotkey = "hotkey";
 const QString qs_console = "console";
 const QString qs_editor = "editor";
 const QString qs_updates = "checkUpdates";
-const QString qs_groups = "groups";
-const QString qs_currentGroup = "currentGroup";
 const QString qs_imageCacheSize = "imageCacheSize";
 }
 
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
+  groupView_ (new GroupView (*model_, this)),
+  groupControl_ (new GroupControl (*groupView_, this)),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
-  groups_ (new QStackedWidget (this)),
   toggleAction_ (nullptr),
-  groupsMenu_ (nullptr),
-  renameGroupAction_ (nullptr),
-  closeGroupAction_ (nullptr),
-  groupsActions_ (new QActionGroup (this)),
   consoleCommand_ (),
   editorCommand_ (),
   checkUpdates_ (false)
 {
-  setWindowTitle (tr ("MultiDir"));
   setWindowIcon (QIcon (":/app.png"));
 
   auto status = new QStatusBar (this);
@@ -70,8 +59,16 @@ MainWindow::MainWindow (QWidget *parent) :
            this, &MainWindow::showFileOperation);
 
 
-  connect (groupsActions_, &QActionGroup::triggered,
-           this, &MainWindow::updateCurrentGroup);
+  connect (groupView_, &GroupView::consoleRequested,
+           this, &MainWindow::openConsole);
+  connect (groupView_, &GroupView::editorRequested,
+           this, &MainWindow::openInEditor);
+  connect (findEdit_, &QLineEdit::textChanged,
+           groupView_, &GroupView::setNameFilter);
+  connect (groupView_, &GroupView::fileOperation,
+           this, &MainWindow::showFileOperation);
+  connect (groupView_, &GroupView::currentChanged,
+           this, &MainWindow::updateWindowTitle);
 
 
   //menu bar
@@ -96,21 +93,7 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  groupsMenu_ = menuBar->addMenu (tr ("Groups"));
-
-  auto addGroup = groupsMenu_->addAction (tr ("Add"));
-  connect (addGroup, &QAction::triggered, this, [this] {
-    auto group = this->addGroup ();
-    group->addWidget ();
-  });
-
-  renameGroupAction_ = groupsMenu_->addAction (tr ("Rename..."));
-  connect (renameGroupAction_, &QAction::triggered, this, &MainWindow::renameGroup);
-
-  closeGroupAction_ = groupsMenu_->addAction (tr ("Close..."));
-  connect (closeGroupAction_, &QAction::triggered, this, &MainWindow::removeGroup);
-
-  groupsMenu_->addSeparator ();
+  menuBar->addMenu (groupControl_->menu ());
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
@@ -157,7 +140,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto layout = new QVBoxLayout (this);
   layout->addLayout (menuBarLayout);
-  layout->addWidget (groups_);
+  layout->addWidget (groupView_);
   layout->addWidget (status);
 
 
@@ -185,15 +168,7 @@ void MainWindow::save (QSettings &settings) const
   settings.setValue (qs_updates, checkUpdates_);
   settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
 
-  settings.beginWriteArray (qs_groups, groups_->count ());
-  for (auto i = 0, end = groups_->count (); i < end; ++i)
-  {
-    settings.setArrayIndex (i);
-    group (i)->save (settings);
-  }
-  settings.endArray ();
-
-  settings.setValue (qs_currentGroup, groups_->currentIndex ());
+  groupControl_->save (settings);
 }
 
 void MainWindow::restore (QSettings &settings)
@@ -220,35 +195,14 @@ void MainWindow::restore (QSettings &settings)
   auto cacheSize = settings.value (qs_imageCacheSize, QPixmapCache::cacheLimit ()).toInt ();
   QPixmapCache::setCacheLimit (std::max (1, cacheSize));
 
-  auto size = settings.beginReadArray (qs_groups);
-  for (auto i = 0; i < size; ++i)
-  {
-    settings.setArrayIndex (i);
-    auto group = addGroup ();
-    group->restore (settings);
-    auto action = groupsActions_->actions ().back ();
-    action->setText (group->name ());
-  }
-  settings.endArray ();
-
-  if (groups_->count () == 0)
-  {
-    auto group = addGroup ();
-    group->addWidget ();
-  }
-  else
-  {
-    auto action = groupAction (settings.value (qs_currentGroup, 0).toInt ());
-    action->setChecked (true);
-    action->trigger ();
-  }
+  groupControl_->restore (settings);
 }
 
 void MainWindow::updateTrayMenu ()
 {
   disconnect (toggleAction_, &QAction::toggled,
               this, &MainWindow::toggleVisible);
-  toggleAction_->setChecked (groups_->isVisible ());
+  toggleAction_->setChecked (groupView_->isVisible ());
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
@@ -373,7 +327,7 @@ void MainWindow::setCheckUpdates (bool isOn)
 
 void MainWindow::addWidget ()
 {
-  group (groups_->currentIndex ())->addWidget ();
+  groupView_->addWidgetToCurrent ();
 }
 
 void MainWindow::keyPressEvent (QKeyEvent *event)
@@ -433,123 +387,7 @@ void MainWindow::showFileOperation (QSharedPointer<FileOperation> operation)
   QTimer::singleShot (1000, widget, &QWidget::show);
 }
 
-void MainWindow::updateGroupsMenu ()
+void MainWindow::updateWindowTitle (const QString &groupName)
 {
-  closeGroupAction_->setEnabled (groups_->count () > 1);
-}
-
-GroupWidget * MainWindow::addGroup ()
-{
-  auto group = new GroupWidget (*model_, this);
-  connect (group, &GroupWidget::consoleRequested,
-           this, &MainWindow::openConsole);
-  connect (group, &GroupWidget::editorRequested,
-           this, &MainWindow::openInEditor);
-  connect (findEdit_, &QLineEdit::textChanged,
-           group, &GroupWidget::setNameFilter);
-  connect (group, &GroupWidget::fileOperation,
-           this, &MainWindow::showFileOperation);
-
-  const auto index = groups_->addWidget (group);
-  groups_->setCurrentIndex (index);
-  group->setName (tr ("Group %1").arg (index + 1));
-
-  auto action = groupsMenu_->addAction (group->name ());
-  action->setCheckable (true);
-  groupsActions_->addAction (action);
-  action->setChecked (true);
-  action->trigger ();
-
-  updateGroupShortcuts ();
-  updateGroupsMenu ();
-
-  return group;
-}
-
-void MainWindow::updateCurrentGroup (QAction *groupAction)
-{
-  ASSERT (groupAction);
-  auto index = groupsActions_->actions ().indexOf (groupAction);
-  ASSERT (index < groups_->count ());
-  groups_->setCurrentIndex (index);
-  setWindowTitle (tr ("Multidir - ") + group (index)->name ());
-}
-
-void MainWindow::updateGroupShortcuts ()
-{
-  auto index = -1;
-  const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
-  const auto count = chars.length ();
-  for (auto &i: groupsActions_->actions ())
-  {
-    if (++index < count)
-    {
-      i->setShortcut (QString ("Alt+G,%1").arg (chars.at (index)));
-    }
-    else
-    {
-      i->setShortcut ({});
-    }
-  }
-}
-
-GroupWidget * MainWindow::group (int index) const
-{
-  ASSERT (index > -1);
-  ASSERT (index < groups_->count ());
-
-  return static_cast<GroupWidget *>(groups_->widget (index));
-}
-
-QAction * MainWindow::groupAction (int index) const
-{
-  const auto actions = groupsMenu_->actions ();
-  const auto menuIndex = actions.size () - (groups_->count () - index);
-  ASSERT (menuIndex >= 0);
-  ASSERT (menuIndex < actions.size ());
-  return actions[menuIndex];
-}
-
-void MainWindow::removeGroup ()
-{
-  ASSERT (groups_->count () > 1);
-  const auto name = groupsActions_->checkedAction ()->text ();
-  const auto res = QMessageBox::question (this, {}, tr ("Close group \"%1\"?").arg (name),
-                                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-  if (res == QMessageBox::No)
-  {
-    return;
-  }
-
-  auto w = groups_->currentWidget ();
-  ASSERT (w);
-
-  const auto index = groups_->currentIndex ();
-  auto firstAction = groupAction (0);
-  firstAction->setChecked (true);
-  firstAction->trigger ();
-
-  auto action = groupAction (index);
-  groups_->removeWidget (w);
-  groupsMenu_->removeAction (action);
-  groupsActions_->removeAction (action);
-
-  updateGroupShortcuts ();
-
-  w->deleteLater ();
-  updateGroupsMenu ();
-}
-
-void MainWindow::renameGroup ()
-{
-  ASSERT (groups_->count () > 1);
-  const auto name = groupsActions_->checkedAction ()->text ();
-  const auto newName = QInputDialog::getText (this, {}, tr ("Group title"),
-                                              QLineEdit::Normal, name);
-  if (!newName.isEmpty ())
-  {
-    const auto index = groups_->currentIndex ();
-    group (index)->setName (newName);
-    groupsActions_->checkedAction ()->setText (newName);
-  }
+  setWindowTitle (tr ("Multidir - ") + groupName);
 }

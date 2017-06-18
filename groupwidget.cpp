@@ -55,7 +55,20 @@ void GroupWidget::save (QSettings &settings) const
 
 void GroupWidget::restore (QSettings &settings)
 {
-  ASSERT (widgets_.isEmpty ());
+  for (auto &i: widgets_)
+  {
+    if (i.widget)
+    {
+      view_->remove (*i.widget);
+      i.widget->deleteLater ();
+    }
+    if (i.action)
+    {
+      i.action->deleteLater ();
+    }
+  }
+  widgets_.clear ();
+
 
   name_ = settings.value (qs_name, name_).toString ();
 
