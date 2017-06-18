@@ -174,6 +174,11 @@ void GroupWidget::close (DirWidget *widget)
   widget->deleteLater ();
   updateWidgetNames ();
   updateWidgetShortcuts ();
+
+  if (widgets_.isEmpty ())
+  {
+    addWidget ();
+  }
 }
 
 void GroupWidget::clone (DirWidget *widget)
