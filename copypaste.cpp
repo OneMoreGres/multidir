@@ -4,11 +4,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QFileInfo>
-#include <QDir>
-#include <QDrag>
 #include <QUrl>
-
-#include <QDebug>
 
 namespace
 {
@@ -32,16 +28,6 @@ bool isCut (const QMimeData &mime)
 #endif
 }
 
-QString uniqueFilePath (const QString &targetPath, const QString &name)
-{
-  auto targetName = name;
-  while (QFile::exists (targetPath + targetName))
-  {
-    targetName = QObject::tr ("copy_") + targetName;
-  }
-  return targetPath + targetName;
-}
-
 QStringList names (const QList<QUrl> &urls)
 {
   QStringList result;
@@ -62,20 +48,6 @@ QList<QUrl> toUrls (const QList<QFileInfo> &infos)
     urls << QUrl::fromLocalFile (i.absoluteFilePath ());
   }
   return urls;
-}
-
-QList<QFileInfo> toInfos (const QList<QUrl> &urls)
-{
-  QList<QFileInfo> result;
-  result.reserve (urls.size ());
-  for (const auto &i: urls)
-  {
-    if (i.isLocalFile ())
-    {
-      result << i.toLocalFile ();
-    }
-  }
-  return result;
 }
 
 }
@@ -122,44 +94,4 @@ QList<QUrl> CopyPaste::clipboardUrls ()
     return mime->urls ();
   }
   return {};
-}
-
-bool CopyPaste::paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action)
-{
-  auto infos = toInfos (urls);
-  if (infos.isEmpty ())
-  {
-    return true;
-  }
-
-  auto targetPath = (target.isDir () ? target.absoluteFilePath () : target.absolutePath ())
-                    + QDir::separator ();
-  bool ok = true;
-  switch (action)
-  {
-    case Qt::CopyAction:
-      for (const auto &i: infos)
-      {
-        ok &= QFile::copy (i.absoluteFilePath (), uniqueFilePath (targetPath, i.fileName ()));
-      }
-      break;
-
-    case Qt::LinkAction:
-      for (const auto &i: infos)
-      {
-        ok &= QFile::link (i.absoluteFilePath (), targetPath + i.fileName ());
-      }
-      break;
-
-    case Qt::MoveAction:
-      for (const auto &i: infos)
-      {
-        ok &= QFile::rename (i.absoluteFilePath (), targetPath + i.fileName ());
-      }
-      break;
-
-    default:
-      return false;
-  }
-  return ok;
 }

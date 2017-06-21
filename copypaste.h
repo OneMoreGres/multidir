@@ -12,5 +12,4 @@ public:
   static void cut (const QList<QFileInfo> &sources);
   static Qt::DropAction clipboardAction ();
   static QList<QUrl> clipboardUrls ();
-  static bool paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action);
 };
