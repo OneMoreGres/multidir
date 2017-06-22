@@ -271,7 +271,11 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
     else if (casted->key () == Qt::Key_Space ||
              (watched == table_ && casted->key () == Qt::Key_Right))
     {
-      emit activated (currentIndex ());
+      const auto index = currentIndex ();
+      if (index.isValid ())
+      {
+        emit activated (index);
+      }
     }
   }
   return false;
