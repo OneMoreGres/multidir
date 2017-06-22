@@ -7,6 +7,7 @@
 #include "filesystemmodel.h"
 #include "fileoperation.h"
 #include "fileoperationwidget.h"
+#include "fileconflictresolver.h"
 #include "constants.h"
 #include "debug.h"
 #include "notifier.h"
@@ -39,6 +40,7 @@ MainWindow::MainWindow (QWidget *parent) :
   model_ (new FileSystemModel (this)),
   groupView_ (new GroupView (*model_, this)),
   groupControl_ (new GroupControl (*groupView_, this)),
+  conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
@@ -150,6 +152,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
 MainWindow::~MainWindow ()
 {
+  conflictResolver_->deleteLater ();
+
   Notifier::setMain (nullptr);
 
 #ifndef DEVELOPMENT
@@ -376,15 +380,13 @@ void MainWindow::showAbout ()
 void MainWindow::showFileOperation (QSharedPointer<FileOperation> operation)
 {
   ASSERT (operation);
-  if (operation->isFinished ())
-  {
-    return;
-  }
 
   auto widget = new FileOperationWidget (operation);
   widget->hide ();
   fileOperationsLayout_->addWidget (widget);
   QTimer::singleShot (1000, widget, &QWidget::show);
+
+  operation->startAsync (conflictResolver_);
 }
 
 void MainWindow::updateWindowTitle (const QString &groupName)

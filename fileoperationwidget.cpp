@@ -9,8 +9,7 @@
 FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operation, QWidget *parent) :
   QWidget (parent),
   progress_ (new QProgressBar (this)),
-  operation_ (operation),
-  watcher_ (this)
+  operation_ (operation)
 {
   ASSERT (operation);
 
@@ -42,7 +41,6 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
   progress_->setRange (0, 1);
   progress_->setValue (0);
 
-  watcher_.setFuture (operation_->future ());
-  connect (&watcher_, &QFutureWatcher<bool>::finished,
+  connect (operation_.data (), &FileOperation::finished,
            this, &QObject::deleteLater);
 }

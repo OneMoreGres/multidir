@@ -65,7 +65,8 @@ SOURCES += \
     filedelegate.cpp \
     notifier.cpp \
     groupview.cpp \
-    groupcontrol.cpp
+    groupcontrol.cpp \
+    fileconflictresolver.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -90,7 +91,8 @@ HEADERS  += \
     filedelegate.h \
     notifier.h \
     groupview.h \
-    groupcontrol.h
+    groupcontrol.h \
+    fileconflictresolver.h
 
 RESOURCES += \
     resources.qrc

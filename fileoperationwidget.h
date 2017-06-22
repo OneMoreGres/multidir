@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QWidget>
-#include <QFutureWatcher>
 
 class FileOperation;
 
@@ -17,5 +16,4 @@ public:
 private:
   QProgressBar *progress_;
   QSharedPointer<FileOperation> operation_;
-  QFutureWatcher<bool> watcher_;
 };

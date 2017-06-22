@@ -7,6 +7,7 @@ class GroupView;
 class GroupControl;
 class FileSystemModel;
 class FileOperation;
+class FileConflictResolver;
 
 class QSettings;
 class QAction;
@@ -42,6 +43,7 @@ private:
   FileSystemModel *model_;
   GroupView *groupView_;
   GroupControl *groupControl_;
+  FileConflictResolver *conflictResolver_;
   QLineEdit *findEdit_;
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;

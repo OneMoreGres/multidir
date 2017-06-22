@@ -1,13 +1,17 @@
 #pragma once
 
-#include <QFuture>
 #include <QFileInfo>
 #include <QUrl>
 
+class FileConflictResolver;
 
-class FileOperation
+class FileOperation : public QObject
 {
+Q_OBJECT
 public:
+  using Ptr = QSharedPointer<FileOperation>;
+  using Infos = QList<QFileInfo>;
+
   enum class Action
   {
     Copy, Move, Link, Remove, Trash
@@ -18,18 +22,26 @@ public:
   const QList<QFileInfo> &sources () const;
   const QFileInfo &target () const;
   const Action &action () const;
-  const QFuture<bool> &future () const;
 
-  bool isFinished () const;
+  void startAsync (FileConflictResolver *resolver);
 
-  static QSharedPointer<FileOperation> paste (const QList<QUrl> &urls, const QFileInfo &target,
-                                              Qt::DropAction action);
-  static QSharedPointer<FileOperation> remove (const QList<QFileInfo> &infos);
-  static QSharedPointer<FileOperation> trash (const QList<QFileInfo> &infos);
+  static Ptr paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action);
+  static Ptr remove (const QList<QFileInfo> &infos);
+  static Ptr trash (const QList<QFileInfo> &infos);
+
+signals:
+  void finished (bool ok);
 
 private:
-  QList<QFileInfo> sources_;
+  bool transfer (const Infos &sources, const QFileInfo &target, int depth);
+  bool link (const Infos &sources, const QFileInfo &target);
+  bool erase (const Infos &infos, int depth);
+
+  int resolveConflict (const QFileInfo &source, const QFileInfo &target);
+
+  Infos sources_;
   QFileInfo target_;
   Action action_;
-  QFuture<bool> future_;
+  FileConflictResolver *resolver_;
+  int allResolution_;
 };
