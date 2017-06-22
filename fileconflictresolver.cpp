@@ -1,12 +1,14 @@
 #include "fileconflictresolver.h"
 #include "fileoperation.h"
 #include "debug.h"
+#include "utils.h"
 
 #include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QBoxLayout>
+#include <QDateTime>
 
 FileConflictResolver::FileConflictResolver (QWidget *parent) :
   QDialog (parent),
@@ -74,13 +76,19 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
                                     int action, int *result)
 {
   ASSERT (result);
+  auto labelText = [](const QFileInfo &i) {
+                     return i.absoluteFilePath ()
+                            + tr ("\nModified: ") + i.lastModified ().toString (Qt::ISODate)
+                            + tr (". Size: ") + utils::sizeString (i);
+                   };
+
   switch (FileOperation::Action (action))
   {
     case FileOperation::Action::Copy:
     case FileOperation::Action::Move:
     case FileOperation::Action::Link:
-      sourceLabel_->setText (source.absoluteFilePath ());
-      targetLabel_->setText (target.absoluteFilePath ());
+      sourceLabel_->setText (labelText (source));
+      targetLabel_->setText (labelText (target));
       break;
 
     case FileOperation::Action::Remove:
