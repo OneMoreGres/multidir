@@ -3,6 +3,7 @@
 #include "trash.h"
 #include "notifier.h"
 #include "debug.h"
+#include "utils.h"
 
 #include <QDir>
 #include <QtConcurrentRun>
@@ -23,12 +24,6 @@ QString uniqueFileName (const QFileInfo &info)
     target = baseName + '.' + QString::number (++attempt) + '.' + extension;
   }
   return target;
-}
-
-FileOperation::Infos dirEntries (const QFileInfo &info)
-{
-  QDir dir (info.absoluteFilePath ());
-  return dir.entryInfoList (QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
 bool createDir (QDir parent, const QString &name)
@@ -60,6 +55,9 @@ FileOperation::FileOperation () :
   action_ (),
   resolver_ (nullptr),
   allResolution_ (FileConflictResolver::Pending),
+  totalSize_ (1),
+  doneSize_ (0),
+  progress_ (0),
   isAborted_ (false)
 {
 
@@ -115,6 +113,18 @@ void FileOperation::startAsync (FileConflictResolver *resolver)
 {
   ASSERT (resolver);
   resolver_ = resolver;
+  if (action_ != FileOperation::Action::Link)
+  {
+    for (const auto &i: sources_)
+    {
+      totalSize_ += utils::totalSize (i);
+    }
+  }
+  else
+  {
+    totalSize_ = sources_.size ();
+  }
+
   switch (action_)
   {
     case FileOperation::Action::Copy:
@@ -130,6 +140,17 @@ void FileOperation::startAsync (FileConflictResolver *resolver)
     case FileOperation::Action::Trash:
       QtConcurrent::run (this, &FileOperation::erase, sources_, 0);
       break;
+  }
+}
+
+void FileOperation::advance (qint64 size)
+{
+  doneSize_ += size;
+  auto newProgress = int (doneSize_ / (totalSize_ / 100.));
+  if (newProgress != progress_)
+  {
+    progress_ = newProgress;
+    emit progress (progress_);
   }
 }
 
@@ -174,7 +195,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
     {
       const auto removeSource = action_ == FileOperation::Action::Move;
       if (createDir (targetDir, name)
-          && transfer (dirEntries (source), targetDir.absoluteFilePath (name), depth + 1)
+          && transfer (utils::dirEntries (source), targetDir.absoluteFilePath (name), depth + 1)
           && ((removeSource && removeDir (source)) || !removeSource))
       {
         continue;
@@ -183,6 +204,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       continue;
     }
 
+    const auto size = source.size ();
     switch (action_)
     {
       case FileOperation::Action::Copy:
@@ -196,6 +218,8 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       default:
         ASSERT_X (false, "wrong switch");
     }
+
+    advance (size);
   }
 
   if (!depth)
@@ -225,6 +249,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
     }
 
     ok &= QFile::link (source.absoluteFilePath (), targetDir.absoluteFilePath (name));
+    advance (1);
   }
   emit finished (ok);
   return ok;
@@ -240,6 +265,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       ok = false;
       break;
     }
+    const auto size = i.size ();
     switch (action_)
     {
       case FileOperation::Action::Remove:
@@ -249,7 +275,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
         }
         else
         {
-          const auto erased = erase (dirEntries (i), depth + 1);
+          const auto erased = erase (utils::dirEntries (i), depth + 1);
           ok &= (erased ? removeDir (i) : false);
         }
         break;
@@ -261,6 +287,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       default:
         ASSERT_X (false, "wrong switch");
     }
+    advance (size);
   }
 
   if (!depth)

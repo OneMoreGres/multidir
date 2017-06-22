@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <QDir>
 #include <QObject>
 
 namespace
@@ -33,6 +34,29 @@ QString sizeString (const QFileInfo &info)
     return QString::number (bytes / kb, 'f', 3) + QObject::tr ("Kb");
   }
   return QString::number (bytes) + QObject::tr ("bytes");
+}
+
+qint64 totalSize (const QFileInfo &info)
+{
+  qint64 result = 0;
+  if (info.isFile ())
+  {
+    result = info.size ();
+  }
+  else if (info.isDir ())
+  {
+    for (const auto &i: dirEntries (info))
+    {
+      result += totalSize (i);
+    }
+  }
+  return result;
+}
+
+Infos dirEntries (const QFileInfo &info)
+{
+  QDir dir (info.absoluteFilePath ());
+  return dir.entryInfoList (QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
 }

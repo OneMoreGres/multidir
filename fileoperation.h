@@ -32,6 +32,7 @@ public:
   void abort ();
 
 signals:
+  void progress (int percent);
   void finished (bool ok);
 
 private:
@@ -40,11 +41,15 @@ private:
   bool erase (const Infos &infos, int depth);
 
   int resolveConflict (const QFileInfo &source, const QFileInfo &target);
+  void advance (qint64 size);
 
   Infos sources_;
   QFileInfo target_;
   Action action_;
   FileConflictResolver *resolver_;
   int allResolution_;
+  qint64 totalSize_;
+  qint64 doneSize_;
+  int progress_;
   std::atomic_bool isAborted_;
 };

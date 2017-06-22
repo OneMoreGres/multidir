@@ -47,8 +47,11 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
   progress_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
   progress_->setMaximumWidth (fontMetrics ().boundingRect (text).width ());
   progress_->setMinimumWidth (fontMetrics ().boundingRect (text).width ());
-  progress_->setRange (0, 1);
+  progress_->setRange (0, 100);
   progress_->setValue (0);
+
+  connect (operation_.data (), &FileOperation::progress,
+           progress_, &QProgressBar::setValue);
 
   connect (operation_.data (), &FileOperation::finished,
            this, &QObject::deleteLater);
