@@ -59,7 +59,8 @@ FileOperation::FileOperation () :
   target_ (),
   action_ (),
   resolver_ (nullptr),
-  allResolution_ (FileConflictResolver::Pending)
+  allResolution_ (FileConflictResolver::Pending),
+  isAborted_ (false)
 {
 
 }
@@ -139,12 +140,17 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
   QDir targetDir (target.absoluteFilePath ());
   for (const auto &source: sources)
   {
+    if (isAborted_)
+    {
+      ok = false;
+      break;
+    }
     auto name = source.fileName ();
     QFileInfo targetFile (targetDir.absoluteFilePath (name));
     if (targetFile.exists () && !targetFile.isDir ())
     {
       const auto resolution = resolveConflict (source, targetFile);
-      if (resolution & FileConflictResolver::Abort)
+      if (isAborted_)
       {
         ok = false;
         break;
@@ -174,10 +180,6 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
         continue;
       }
       ok = false;
-      if (allResolution_ & FileConflictResolver::Abort)
-      {
-        break;
-      }
       continue;
     }
 
@@ -209,6 +211,11 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
   QDir targetDir (target.absoluteFilePath ());
   for (const auto &source: sources)
   {
+    if (isAborted_)
+    {
+      ok = false;
+      break;
+    }
     auto name = source.fileName ();
     if (targetDir.exists (name))
     {
@@ -228,6 +235,11 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
   auto ok = true;
   for (const auto &i: infos)
   {
+    if (isAborted_)
+    {
+      ok = false;
+      break;
+    }
     switch (action_)
     {
       case FileOperation::Action::Remove:
@@ -273,11 +285,20 @@ int FileOperation::resolveConflict (const QFileInfo &source, const QFileInfo &ta
                                Q_ARG (QFileInfo, target),
                                Q_ARG (int, int(action_)),
                                Q_ARG (int *, &resolution));
-    if (resolution & FileConflictResolver::All || resolution & FileConflictResolver::Abort)
+    if (resolution & FileConflictResolver::Abort)
+    {
+      isAborted_ = true;
+    }
+    if (resolution & FileConflictResolver::All)
     {
       allResolution_ = resolution;
     }
   }
 
   return resolution;
+}
+
+void FileOperation::abort ()
+{
+  isAborted_ = true;
 }

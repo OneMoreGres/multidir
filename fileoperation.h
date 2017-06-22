@@ -29,6 +29,8 @@ public:
   static Ptr remove (const QList<QFileInfo> &infos);
   static Ptr trash (const QList<QFileInfo> &infos);
 
+  void abort ();
+
 signals:
   void finished (bool ok);
 
@@ -44,4 +46,5 @@ private:
   Action action_;
   FileConflictResolver *resolver_;
   int allResolution_;
+  std::atomic_bool isAborted_;
 };

@@ -5,6 +5,7 @@
 #include <QFontMetrics>
 #include <QProgressBar>
 #include <QBoxLayout>
+#include <QPushButton>
 
 FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operation, QWidget *parent) :
   QWidget (parent),
@@ -15,7 +16,15 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
 
   auto layout = new QHBoxLayout (this);
   layout->setMargin (0);
+  layout->setSpacing (0);
   layout->addWidget (progress_);
+
+  auto abortButton = new QPushButton (this);
+  abortButton->setFlat (true);
+  abortButton->setIcon (QIcon (":/abort.png"));
+  connect (abortButton, &QPushButton::pressed,
+           operation.data (), &FileOperation::abort);
+  layout->addWidget (abortButton);
 
 
   const auto action = QMap<FileOperation::Action, QString>{
