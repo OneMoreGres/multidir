@@ -360,7 +360,7 @@ void MainWindow::activateFindMode ()
 void MainWindow::showAbout ()
 {
   QStringList lines {
-    tr ("<b>%1</b> version %2").arg (windowTitle (), constants::version),
+    tr ("<b>%1</b> version %2").arg (tr ("Multidir"), constants::version),
     tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
     tr ("Homepage: <a href='%1'>%1</a>").arg ("https://gres.biz/multidir"),
     tr ("Sources: <a href='%1'>%1</a>").arg ("https://github.com/onemoregres/multidir"),
