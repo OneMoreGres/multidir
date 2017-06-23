@@ -32,6 +32,7 @@ DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   list_ (nullptr)
 {
   setLayout (new QVBoxLayout);
+  layout ()->setMargin (0);
   setIsList (isList_);
 }
 

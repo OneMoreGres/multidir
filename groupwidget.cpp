@@ -28,6 +28,7 @@ GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
   view_ (new TiledView (this))
 {
   auto layout = new QVBoxLayout (this);
+  layout->setMargin (0);
   layout->addWidget (view_);
 
   connect (view_, &TiledView::tileSwapped,

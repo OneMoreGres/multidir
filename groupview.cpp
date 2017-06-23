@@ -20,6 +20,7 @@ GroupView::GroupView (FileSystemModel &model, QWidget *parent) :
   groups_ (new QStackedWidget (this))
 {
   auto layout = new QVBoxLayout (this);
+  layout->setMargin (0);
   layout->addWidget (groups_);
 }
 

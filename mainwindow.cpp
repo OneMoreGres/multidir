@@ -141,6 +141,8 @@ MainWindow::MainWindow (QWidget *parent) :
   menuBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
+  layout->setMargin (3);
+  layout->setSpacing (0);
   layout->addLayout (menuBarLayout);
   layout->addWidget (groupView_);
   layout->addWidget (status);

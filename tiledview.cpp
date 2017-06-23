@@ -148,8 +148,8 @@ TiledView::TiledView (QWidget *parent) :
   rows_ (),
   columns_ (),
   tiles_ (),
-  spacing_ (15),
-  margin_ (15),
+  spacing_ (10),
+  margin_ (10),
   dragStartPos_ (),
   resizeIndex_ (-1),
   resizeDir_ (0)
