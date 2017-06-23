@@ -10,6 +10,7 @@
 #include <QSettings>
 #include <QMenu>
 #include <QKeyEvent>
+#include <QGraphicsDropShadowEffect>
 
 #include <QDebug>
 
@@ -277,6 +278,18 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
         emit activated (index);
       }
     }
+  }
+  else if (event->type () == QEvent::FocusIn)
+  {
+    auto effect = new QGraphicsDropShadowEffect ();
+    effect->setOffset (0.);
+    effect->setBlurRadius (10.0);
+    effect->setColor (QColor (0,153,204));
+    setGraphicsEffect (effect);
+  }
+  else if (event->type () == QEvent::FocusOut)
+  {
+    setGraphicsEffect (nullptr);
   }
   return false;
 }
