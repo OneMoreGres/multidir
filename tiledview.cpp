@@ -261,16 +261,7 @@ Tile * TiledView::findTileBorders (const QPoint &pos) const
 
 void TiledView::add (int row, int col)
 {
-  Tile tile (nullptr, row, col);
-  if (col != columns_.size () - 1)
-  {
-    tile.createBorder (Border::Right, this);
-  }
-  if (row != rows_.size () - 1)
-  {
-    tile.createBorder (Border::Bottom, this);
-  }
-  tiles_ << tile;
+  tiles_.append ({nullptr, row, col});
 }
 
 QWidget * TiledView::remove (int row, int col)
@@ -335,7 +326,7 @@ void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int 
   }
   for (auto i = 0, end = opposite.size (); i < end; ++i)
   {
-    tiles_.append ({nullptr, (isRow ? index : i), (isRow ? i : index)});
+    this->add ((isRow ? index : i), (isRow ? i : index));
   }
 
   sort (begin (tiles_), end (tiles_));
@@ -816,8 +807,7 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
     --span;
     for (auto i = 0; i < otherSpan; ++i)
     {
-      tiles_.append ({nullptr, (isRow ? index : otherIndex + i),
-                      (isRow ? otherIndex + i : index)});
+      add ((isRow ? index : otherIndex + i), (isRow ? otherIndex + i : index));
     }
     sort (begin (tiles_), end (tiles_));
     position -= sizes[index] + spacing_;
