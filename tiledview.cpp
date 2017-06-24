@@ -711,7 +711,7 @@ QSize TiledView::minimumSizeHint () const
                 (minTileSize  + spacing_) * rows_.size () - spacing_ + 2 * margin_);
 }
 
-void TiledView::setResize (int index, Qt::Orientations dir)
+void TiledView::startResize (int index, Qt::Orientations dir)
 {
   resizeIndex_ = index;
   resizeDir_ = dir;
@@ -830,7 +830,7 @@ void TiledView::mousePressEvent (QMouseEvent *event)
       {{Border::Right, Qt::Horizontal},{Border::Bottom, Qt::Vertical},
        {Border::BottomRight, Qt::Horizontal | Qt::Vertical}}
       .value (type, 0);
-      setResize (tiles_.indexOf (*borders), dir);
+      startResize (tiles_.indexOf (*borders), dir);
     }
     event->accept ();
   }
@@ -841,7 +841,7 @@ void TiledView::mouseReleaseEvent (QMouseEvent *event)
   if (event->button () == Qt::LeftButton)
   {
     dragStartPos_ = {};
-    setResize (-1, 0);
+    startResize (-1, 0);
   }
 }
 

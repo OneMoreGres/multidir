@@ -72,7 +72,7 @@ private:
   //! Size currently occupied by tiles.
   QSize tilesSize () const;
 
-  void setResize (int index, Qt::Orientations dir);
+  void startResize (int index, Qt::Orientations dir);
   void handleResizing (const QPoint &current);
   void resizeDimension (int index, QList<int> &sizes, int diff);
   void handleSpanning (const QPoint &current);
