@@ -42,6 +42,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   proxy_ (new ProxyModel (model, this)),
   view_ (new DirView (*proxy_, this)),
   path_ (),
+  indexLabel_ (new QLabel (this)),
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   pathEdit_ (new QLineEdit (this)),
@@ -230,6 +231,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   togglePathEdition (false);
 
   controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (indexLabel_);
   controlsLayout_->addWidget (pathLabel_);
   controlsLayout_->addWidget (dirLabel_);
   controlsLayout_->addWidget (pathEdit_);
@@ -288,6 +290,18 @@ void DirWidget::restore (QSettings &settings)
 QFileInfo DirWidget::path () const
 {
   return path_;
+}
+
+void DirWidget::setIndex (const QString &index)
+{
+  if (!index.isEmpty ())
+  {
+    indexLabel_->setText ('(' + index + ')');
+  }
+  else
+  {
+    indexLabel_->clear ();
+  }
 }
 
 void DirWidget::setPath (const QFileInfo &path)
@@ -445,6 +459,7 @@ void DirWidget::activate ()
 void DirWidget::togglePathEdition (bool isOn)
 {
   pathEdit_->setVisible (isOn);
+  indexLabel_->setVisible (!isOn);
   pathLabel_->setVisible (!isOn);
   dirLabel_->setVisible (!isOn);
 

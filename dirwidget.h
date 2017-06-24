@@ -29,6 +29,8 @@ public:
   void setPath (const QFileInfo &path);
   QFileInfo path () const;
 
+  void setIndex (const QString &index);
+
   void setNameFilter (const QString &filter);
 
   bool eventFilter (QObject *watched, QEvent *event) override;
@@ -83,6 +85,7 @@ private:
   ProxyModel *proxy_;
   DirView *view_;
   QFileInfo path_;
+  QLabel *indexLabel_;
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QLineEdit *pathEdit_;

@@ -147,9 +147,11 @@ void GroupWidget::updateWidgetShortcuts ()
   for (auto &i: widgets_)
   {
     const auto index = order.indexOf (i.widget);
-    if (index < count)
+    const auto key = (index < count) ? chars.at (index) : QChar ();
+    i.widget->setIndex (key);
+    if (!key.isNull ())
     {
-      i.action->setShortcut (QString ("Alt+T,%1").arg (chars.at (index)));
+      i.action->setShortcut (QString ("Alt+T,%1").arg (key));
     }
     else
     {
