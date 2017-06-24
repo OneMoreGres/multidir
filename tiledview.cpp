@@ -747,9 +747,13 @@ void TiledView::handleSpanning (const QPoint &current)
 {
   ASSERT (resizeIndex_ >= 0);
   ASSERT (resizeIndex_ < tiles_.size ());
+  auto &tile = tiles_[resizeIndex_];
+  if (!tile.widget)
+  {
+    return;
+  }
   const auto diff = current - dragStartPos_;
   auto changed = false;
-  auto &tile = tiles_[resizeIndex_];
 
   if (resizeDir_ & Qt::Horizontal)
   {
