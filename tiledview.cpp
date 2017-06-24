@@ -57,6 +57,11 @@ public:
   Border borderAt (const QPoint &pos) const;
   bool operator< (const Tile &r) const { return tie (row, col) < tie (r.row,r.col); }
   bool operator== (const Tile &r) const { return tie (row, col) == tie (r.row,r.col); }
+  bool occupies (int row, int col) const
+  {
+    return this->row <= row && this->row + rowSpan - 1 >= row
+           && this->col <= col && this->col + colSpan - 1 >= col;
+  }
 };
 
 Tile::Tile (QWidget *widget, int row, int col) :
@@ -201,6 +206,18 @@ void TiledView::reserveTile ()
   updateTilesGeometry ();
 }
 
+Tile * TiledView::findTile (int row, int col) const
+{
+  auto it = find_if (cbegin (tiles_), cend (tiles_), [row, col](const Tile &i) {
+    return i.occupies (row, col);
+  });
+  if (it == cend (tiles_))
+  {
+    return nullptr;
+  }
+  return &const_cast<Tile &>(*it);
+}
+
 Tile * TiledView::findTile (QWidget *widget) const
 {
   auto it = find_if (cbegin (tiles_), cend (tiles_), [widget](const Tile &i) {
@@ -240,6 +257,52 @@ Tile * TiledView::findTileBorders (const QPoint &pos) const
     return nullptr;
   }
   return &const_cast<Tile &>(*it);
+}
+
+void TiledView::add (int row, int col)
+{
+  Tile tile (nullptr, row, col);
+  if (col != columns_.size () - 1)
+  {
+    tile.createBorder (Border::Right, this);
+  }
+  if (row != rows_.size () - 1)
+  {
+    tile.createBorder (Border::Bottom, this);
+  }
+  tiles_ << tile;
+}
+
+QWidget * TiledView::remove (int row, int col)
+{
+  auto *occupied = findTile (row, col);
+  Q_ASSERT (occupied);
+  for (auto i = 0; i < occupied->rowSpan; ++i)
+  {
+    for (auto j = 0; j < occupied->colSpan; ++j)
+    {
+      const auto newRow = occupied->row + i;
+      const auto newCol = occupied->col + j;
+      if ((newRow == row && newCol == col) || (i == 0 && j == 0))
+      {
+        continue;
+      }
+      add (newRow, newCol);
+    }
+  }
+
+  QWidget *widget = nullptr;
+  if (occupied->row == row && occupied->col == col)
+  {
+    widget = occupied->widget;
+    occupied->removeBorders ();
+    tiles_.removeOne (*occupied);
+  }
+  else
+  {
+    occupied->rowSpan = occupied->colSpan = 1;
+  }
+  return widget;
 }
 
 void TiledView::addRow (Add add)
@@ -736,23 +799,17 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
   auto changed = false;
   if (index < sizes.size () - 1 && change >= sizes[index + 1] / 2 + spacing_)
   {
-    ++span;
     for (auto i = 0; i < otherSpan; ++i)
     {
-      auto smashedIndex = tiles_.indexOf ({nullptr, (isRow ? index + 1 : otherIndex + i),
-                                           (isRow ? otherIndex + i : index + 1)});
-      if (smashedIndex != -1)
+      if (auto *widget = remove ((isRow ? index + 1 : otherIndex + i),
+                                 (isRow ? otherIndex + i : index + 1)))
       {
-        auto tile = tiles_.takeAt (smashedIndex);
-        tile.removeBorders ();
-        if (tile.widget)
-        {
-          add (*tile.widget);
-        }
+        add (*widget);
       }
     }
     position += sizes[index + 1] + spacing_;
     changed = true;
+    ++span;
   }
   else if (span > 1 && change < -sizes[index] / 2 - spacing_)
   {

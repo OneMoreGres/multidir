@@ -52,9 +52,15 @@ private:
   void removeColumn (int index);
   void cleanupDimensions ();
 
+  Tile * findTile (int row, int col) const;
   Tile * findTile (QWidget *widget) const;
   Tile * findTile (const QPoint &pos) const;
   Tile * findTileBorders (const QPoint &pos) const;
+
+  //! Add empty tile.
+  void add (int row, int col);
+  // Returns widget of tile if removed.
+  QWidget * remove (int row, int col);
 
   //! Distribute given size over items (rows or cols).
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
