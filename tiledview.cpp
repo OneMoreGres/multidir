@@ -296,75 +296,76 @@ QWidget * TiledView::remove (int row, int col)
   return widget;
 }
 
+void TiledView::shift (bool isRow, int change, int start, int end)
+{
+  int Tile::*field = isRow ? &Tile::row : &Tile::col;
+  for (auto &i: tiles_)
+  {
+    if (i.*field >= start && (end == -1 || i.*field < end))
+    {
+      i.*field += change;
+    }
+  }
+}
+
 void TiledView::addRow (AddMode mode)
 {
-  addDimesion (rows_, columns_, height (), true, mode);
+  addDimesion (true, mode);
 }
 
 void TiledView::addColumn (AddMode mode)
 {
-  addDimesion (columns_, rows_, width (), false, mode);
+  addDimesion (false, mode);
 }
 
-void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
-                             bool isRow, AddMode mode)
+void TiledView::addDimesion (bool isRow, AddMode mode)
 {
-  const auto index = (mode == AddMode::Append) ? sizes.size () : 0;
-  if (mode == AddMode::Prepend)
+  auto &sizes = this->sizes (isRow);
+  const auto &opposite = this->sizes (!isRow);
+  const auto fullSize = isRow ? height () : width ();
+  const auto isPrepend = mode == AddMode::Prepend;
+  const auto index = isPrepend ? 0 : sizes.size ();
+
+  if (isPrepend)
   {
-    for (auto &i: tiles_)
-    {
-      if (isRow)
-      {
-        ++i.row;
-      }
-      else
-      {
-        ++i.col;
-      }
-    }
+    shift (isRow, 1, 0);
   }
   for (auto i = 0, end = opposite.size (); i < end; ++i)
   {
-    this->add ((isRow ? index : i), (isRow ? i : index));
+    add ((isRow ? index : i), (isRow ? i : index));
   }
 
   sort (begin (tiles_), end (tiles_));
 
   const auto size = max (0, (fullSize - 2 * margin_ - index * spacing_) / (sizes.size () + 1));
   adjustSizes (sizes, -size - spacing_);
-  if (mode == AddMode::Append)
-  {
-    sizes << size;
-  }
-  else
-  {
-    sizes.prepend (size);
-  }
+  sizes.insert (index, size);
 
   updateTilesBorders ();
 }
 
-void TiledView::removeDimesion (QList<int> &sizes, int Tile::*field, int index)
+void TiledView::removeRow (int index)
 {
-  for (auto &i :tiles_)
+  removeDimesion (true, index);
+}
+
+void TiledView::removeColumn (int index)
+{
+  removeDimesion (false, index);
+}
+
+void TiledView::removeDimesion (bool isRow, int index)
+{
+  auto &sizes = isRow ? rows_ : columns_;
+  auto &opposite = isRow ? columns_ : rows_;
+
+  for (auto i = 0, end = opposite.size (); i < end; ++i)
   {
-    if (i.*field == index)
-    {
-      i.removeBorders ();
-    }
+    remove ((isRow ? index : i), (isRow ? i : index));
   }
 
-  tiles_.erase (remove_if (begin (tiles_), end (tiles_), [index, field](const Tile &i) {
-    return i.*field == index;
-  }), end (tiles_));
-  for (auto &i: tiles_)
-  {
-    if (i.*field > index)
-    {
-      --(i.*field);
-    }
-  }
+  shift (isRow, -1, index);
+
   const auto size = sizes[index] + (sizes.size () > 1 ? spacing_ : 0);
   sizes.removeAt (index);
   adjustSizes (sizes, size);
@@ -602,16 +603,6 @@ void TiledView::restore (QSettings &settings)
   updateGeometry ();
 }
 
-void TiledView::removeRow (int index)
-{
-  removeDimesion (rows_, &Tile::row, index);
-}
-
-void TiledView::removeColumn (int index)
-{
-  removeDimesion (columns_, &Tile::col, index);
-}
-
 void TiledView::cleanupDimensions ()
 {
   QSet<int> rows, cols;
@@ -727,21 +718,22 @@ void TiledView::handleResizing (const QPoint &current)
   if (resizeDir_ & Qt::Horizontal)
   {
     const auto col = tile.col + tile.colSpan - 1;
-    resizeDimension (col, columns_, diff.x ());
+    resizeDimension (false, col, diff.x ());
   }
 
   if (resizeDir_ & Qt::Vertical)
   {
     const auto row = tile.row + tile.rowSpan - 1;
-    resizeDimension (row, rows_, diff.y ());
+    resizeDimension (true, row, diff.y ());
   }
 
   updateTilesGeometry ();
   dragStartPos_ = current;
 }
 
-void TiledView::resizeDimension (int index, QList<int> &sizes, int diff)
+void TiledView::resizeDimension (bool isRow, int index, int diff)
 {
+  auto &sizes = this->sizes (isRow);
   if (index < sizes.size () - 1)
   {
     const auto change = clamp (diff, -sizes[index] + minTileSize,
@@ -815,6 +807,11 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
   }
 
   return changed;
+}
+
+QList<int> &TiledView::sizes (bool isRow)
+{
+  return isRow ? rows_ : columns_;
 }
 
 void TiledView::mousePressEvent (QMouseEvent *event)
