@@ -121,11 +121,19 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
     const auto info = model_->fileInfo (mapToSource (index));
     if (info.isDir ())
     {
+      if (!info.isExecutable () || !info.isReadable ())
+      {
+        return QColor (255,153,153);
+      }
       return QColor (204,255,255);
     }
     if (info.isExecutable ())
     {
       return QColor (255,204,153);
+    }
+    else if (!info.isReadable ())
+    {
+      return QColor (255,153,153);
     }
     return {};
   }
