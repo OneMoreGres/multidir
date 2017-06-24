@@ -396,29 +396,13 @@ void TiledView::updateTilesGeometry ()
 
   for (auto &i: tiles_)
   {
-    auto left = margin_ + spacing_ * i.col;
-    for (auto j = 0; j < i.col; ++j)
-    {
-      left += columns_[j];
-    }
+    auto columnIt = cbegin (columns_) + i.col;
+    auto left = margin_ + spacing_ * i.col + accumulate (cbegin (columns_), columnIt, 0);
+    auto width = spacing_ * (i.colSpan - 1) + accumulate (columnIt, columnIt + i.colSpan, 0);
 
-    auto top = margin_ + spacing_ * i.row;
-    for (auto j = 0; j < i.row; ++j)
-    {
-      top += rows_[j];
-    }
-
-    auto width = columns_[i.col];
-    for (auto n = 1; n < i.colSpan; ++n)
-    {
-      width += spacing_ + columns_[i.col + n];
-    }
-
-    auto height = rows_[i.row];
-    for (auto n = 1; n < i.rowSpan; ++n)
-    {
-      height += spacing_ + rows_[i.row + n];
-    }
+    auto rowIt = cbegin (rows_) + i.row;
+    auto top = margin_ + spacing_ * i.row + accumulate (cbegin (rows_), rowIt, 0);
+    auto height = spacing_ * (i.rowSpan - 1) + accumulate (rowIt, rowIt + i.rowSpan, 0);
 
     i.setGeometry ({left, top, width, height}, spacing_);
   }
