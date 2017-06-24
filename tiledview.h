@@ -36,7 +36,7 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
-  enum class Add
+  enum class AddMode
   {
     Append, Prepend
   };
@@ -46,8 +46,8 @@ private:
   void updateTilesGeometry ();
   void updateTilesBorders ();
 
-  void addRow (Add add = Add::Append);
-  void addColumn (Add add = Add::Append);
+  void addRow (AddMode mode = AddMode::Append);
+  void addColumn (AddMode mode = AddMode::Append);
   void removeRow (int index);
   void removeColumn (int index);
   void cleanupDimensions ();
@@ -66,7 +66,7 @@ private:
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
   //! Add new row or col.
   void addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
-                    bool isRow, Add add);
+                    bool isRow, AddMode mode);
   //! Remove given row or col.
   void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
   //! Size currently occupied by tiles.

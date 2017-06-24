@@ -305,21 +305,21 @@ QWidget * TiledView::remove (int row, int col)
   return widget;
 }
 
-void TiledView::addRow (Add add)
+void TiledView::addRow (AddMode mode)
 {
-  addDimesion (rows_, columns_, height (), true, add);
+  addDimesion (rows_, columns_, height (), true, mode);
 }
 
-void TiledView::addColumn (Add add)
+void TiledView::addColumn (AddMode mode)
 {
-  addDimesion (columns_, rows_, width (), false, add);
+  addDimesion (columns_, rows_, width (), false, mode);
 }
 
 void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
-                             bool isRow, Add add)
+                             bool isRow, AddMode mode)
 {
-  const auto index = (add == Add::Append) ? sizes.size () : 0;
-  if (add == Add::Prepend)
+  const auto index = (mode == AddMode::Append) ? sizes.size () : 0;
+  if (mode == AddMode::Prepend)
   {
     for (auto &i: tiles_)
     {
@@ -342,7 +342,7 @@ void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int 
 
   const auto size = max (0, (fullSize - 2 * margin_ - index * spacing_) / (sizes.size () + 1));
   adjustSizes (sizes, -size - spacing_);
-  if (add == Add::Append)
+  if (mode == AddMode::Append)
   {
     sizes << size;
   }
@@ -923,14 +923,14 @@ void TiledView::dropEvent (QDropEvent *event)
   if (pos.x () < margin_ || width () - pos.x () < margin_)
   {
     const auto prepend = pos.x () < margin_;
-    addColumn (prepend ? Add::Prepend : Add::Append);
+    addColumn (prepend ? AddMode::Prepend : AddMode::Append);
     changed = true;
     pos.rx () += (prepend ? 1 : -1) * margin_;
   }
   if (pos.y () < margin_ || height () - pos.y () < margin_)
   {
     const auto prepend = pos.y () < margin_;
-    addRow (prepend ? Add::Prepend : Add::Append);
+    addRow (prepend ? AddMode::Prepend : AddMode::Append);
     changed = true;
     pos.ry () += (prepend ? 1 : -1) * margin_;
   }
