@@ -242,19 +242,34 @@ Tile * TiledView::findTileBorders (const QPoint &pos) const
   return &const_cast<Tile &>(*it);
 }
 
-void TiledView::addRow ()
+void TiledView::addRow (Add add)
 {
-  addDimesion (rows_, columns_, height (), true);
+  addDimesion (rows_, columns_, height (), true, add);
 }
 
-void TiledView::addColumn ()
+void TiledView::addColumn (Add add)
 {
-  addDimesion (columns_, rows_, width (), false);
+  addDimesion (columns_, rows_, width (), false, add);
 }
 
-void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize, bool isRow)
+void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
+                             bool isRow, Add add)
 {
-  const auto index = sizes.size ();
+  const auto index = (add == Add::Append) ? sizes.size () : 0;
+  if (add == Add::Prepend)
+  {
+    for (auto &i: tiles_)
+    {
+      if (isRow)
+      {
+        ++i.row;
+      }
+      else
+      {
+        ++i.col;
+      }
+    }
+  }
   for (auto i = 0, end = opposite.size (); i < end; ++i)
   {
     tiles_.append ({nullptr, (isRow ? index : i), (isRow ? i : index)});
@@ -262,9 +277,16 @@ void TiledView::addDimesion (QList<int> &sizes, const QList<int> &opposite, int 
 
   sort (begin (tiles_), end (tiles_));
 
-  const auto size = max (0, (fullSize - 2 * margin_ - index * spacing_) / (index + 1));
+  const auto size = max (0, (fullSize - 2 * margin_ - index * spacing_) / (sizes.size () + 1));
   adjustSizes (sizes, -size - spacing_);
-  sizes << size;
+  if (add == Add::Append)
+  {
+    sizes << size;
+  }
+  else
+  {
+    sizes.prepend (size);
+  }
 
   updateTilesBorders ();
 }
@@ -840,19 +862,25 @@ void TiledView::dropEvent (QDropEvent *event)
 
   auto pos = event->pos ();
   auto sourceWidget = source->widget;
-  if (height () - pos.y () < margin_)
+  auto changed = false;
+  if (pos.x () < margin_ || width () - pos.x () < margin_)
   {
-    addRow ();
+    const auto prepend = pos.x () < margin_;
+    addColumn (prepend ? Add::Prepend : Add::Append);
+    changed = true;
+    pos.rx () += (prepend ? 1 : -1) * margin_;
+  }
+  if (pos.y () < margin_ || height () - pos.y () < margin_)
+  {
+    const auto prepend = pos.y () < margin_;
+    addRow (prepend ? Add::Prepend : Add::Append);
+    changed = true;
+    pos.ry () += (prepend ? 1 : -1) * margin_;
+  }
+  if (changed)
+  {
     source = findTile (sourceWidget); // addRow can alter it
     updateTilesGeometry ();
-    pos.ry () -= margin_;
-  }
-  else if (width () - pos.x () < margin_)
-  {
-    addColumn ();
-    source = findTile (sourceWidget); // addColumn can alter it
-    updateTilesGeometry ();
-    pos.rx () -= margin_;
   }
   ASSERT (source);
   ASSERT (source->widget);

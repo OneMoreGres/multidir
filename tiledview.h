@@ -36,13 +36,18 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
+  enum class Add
+  {
+    Append, Prepend
+  };
+
   void reserveTile ();
   void emplace (QWidget *widget);
   void updateTilesGeometry ();
   void updateTilesBorders ();
 
-  void addRow ();
-  void addColumn ();
+  void addRow (Add add = Add::Append);
+  void addColumn (Add add = Add::Append);
   void removeRow (int index);
   void removeColumn (int index);
   void cleanupDimensions ();
@@ -54,7 +59,8 @@ private:
   //! Distribute given size over items (rows or cols).
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
   //! Add new row or col.
-  void addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize, bool isRow);
+  void addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
+                    bool isRow, Add add);
   //! Remove given row or col.
   void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
   //! Size currently occupied by tiles.
