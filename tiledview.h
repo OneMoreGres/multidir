@@ -36,7 +36,7 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
-  enum class Add
+  enum class AddMode
   {
     Append, Prepend
   };
@@ -46,8 +46,8 @@ private:
   void updateTilesGeometry ();
   void updateTilesBorders ();
 
-  void addRow (Add add = Add::Append);
-  void addColumn (Add add = Add::Append);
+  void addRow (AddMode mode = AddMode::Append);
+  void addColumn (AddMode mode = AddMode::Append);
   void removeRow (int index);
   void removeColumn (int index);
   void cleanupDimensions ();
@@ -62,22 +62,26 @@ private:
   // Returns widget of tile if removed.
   QWidget * remove (int row, int col);
 
+  //! Shift all tiles in range for given number of rows/cols.
+  void shift (bool isRow, int change, int start, int end = -1);
+
   //! Distribute given size over items (rows or cols).
   void adjustSizes (QList<int> &sizes, int sizeToFill) const;
   //! Add new row or col.
-  void addDimesion (QList<int> &sizes, const QList<int> &opposite, int fullSize,
-                    bool isRow, Add add);
+  void addDimesion (bool isRow, AddMode mode);
   //! Remove given row or col.
-  void removeDimesion (QList<int> &sizes, int (Tile::*field), int index);
+  void removeDimesion (bool isRow, int index);
   //! Size currently occupied by tiles.
   QSize tilesSize () const;
 
-  void setResize (int index, Qt::Orientations dir);
+  void startResize (int index, Qt::Orientations dir);
   void handleResizing (const QPoint &current);
-  void resizeDimension (int index, QList<int> &sizes, int diff);
+  void resizeDimension (bool isRow, int index, int diff);
   void handleSpanning (const QPoint &current);
   bool spanTile (Tile &tile, const QPoint &diff, bool isRow);
 
+
+  QList<int> &sizes (bool isRow);
 
   //! Row sizes,
   QList<int> rows_;
