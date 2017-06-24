@@ -1,4 +1,4 @@
-#include "groupview.h"
+#include "groupholder.h"
 #include "groupwidget.h"
 #include "fileoperation.h"
 #include "debug.h"
@@ -14,7 +14,7 @@ const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
 }
 
-GroupView::GroupView (FileSystemModel &model, QWidget *parent) :
+GroupHolder::GroupHolder (FileSystemModel &model, QWidget *parent) :
   QWidget (parent),
   model_ (model),
   groups_ (new QStackedWidget (this))
@@ -24,7 +24,7 @@ GroupView::GroupView (FileSystemModel &model, QWidget *parent) :
   layout->addWidget (groups_);
 }
 
-void GroupView::save (QSettings &settings) const
+void GroupHolder::save (QSettings &settings) const
 {
   settings.beginWriteArray (qs_groups, groups_->count ());
   for (auto i = 0, end = groups_->count (); i < end; ++i)
@@ -37,7 +37,7 @@ void GroupView::save (QSettings &settings) const
   settings.setValue (qs_currentGroup, groups_->currentIndex ());
 }
 
-void GroupView::restore (QSettings &settings)
+void GroupHolder::restore (QSettings &settings)
 {
   auto size = settings.beginReadArray (qs_groups);
   for (auto i = 0; i < size; ++i)
@@ -62,34 +62,34 @@ void GroupView::restore (QSettings &settings)
   }
 }
 
-void GroupView::addWidgetToCurrent ()
+void GroupHolder::addWidgetToCurrent ()
 {
   current ().addWidget ();
 }
 
-int GroupView::count () const
+int GroupHolder::count () const
 {
   return groups_->count ();
 }
 
-int GroupView::currentIndex () const
+int GroupHolder::currentIndex () const
 {
   return groups_->currentIndex ();
 }
 
-void GroupView::setCurrentIndex (int index)
+void GroupHolder::setCurrentIndex (int index)
 {
   ASSERT (index < groups_->count ());
   groups_->setCurrentIndex (index);
   emit currentChanged (current ().name ());
 }
 
-GroupWidget &GroupView::current () const
+GroupWidget &GroupHolder::current () const
 {
   return at (currentIndex ());
 }
 
-GroupWidget &GroupView::at (int index) const
+GroupWidget &GroupHolder::at (int index) const
 {
   ASSERT (index > -1);
   ASSERT (index < groups_->count ());
@@ -97,17 +97,17 @@ GroupWidget &GroupView::at (int index) const
   return static_cast<GroupWidget &>(*groups_->widget (index));
 }
 
-GroupWidget &GroupView::add ()
+GroupWidget &GroupHolder::add ()
 {
   auto group = new GroupWidget (model_, this);
   connect (group, &GroupWidget::consoleRequested,
-           this, &GroupView::consoleRequested);
+           this, &GroupHolder::consoleRequested);
   connect (group, &GroupWidget::editorRequested,
-           this, &GroupView::editorRequested);
-  connect (this, &GroupView::setNameFilter,
+           this, &GroupHolder::editorRequested);
+  connect (this, &GroupHolder::setNameFilter,
            group, &GroupWidget::setNameFilter);
   connect (group, &GroupWidget::fileOperation,
-           this, &GroupView::fileOperation);
+           this, &GroupHolder::fileOperation);
 
   const auto index = groups_->addWidget (group);
   groups_->setCurrentIndex (index);
@@ -118,14 +118,14 @@ GroupWidget &GroupView::add ()
   return *group;
 }
 
-void GroupView::removeCurrent ()
+void GroupHolder::removeCurrent ()
 {
   auto &group = current ();
   groups_->removeWidget (&group);
   group.deleteLater ();
 }
 
-void GroupView::renameCurrent (const QString &newName)
+void GroupHolder::renameCurrent (const QString &newName)
 {
   ASSERT (!newName.isEmpty ());
   auto &group = current ();

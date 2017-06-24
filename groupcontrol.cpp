@@ -1,5 +1,5 @@
 #include "groupcontrol.h"
-#include "groupview.h"
+#include "groupholder.h"
 #include "groupwidget.h"
 #include "debug.h"
 
@@ -14,7 +14,7 @@ const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
 }
 
-GroupControl::GroupControl (GroupView &view, QObject *parent) :
+GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   QObject (parent),
   view_ (view),
   menu_ (new QMenu (tr ("Groups"))),

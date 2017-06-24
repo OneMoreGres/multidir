@@ -64,10 +64,10 @@ SOURCES += \
     groupwidget.cpp \
     filedelegate.cpp \
     notifier.cpp \
-    groupview.cpp \
     groupcontrol.cpp \
     fileconflictresolver.cpp \
-    utils.cpp
+    utils.cpp \
+    groupholder.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -91,10 +91,10 @@ HEADERS  += \
     groupwidget.h \
     filedelegate.h \
     notifier.h \
-    groupview.h \
     groupcontrol.h \
     fileconflictresolver.h \
-    utils.h
+    utils.h \
+    groupholder.h
 
 RESOURCES += \
     resources.qrc

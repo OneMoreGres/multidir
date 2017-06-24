@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "groupview.h"
+#include "groupholder.h"
 #include "groupcontrol.h"
 #include "globalaction.h"
 #include "settings.h"
@@ -38,8 +38,8 @@ const QString qs_imageCacheSize = "imageCacheSize";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groupView_ (new GroupView (*model_, this)),
-  groupControl_ (new GroupControl (*groupView_, this)),
+  groups_ (new GroupHolder (*model_, this)),
+  groupControl_ (new GroupControl (*groups_, this)),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
@@ -61,15 +61,15 @@ MainWindow::MainWindow (QWidget *parent) :
            this, &MainWindow::showFileOperation);
 
 
-  connect (groupView_, &GroupView::consoleRequested,
+  connect (groups_, &GroupHolder::consoleRequested,
            this, &MainWindow::openConsole);
-  connect (groupView_, &GroupView::editorRequested,
+  connect (groups_, &GroupHolder::editorRequested,
            this, &MainWindow::openInEditor);
   connect (findEdit_, &QLineEdit::textChanged,
-           groupView_, &GroupView::setNameFilter);
-  connect (groupView_, &GroupView::fileOperation,
+           groups_, &GroupHolder::setNameFilter);
+  connect (groups_, &GroupHolder::fileOperation,
            this, &MainWindow::showFileOperation);
-  connect (groupView_, &GroupView::currentChanged,
+  connect (groups_, &GroupHolder::currentChanged,
            this, &MainWindow::updateWindowTitle);
 
 
@@ -144,7 +144,7 @@ MainWindow::MainWindow (QWidget *parent) :
   layout->setMargin (3);
   layout->setSpacing (0);
   layout->addLayout (menuBarLayout);
-  layout->addWidget (groupView_);
+  layout->addWidget (groups_);
   layout->addWidget (status);
 
 
@@ -208,7 +208,7 @@ void MainWindow::updateTrayMenu ()
 {
   disconnect (toggleAction_, &QAction::toggled,
               this, &MainWindow::toggleVisible);
-  toggleAction_->setChecked (groupView_->isVisible ());
+  toggleAction_->setChecked (groups_->isVisible ());
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
@@ -333,7 +333,7 @@ void MainWindow::setCheckUpdates (bool isOn)
 
 void MainWindow::addWidget ()
 {
-  groupView_->addWidgetToCurrent ();
+  groups_->addWidgetToCurrent ();
 }
 
 void MainWindow::keyPressEvent (QKeyEvent *event)
