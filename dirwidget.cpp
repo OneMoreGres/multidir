@@ -98,38 +98,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   menu_->addSeparator ();
 
-  auto representMenu = menu_->addMenu (tr ("View"));
-
-  showDirs_ = representMenu->addAction (QIcon (":/folder.png"), tr ("Show directories"));
-  showDirs_->setCheckable (true);
-  showDirs_->setChecked (proxy_->showDirs ());
-  connect (showDirs_, &QAction::toggled,
-           this, &DirWidget::setShowDirs);
-
-  showHidden_ = representMenu->addAction (QIcon (":/hidden.png"), tr ("Show hidden"));
-  showHidden_->setCheckable (true);
-  showHidden_->setChecked (proxy_->showHidden ());
-  connect (showHidden_, &QAction::toggled,
-           proxy_, &ProxyModel::setShowHidden);
-
-  extensiveAction_ = representMenu->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
-  extensiveAction_->setCheckable (true);
-  extensiveAction_->setChecked (view_->isExtensive ());
-  connect (extensiveAction_, &QAction::toggled,
-           view_, &DirView::setExtensive);
-
-  listMode_ = representMenu->addAction (QIcon (":/listMode.png"), tr ("List mode"));
-  listMode_->setCheckable (true);
-  listMode_->setChecked (view_->isList ());
-  connect (listMode_, &QAction::toggled,
-           view_, &DirView::setIsList);
-
-  showThumbs_ = representMenu->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
-  showThumbs_->setCheckable (true);
-  showThumbs_->setChecked (proxy_->showThumbnails ());
-  connect (showThumbs_, &QAction::toggled,
-           proxy_, &ProxyModel::setShowThumbnails);
-
 
   isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
   isLocked_->setCheckable (true);
@@ -205,6 +173,43 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
 
   // controls
+  auto viewMenuButton = new QToolButton (this);
+  viewMenuButton->setPopupMode (QToolButton::InstantPopup);
+  viewMenuButton->setIcon (QIcon (":/view.png"));
+  auto representMenu = new QMenu (tr ("View"), viewMenuButton);
+  viewMenuButton->setMenu (representMenu);
+
+  showDirs_ = representMenu->addAction (QIcon (":/folder.png"), tr ("Show directories"));
+  showDirs_->setCheckable (true);
+  showDirs_->setChecked (proxy_->showDirs ());
+  connect (showDirs_, &QAction::toggled,
+           this, &DirWidget::setShowDirs);
+
+  showHidden_ = representMenu->addAction (QIcon (":/hidden.png"), tr ("Show hidden"));
+  showHidden_->setCheckable (true);
+  showHidden_->setChecked (proxy_->showHidden ());
+  connect (showHidden_, &QAction::toggled,
+           proxy_, &ProxyModel::setShowHidden);
+
+  extensiveAction_ = representMenu->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
+  extensiveAction_->setCheckable (true);
+  extensiveAction_->setChecked (view_->isExtensive ());
+  connect (extensiveAction_, &QAction::toggled,
+           view_, &DirView::setExtensive);
+
+  listMode_ = representMenu->addAction (QIcon (":/listMode.png"), tr ("List mode"));
+  listMode_->setCheckable (true);
+  listMode_->setChecked (view_->isList ());
+  connect (listMode_, &QAction::toggled,
+           view_, &DirView::setIsList);
+
+  showThumbs_ = representMenu->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
+  showThumbs_->setCheckable (true);
+  showThumbs_->setChecked (proxy_->showThumbnails ());
+  connect (showThumbs_, &QAction::toggled,
+           proxy_, &ProxyModel::setShowThumbnails);
+
+
   up_->setIcon (QIcon (":/up.png"));
   up_->setToolTip (tr ("Move up"));
   connect (up_, &QToolButton::pressed,
@@ -236,6 +241,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_->addWidget (dirLabel_);
   controlsLayout_->addWidget (pathEdit_);
   controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (viewMenuButton);
   controlsLayout_->addWidget (newFolder_);
   controlsLayout_->addWidget (up_);
 

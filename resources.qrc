@@ -21,5 +21,6 @@
         <file alias="app.png">icons/multidir.png</file>
         <file alias="hidden.png">icons/view.png</file>
         <file alias="abort.png">icons/multiply-1.png</file>
+        <file alias="view.png">icons/television.png</file>
     </qresource>
 </RCC>
