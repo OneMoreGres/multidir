@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QLayout>
 #include <QSettings>
+#include <QFrame>
 
 
 using namespace std;
@@ -47,7 +48,7 @@ public:
   int col = -1;
   int rowSpan = 1;
   int colSpan = 1;
-  QMap<Border, QWidget *> borders = {};
+  QMap<Border, QFrame *> borders = {};
 
   void setWidget (QWidget *widget);
   void setGeometry (const QRect &rect, int spacing);
@@ -90,7 +91,7 @@ void Tile::setGeometry (const QRect &rect, int spacing)
   }
   if (borders.contains (Border::Right))
   {
-    borders[Border::Right]->setGeometry (rect.right (), rect.top (), spacing, rect.height ());
+    borders[Border::Right]->setGeometry (rect.right () + 1, rect.top (), spacing, rect.height ());
   }
   if (borders.contains (Border::Bottom))
   {
@@ -98,7 +99,7 @@ void Tile::setGeometry (const QRect &rect, int spacing)
   }
   if (borders.contains (Border::BottomRight))
   {
-    borders[Border::BottomRight]->setGeometry (rect.right (), rect.bottom (), spacing, spacing);
+    borders[Border::BottomRight]->setGeometry (rect.right () + 1, rect.bottom (), spacing, spacing);
   }
 }
 
@@ -109,12 +110,16 @@ void Tile::createBorder (Border border, QWidget *parent)
     return;
   }
 
-  auto w = new QWidget (parent);
+  auto w = new QFrame (parent);
   w->setCursor (QMap<Border,Qt::CursorShape>
                 {{Border::Right, Qt::SizeHorCursor},{Border::Bottom, Qt::SizeVerCursor},
                  {Border::BottomRight, Qt::SizeAllCursor}}
                 .value (border, Qt::ArrowCursor));
   borders[border] = w;
+  w->setFrameShape (QMap<Border,QFrame::Shape>
+                    {{Border::Right, QFrame::VLine},{Border::Bottom, QFrame::HLine}}
+                    .value (border, QFrame::NoFrame));
+  w->setFrameShadow (QFrame::Sunken);
   w->show ();
 }
 
