@@ -500,11 +500,12 @@ void DirWidget::togglePathEdition (bool isOn)
   pathLabel_->setVisible (!isOn);
   dirLabel_->setVisible (!isOn);
 
-  const auto path = pathLabel_->text () + dirLabel_->text ();
+  const auto path = this->path ().absoluteFilePath ();
   if (isOn)
   {
     pathEdit_->setText (path);
     pathEdit_->setFocus ();
+    pathEdit_->selectAll ();
   }
   else
   {
