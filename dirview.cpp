@@ -279,6 +279,24 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
         emit activated (index);
       }
     }
+    else if (casted->key () == Qt::Key_Home)
+    {
+      const auto rows = model_->rowCount (rootIndex ());
+      if (rows > 0)
+      {
+        setCurrentIndex (model_->index (0, 0, rootIndex ()));
+      }
+      return true;
+    }
+    else if (casted->key () == Qt::Key_End)
+    {
+      const auto rows = model_->rowCount (rootIndex ());
+      if (rows > 0)
+      {
+        setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+      }
+      return true;
+    }
   }
   else if (event->type () == QEvent::FocusIn)
   {
