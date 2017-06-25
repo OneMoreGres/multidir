@@ -4,6 +4,7 @@
 #include "backport.h"
 #include "fileoperation.h"
 #include "debug.h"
+#include "shortcutmanager.h"
 
 #include <QBoxLayout>
 #include <QSettings>
@@ -25,7 +26,8 @@ GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
   name_ (),
   model_ (&model),
   widgets_ (),
-  view_ (new TiledView (this))
+  view_ (new TiledView (this)),
+  ids_ ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")
 {
   auto layout = new QVBoxLayout (this);
   layout->setMargin (0);
@@ -120,6 +122,10 @@ DirWidget * GroupWidget::addWidget ()
 
   w->setPath (QDir::homePath ());
   view_->add (*w);
+
+  action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  addAction (action);
+
   updateWidgetNames ();
   updateWidgetShortcuts ();
 
@@ -141,23 +147,34 @@ void GroupWidget::updateWidgetNames ()
 
 void GroupWidget::updateWidgetShortcuts ()
 {
-  const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
-  const auto count = chars.length ();
+  const auto count = ids_.length ();
   const auto order = view_->widgets ();
+  const auto commonPart = ShortcutManager::get (ShortcutManager::SwitchTab).toString ();
   for (auto &i: widgets_)
   {
     const auto index = order.indexOf (i.widget);
-    const auto key = (index < count) ? chars.at (index) : QChar ();
+    const auto key = (index < count) ? ids_.at (index) : QChar ();
     i.widget->setIndex (key);
-    if (!key.isNull ())
+    if (!key.isNull () && !commonPart.isEmpty ())
     {
-      i.action->setShortcut (QString ("Alt+T,%1").arg (key));
+      i.action->setShortcut (QString ("%1,%2").arg (commonPart).arg (ids_.at (index)));
     }
     else
     {
       i.action->setShortcut ({});
     }
   }
+}
+
+const QString &GroupWidget::ids () const
+{
+  return ids_;
+}
+
+void GroupWidget::setIds (const QString &ids)
+{
+  ids_ = ids;
+  updateWidgetShortcuts ();
 }
 
 QString GroupWidget::name () const

@@ -26,6 +26,9 @@ public:
   QString name () const;
   void setName (const QString &name);
 
+  const QString &ids () const;
+  void setIds (const QString &ids);
+
 signals:
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);
@@ -50,4 +53,5 @@ private:
   FileSystemModel *model_;
   QList<Widget> widgets_;
   TiledView *view_;
+  QString ids_;
 };

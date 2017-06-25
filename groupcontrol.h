@@ -21,6 +21,9 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+  const QString &ids () const;
+  void setIds (const QString &ids);
+
 private:
   void add ();
   void renameCurrent ();
@@ -39,4 +42,5 @@ private:
   QAction *renameAction_;
   QAction *closeAction_;
   QActionGroup *actions_;
+  QString ids_;
 };

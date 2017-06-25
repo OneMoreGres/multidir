@@ -49,6 +49,8 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename tabs group")};
   shortcuts[SM::RemoveGroup] = {{QS ("Ctrl+G,D")}, QObject::tr ("Delete tabs group")};
   shortcuts[SM::CreateFolder] = {{QS ("F7")}, QObject::tr ("Create folder")};
+  shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch group (plus ', ID')")};
+  shortcuts[SM::SwitchTab] = {{QS ("Ctrl+E")}, QObject::tr ("Switch tab (plus ', ID')")};
 }
 
 void ShortcutManager::save (QSettings &settings)

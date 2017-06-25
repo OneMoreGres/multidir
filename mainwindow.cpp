@@ -247,6 +247,8 @@ void MainWindow::editSettings ()
   settings.setCheckUpdates (checkUpdates_);
   settings.setEditor (editorCommand_);
   settings.setImageCacheSize (QPixmapCache::cacheLimit ());
+  settings.setGroupShortcuts (groupControl_->ids ());
+  settings.setTabShortcuts (groups_->widgetIds ());
 
   if (settings.exec () == QDialog::Accepted)
   {
@@ -256,6 +258,8 @@ void MainWindow::editSettings ()
     editorCommand_ = settings.editor ();
     setCheckUpdates (settings.checkUpdates ());
     QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
+    groupControl_->setIds (settings.groupShortcuts ());
+    groups_->setWidgetIds (settings.tabShortcuts ());
     GlobalAction::makeGlobal (toggleAction_);
   }
 }

@@ -19,7 +19,8 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   QObject (parent),
   view_ (view),
   menu_ (new QMenu (tr ("Groups"))),
-  actions_ (new QActionGroup (this))
+  actions_ (new QActionGroup (this)),
+  ids_ ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")
 {
   connect (actions_, &QActionGroup::triggered,
            this, &GroupControl::setCurrent);
@@ -150,13 +151,13 @@ void GroupControl::setCurrent (QAction *action)
 void GroupControl::updateShortcuts ()
 {
   auto index = -1;
-  const QString chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
-  const auto count = chars.length ();
+  const auto count = ids_.length ();
+  const auto commonPart = ShortcutManager::get (ShortcutManager::SwitchGroup).toString ();
   for (auto &i: actions_->actions ())
   {
-    if (++index < count)
+    if (++index < count && !commonPart.isEmpty ())
     {
-      i->setShortcut (QString ("Alt+G,%1").arg (chars.at (index)));
+      i->setShortcut (QString ("%1,%2").arg (commonPart).arg (ids_.at (index)));
     }
     else
     {
@@ -177,4 +178,15 @@ QAction * GroupControl::actionAt (int index) const
 int GroupControl::index (QAction *action) const
 {
   return actions_->actions ().indexOf (action);
+}
+
+const QString &GroupControl::ids () const
+{
+  return ids_;
+}
+
+void GroupControl::setIds (const QString &ids)
+{
+  ids_ = ids;
+  updateShortcuts ();
 }

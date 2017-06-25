@@ -56,7 +56,9 @@ Settings::Settings (QWidget *parent) :
   editor_ (new QLineEdit (this)),
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
   imageCache_ (new QSpinBox (this)),
-  shortcuts_ (new QTableWidget (this))
+  shortcuts_ (new QTableWidget (this)),
+  groupShortcuts_ (new QLineEdit (this)),
+  tabShortcuts_ (new QLineEdit (this))
 {
   setWindowTitle (tr ("Settings"));
 
@@ -91,9 +93,10 @@ Settings::Settings (QWidget *parent) :
   {
     auto tab = new QWidget (tabs_);
     tabs_->addTab (tab, tr ("Shortcuts"));
-    auto layout = new QVBoxLayout (tab);
+    auto layout = new QGridLayout (tab);
 
-    layout->addWidget (shortcuts_);
+    auto row = 0;
+    layout->addWidget (shortcuts_, row, 0, 1, 2);
     shortcuts_->setColumnCount (ShortcutColumn::Count);
     shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Shortcut")});
     shortcuts_->hideColumn (ShortcutColumn::Id);
@@ -103,6 +106,18 @@ Settings::Settings (QWidget *parent) :
     shortcuts_->setSelectionMode (QTableWidget::SingleSelection);
     shortcuts_->setSelectionBehavior (QTableWidget::SelectRows);
     shortcuts_->setItemDelegateForColumn (ShortcutColumn::Key,new ShortcutDelegate (shortcuts_));
+
+    ++row;
+    layout->addWidget (new QLabel ("Group ids:"), row, 0);
+    layout->addWidget (groupShortcuts_, row, 1);
+    groupShortcuts_->setToolTip (tr ("Each character represents ID part of group"
+                                     " switch shortcut"));
+
+    ++row;
+    layout->addWidget (new QLabel ("Tab ids:"), row, 0);
+    layout->addWidget (tabShortcuts_, row, 1);
+    tabShortcuts_->setToolTip (tr ("Each character represents ID part of tab"
+                                   " switch shortcut"));
   }
 
   auto layout = new QVBoxLayout (this);
@@ -155,6 +170,26 @@ QString Settings::editor () const
 void Settings::setEditor (const QString &editor)
 {
   editor_->setText (editor);
+}
+
+QString Settings::groupShortcuts () const
+{
+  return groupShortcuts_->text ();
+}
+
+void Settings::setGroupShortcuts (const QString &value)
+{
+  groupShortcuts_->setText (value);
+}
+
+QString Settings::tabShortcuts () const
+{
+  return tabShortcuts_->text ();
+}
+
+void Settings::setTabShortcuts (const QString &value)
+{
+  tabShortcuts_->setText (value);
 }
 
 void Settings::loadShortcuts ()

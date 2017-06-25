@@ -13,7 +13,7 @@ public:
     ToggleGui, AddTab, Find, Copy, Paste, Cut, Rename, OpenInExplorer, OpenConsole,
     ChangePath, LockTab, CloneTab, CloseTab, OpenInTab, OpenInEditor, CopyPath,
     Trash, Remove, ShowDirectories, ShowHidden, ExtensiveMode, ListMode, ShowThumbnails,
-    AddGroup, RenameGroup, RemoveGroup, CreateFolder,
+    AddGroup, RenameGroup, RemoveGroup, CreateFolder, SwitchGroup, SwitchTab,
     ShortcutCount
   };
 

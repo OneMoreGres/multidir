@@ -27,6 +27,12 @@ public:
   QString editor () const;
   void setEditor (const QString &editor);
 
+  QString groupShortcuts () const;
+  void setGroupShortcuts (const QString &value);
+
+  QString tabShortcuts () const;
+  void setTabShortcuts (const QString &value);
+
 private:
   void loadShortcuts ();
   void saveShortcuts ();
@@ -37,4 +43,6 @@ private:
   QCheckBox *checkUpdates_;
   QSpinBox *imageCache_;
   QTableWidget *shortcuts_;
+  QLineEdit *groupShortcuts_;
+  QLineEdit *tabShortcuts_;
 };

@@ -125,6 +125,19 @@ void GroupHolder::removeCurrent ()
   group.deleteLater ();
 }
 
+const QString &GroupHolder::widgetIds () const
+{
+  return current ().ids ();
+}
+
+void GroupHolder::setWidgetIds (const QString &ids)
+{
+  for (auto i = 0, end = count (); i < end; ++i)
+  {
+    at (i).setIds (ids);
+  }
+}
+
 void GroupHolder::renameCurrent (const QString &newName)
 {
   ASSERT (!newName.isEmpty ());
