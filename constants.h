@@ -14,7 +14,7 @@ const int itemVerticalMargins = 8;
 
 const QString dotdot = "..";
 
-const auto updateUrl = "https://cdn.rawgit.com/OneMoreGres/multidir/master/version";
+const auto updateUrl = "https://github.com/OneMoreGres/multidir/raw/master/version";
 const auto version = STR (APP_VERSION);
 }
 #undef STR
