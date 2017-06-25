@@ -38,6 +38,11 @@ void handler (QtMsgType type, const QMessageLogContext &context, const QString &
 
 namespace debug
 {
+#ifdef DEVELOPMENT
+std::atomic_bool isOn {true};
+#else
+std::atomic_bool isOn {false};
+#endif
 
 void setDebugMode (bool isOn)
 {
@@ -63,6 +68,7 @@ void setDebugMode (bool isOn)
     original = nullptr;
     qInstallMessageHandler (nullptr);
   }
+  debug::isOn = isOn;
 }
 
 }
