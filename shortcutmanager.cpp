@@ -51,6 +51,7 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::CreateFolder] = {{QS ("F7")}, QObject::tr ("Create folder")};
   shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch group (plus ', ID')")};
   shortcuts[SM::SwitchTab] = {{QS ("Ctrl+E")}, QObject::tr ("Switch tab (plus ', ID')")};
+  shortcuts[SM::NextTab] = {{QS ("Tab")}, QObject::tr ("Move to next tab")};
 }
 
 void ShortcutManager::save (QSettings &settings)

@@ -37,6 +37,7 @@ signals:
 private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);
+  void nextTab (DirWidget *widget);
   void add (const QFileInfo &path);
   void updateWidgetNames ();
   void updateWidgetShortcuts ();

@@ -14,6 +14,7 @@ public:
     ChangePath, LockTab, CloneTab, CloseTab, OpenInTab, OpenInEditor, CopyPath,
     Trash, Remove, ShowDirectories, ShowHidden, ExtensiveMode, ListMode, ShowThumbnails,
     AddGroup, RenameGroup, RemoveGroup, CreateFolder, SwitchGroup, SwitchTab,
+    NextTab,
     ShortcutCount
   };
 

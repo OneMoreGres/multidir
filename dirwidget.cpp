@@ -78,6 +78,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::handleDirRename);
 
 
+  auto nextTab = new QAction (this);
+  registerShortcut (ShortcutManager::NextTab, nextTab);
+  connect (nextTab, &QAction::triggered,
+           this, [this] {emit nextTabRequested (this);});
+
   // menu
   setContextMenuPolicy (Qt::CustomContextMenu);
   connect (this, &QWidget::customContextMenuRequested,

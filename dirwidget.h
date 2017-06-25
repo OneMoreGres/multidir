@@ -40,6 +40,7 @@ public:
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
+  void nextTabRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);

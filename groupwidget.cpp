@@ -112,6 +112,8 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::close);
   connect (w, &DirWidget::cloneRequested,
            this, &GroupWidget::clone);
+  connect (w, &DirWidget::nextTabRequested,
+           this, &GroupWidget::nextTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
   connect (w, &DirWidget::consoleRequested,
@@ -207,6 +209,28 @@ void GroupWidget::clone (DirWidget *widget)
   auto w = addWidget ();
   w->setPath (widget->path ());
   w->activate ();
+}
+
+void GroupWidget::nextTab (DirWidget *widget)
+{
+  ASSERT (!widgets_.isEmpty ());
+  auto found = false;
+  DirWidget *target = widgets_.first ().widget;
+  for (auto &i: widgets_)
+  {
+    if (i.widget == widget)
+    {
+      found = true;
+    }
+    else if (found)
+    {
+      target = i.widget;
+      break;
+    }
+  }
+
+  ASSERT (target);
+  target->activate ();
 }
 
 void GroupWidget::add (const QFileInfo &path)
