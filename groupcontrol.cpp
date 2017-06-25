@@ -2,6 +2,7 @@
 #include "groupholder.h"
 #include "groupwidget.h"
 #include "debug.h"
+#include "shortcutmanager.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -24,12 +25,15 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
            this, &GroupControl::setCurrent);
 
   auto addGroup = menu_->addAction (tr ("Add"));
+  ShortcutManager::add (ShortcutManager::AddGroup, addGroup);
   connect (addGroup, &QAction::triggered, this, &GroupControl::add);
 
   renameAction_ = menu_->addAction (tr ("Rename..."));
+  ShortcutManager::add (ShortcutManager::RenameGroup, renameAction_);
   connect (renameAction_, &QAction::triggered, this, &GroupControl::renameCurrent);
 
   closeAction_ = menu_->addAction (tr ("Close..."));
+  ShortcutManager::add (ShortcutManager::RemoveGroup, closeAction_);
   connect (closeAction_, &QAction::triggered, this, &GroupControl::removeCurrent);
 
   menu_->addSeparator ();

@@ -80,7 +80,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto fileMenu = menuBar->addMenu (tr ("File"));
 
   auto add = fileMenu->addAction (QIcon (":/add.png"), tr ("Add"));
-  ShortcutManager::add (ShortcutManager::AddDir, add);
+  ShortcutManager::add (ShortcutManager::AddTab, add);
   connect (add, &QAction::triggered, this, &MainWindow::addWidget);
 
   auto find = fileMenu->addAction (QIcon (":/find.png"), tr ("Find"));

@@ -84,15 +84,18 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, [this] {menu_->exec (QCursor::pos ());});
 
   auto openExternal = menu_->addAction (QIcon (":/openExternal.png"), tr ("Open in explorer"));
+  registerShortcut (ShortcutManager::OpenInExplorer, openExternal);
   connect (openExternal, &QAction::triggered,
            this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (
                                                       path ().absoluteFilePath ()));});
 
   auto editPath = menu_->addAction (QIcon (":/rename.png"), tr ("Change path"));
+  registerShortcut (ShortcutManager::ChangePath, editPath);
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
 
   auto openConsole = menu_->addAction (tr ("Open console"));
+  registerShortcut (ShortcutManager::OpenConsole, openConsole);
   connect (openConsole, &QAction::triggered,
            this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
 
@@ -101,17 +104,19 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
 
   isLocked_ = menu_->addAction (QIcon (":/lockTab.png"), tr ("Lock"));
-  isLocked_->setCheckable (true);
+  registerShortcut (ShortcutManager::LockTab, isLocked_, true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setLocked);
 
   auto clone = menu_->addAction (QIcon (":/cloneTab.png"), tr ("Clone"));
+  registerShortcut (ShortcutManager::CloneTab, clone);
   connect (clone, &QAction::triggered,
            this, [this]() {emit cloneRequested (this);});
 
   menu_->addSeparator ();
 
   auto close = menu_->addAction (QIcon (":/closeTab.png"), tr ("Close..."));
+  registerShortcut (ShortcutManager::CloseTab, close);
   connect (close, &QAction::triggered,
            this, &DirWidget::promptClose);
 
@@ -123,52 +128,59 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openWith_ = viewMenu_->addMenu (tr ("Open with"));
 
   openInTabAction_ = viewMenu_->addAction (tr ("Open in tab"));
+  registerShortcut (ShortcutManager::OpenInTab, openInTabAction_);
   connect (openInTabAction_, &QAction::triggered,
-           this, [this]() {emit newTabRequested (current ().absoluteFilePath ());});
+           this, [this]() {
+    if (current ().isDir ())
+    {
+      emit newTabRequested (current ().absoluteFilePath ());
+    }
+  });
 
   openInEditorAction_ = viewMenu_->addAction (tr ("Open in editor"));
+  registerShortcut (ShortcutManager::OpenInEditor, openInEditorAction_);
   connect (openInEditorAction_, &QAction::triggered,
-           this, [this]() {emit editorRequested (current ().absoluteFilePath ());});
+           this, [this]() {
+    if (current ().isFile ())
+    {
+      emit editorRequested (current ().absoluteFilePath ());
+    }
+  });
 
   cutAction_ = viewMenu_->addAction (QIcon::fromTheme ("cut"), tr ("Cut"));
-  ShortcutManager::add (ShortcutManager::Cut, cutAction_);
-  cutAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
-  this->addAction (cutAction_);
+  registerShortcut (ShortcutManager::Cut, cutAction_);
   connect (cutAction_, &QAction::triggered,
            this, &DirWidget::cut);
 
   copyAction_ = viewMenu_->addAction (QIcon::fromTheme ("copy"), tr ("Copy"));
-  ShortcutManager::add (ShortcutManager::Copy, copyAction_);
-  copyAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
-  this->addAction (copyAction_);
+  registerShortcut (ShortcutManager::Copy, copyAction_);
   connect (copyAction_, &QAction::triggered,
            this, &DirWidget::copy);
 
   pasteAction_ = viewMenu_->addAction (QIcon::fromTheme ("paste"), tr ("Paste"));
-  ShortcutManager::add (ShortcutManager::Paste, pasteAction_);
-  pasteAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
-  this->addAction (pasteAction_);
+  registerShortcut (ShortcutManager::Paste, pasteAction_);
   connect (pasteAction_, &QAction::triggered,
            this, &DirWidget::paste);
 
   copyPathAction_ = viewMenu_->addAction (tr ("Copy path"));
+  registerShortcut (ShortcutManager::CopyPath, copyPathAction_);
   connect (copyPathAction_, &QAction::triggered,
            this, &DirWidget::copyPath);
 
   viewMenu_->addSeparator ();
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
-  ShortcutManager::add (ShortcutManager::Rename, renameAction_);
-  renameAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
-  this->addAction (renameAction_);
+  registerShortcut (ShortcutManager::Rename, renameAction_);
   connect (renameAction_, &QAction::triggered,
            view_, &DirView::renameCurrent);
 
   trashAction_ = viewMenu_->addAction (QIcon (":/trash.png"), tr ("Move to trash..."));
+  registerShortcut (ShortcutManager::Trash, trashAction_);
   connect (trashAction_, &QAction::triggered,
            this, &DirWidget::promptTrash);
 
   removeAction_ = viewMenu_->addAction (QIcon (":/remove.png"), tr ("Remove..."));
+  registerShortcut (ShortcutManager::Remove, removeAction_);
   connect (removeAction_, &QAction::triggered,
            this, &DirWidget::promptRemove);
 
@@ -181,31 +193,31 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenuButton->setMenu (representMenu);
 
   showDirs_ = representMenu->addAction (QIcon (":/folder.png"), tr ("Show directories"));
-  showDirs_->setCheckable (true);
+  registerShortcut (ShortcutManager::ShowDirectories, showDirs_, true);
   showDirs_->setChecked (proxy_->showDirs ());
   connect (showDirs_, &QAction::toggled,
            this, &DirWidget::setShowDirs);
 
   showHidden_ = representMenu->addAction (QIcon (":/hidden.png"), tr ("Show hidden"));
-  showHidden_->setCheckable (true);
+  registerShortcut (ShortcutManager::ShowHidden, showHidden_, true);
   showHidden_->setChecked (proxy_->showHidden ());
   connect (showHidden_, &QAction::toggled,
            proxy_, &ProxyModel::setShowHidden);
 
   extensiveAction_ = representMenu->addAction (QIcon (":/extensive.png"), tr ("Extensive mode"));
-  extensiveAction_->setCheckable (true);
+  registerShortcut (ShortcutManager::ExtensiveMode, extensiveAction_, true);
   extensiveAction_->setChecked (view_->isExtensive ());
   connect (extensiveAction_, &QAction::toggled,
            view_, &DirView::setExtensive);
 
   listMode_ = representMenu->addAction (QIcon (":/listMode.png"), tr ("List mode"));
-  listMode_->setCheckable (true);
+  registerShortcut (ShortcutManager::ListMode, listMode_, true);
   listMode_->setChecked (view_->isList ());
   connect (listMode_, &QAction::toggled,
            view_, &DirView::setIsList);
 
   showThumbs_ = representMenu->addAction (QIcon (":/showThumbs.png"), tr ("Show thumbnails"));
-  showThumbs_->setCheckable (true);
+  registerShortcut (ShortcutManager::ShowThumbnails, showThumbs_, true);
   showThumbs_->setChecked (proxy_->showThumbnails ());
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
@@ -420,6 +432,17 @@ void DirWidget::newFolder ()
   auto index = model_->mkdir (proxy_->mapToSource (view_->rootIndex ()), name);
   view_->setCurrentIndex (proxy_->mapFromSource (index));
   view_->renameCurrent ();
+}
+
+void DirWidget::registerShortcut (int shortcutType, QAction *action, bool isCheckable)
+{
+  ShortcutManager::add (ShortcutManager::Shortcut (shortcutType), action);
+  action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+  addAction (action);
+  if (isCheckable)
+  {
+    action->setCheckable (true);
+  }
 }
 
 void DirWidget::resizeEvent (QResizeEvent *)

@@ -51,6 +51,7 @@ protected:
 private:
   void openPath (const QModelIndex &index);
   void newFolder ();
+  void registerShortcut (int shortcutType, QAction *action, bool isCheckable = false);
 
   QString fittedPath () const;
   QList<QFileInfo> selected () const;
