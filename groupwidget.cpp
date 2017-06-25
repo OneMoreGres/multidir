@@ -5,6 +5,7 @@
 #include "fileoperation.h"
 #include "debug.h"
 #include "shortcutmanager.h"
+#include "utils.h"
 
 #include <QBoxLayout>
 #include <QSettings>
@@ -27,7 +28,7 @@ GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
   model_ (&model),
   widgets_ (),
   view_ (new TiledView (this)),
-  ids_ ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")
+  ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))
 {
   auto layout = new QVBoxLayout (this);
   layout->setMargin (0);
@@ -173,7 +174,7 @@ const QString &GroupWidget::ids () const
 
 void GroupWidget::setIds (const QString &ids)
 {
-  ids_ = ids;
+  ids_ = utils::uniqueChars (ids);
   updateWidgetShortcuts ();
 }
 

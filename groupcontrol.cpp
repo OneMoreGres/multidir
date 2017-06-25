@@ -3,6 +3,7 @@
 #include "groupwidget.h"
 #include "debug.h"
 #include "shortcutmanager.h"
+#include "utils.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -20,7 +21,7 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   view_ (view),
   menu_ (new QMenu (tr ("Groups"))),
   actions_ (new QActionGroup (this)),
-  ids_ ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")
+  ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))
 {
   connect (actions_, &QActionGroup::triggered,
            this, &GroupControl::setCurrent);
@@ -187,6 +188,6 @@ const QString &GroupControl::ids () const
 
 void GroupControl::setIds (const QString &ids)
 {
-  ids_ = ids;
+  ids_ = utils::uniqueChars (ids);
   updateShortcuts ();
 }

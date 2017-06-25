@@ -59,4 +59,18 @@ Infos dirEntries (const QFileInfo &info)
   return dir.entryInfoList (QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
+QString uniqueChars (const QString &source)
+{
+  QString result;
+  for (auto i = 0, end = source.size (); i < end; ++i)
+  {
+    const auto c = source.at (i);
+    if (!result.contains (c))
+    {
+      result += c;
+    }
+  }
+  return result;
+}
+
 }

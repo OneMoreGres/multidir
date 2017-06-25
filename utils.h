@@ -12,4 +12,6 @@ qint64 totalSize (const QFileInfo &info);
 
 Infos dirEntries (const QFileInfo &info);
 
+QString uniqueChars (const QString &source);
+
 }
