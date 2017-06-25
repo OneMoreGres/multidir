@@ -226,13 +226,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
 
-  upAction_ = new QAction (QIcon (":/up.png"), tr ("Move up"));
+  upAction_ = new QAction (QIcon (":/up.png"), tr ("Move up"), this);
   connect (upAction_, &QAction::triggered,
            this, [this] {openPath (view_->rootIndex ().parent ());});
   auto up = new QToolButton (this);
   up->setDefaultAction (upAction_);
 
-  newFolderAction_ = new QAction (QIcon (":/newFolder.png"), tr ("Create folder"));
+  newFolderAction_ = new QAction (QIcon (":/newFolder.png"), tr ("Create folder"), this);
   registerShortcut (ShortcutManager::CreateFolder, newFolderAction_);
   connect (newFolderAction_, &QAction::triggered,
            this, &DirWidget::newFolder);
