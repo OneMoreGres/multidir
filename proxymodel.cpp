@@ -8,8 +8,6 @@
 #include <QImageReader>
 #include <QThread>
 
-#include <QDebug>
-
 
 ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),

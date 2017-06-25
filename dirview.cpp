@@ -12,8 +12,6 @@
 #include <QKeyEvent>
 #include <QGraphicsDropShadowEffect>
 
-#include <QDebug>
-
 
 namespace
 {

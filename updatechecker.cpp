@@ -1,5 +1,6 @@
 #include "updatechecker.h"
 #include "constants.h"
+#include "debug.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -53,7 +54,7 @@ void UpdateChecker::parse (QNetworkReply *reply)
 {
   if (reply->error () != QNetworkReply::NoError)
   {
-    qCritical () << "Available version check failed: " << reply->errorString ();
+    ERROR () << "Available version check failed" << LARG (reply->errorString ());
     return;
   }
   const auto data = reply->readAll ().trimmed ();

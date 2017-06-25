@@ -4,8 +4,6 @@
 #include <QMimeData>
 #include <QUrl>
 
-#include <QDebug>
-
 FileSystemModel::FileSystemModel (QObject *parent) :
   QFileSystemModel (parent)
 {

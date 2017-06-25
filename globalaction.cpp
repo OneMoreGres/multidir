@@ -1,6 +1,6 @@
 #include "globalaction.h"
+#include "debug.h"
 
-#include <QDebug>
 #include <QApplication>
 
 QHash<QPair<quint32, quint32>, QAction *> GlobalAction::actions_;
@@ -34,7 +34,7 @@ bool GlobalAction::makeGlobal (QAction *action)
   }
   else
   {
-    qWarning () << "Failed to register global hotkey:" << hotKey.toString ();
+    ERROR () << "Failed to register global hotkey:" << LARG (hotKey.toString ());
   }
   return res;
 }
@@ -67,7 +67,7 @@ bool GlobalAction::removeGlobal (QAction *action)
   }
   else
   {
-    qWarning () << "Failed to unregister global hotkey:" << hotKey.toString ();
+    ERROR () << "Failed to unregister global hotkey:" << (hotKey.toString ());
   }
   return res;
 }

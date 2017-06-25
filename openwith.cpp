@@ -1,4 +1,5 @@
 #include "openwith.h"
+#include "debug.h"
 
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -8,7 +9,6 @@
 #include <QUrl>
 #include <QProcess>
 #include <QMenu>
-#include <QDebug>
 #include <QSettings>
 #include <QFileIconProvider>
 #include <QtConcurrentRun>
@@ -50,6 +50,7 @@ void loadDesktop (const QString &fileName)
   QFile f (fileName);
   if (!f.open (QFile::ReadOnly))
   {
+    WARNING () << "Failed to open desktop file" << LARG (fileName);
     return;
   }
 
@@ -143,6 +144,7 @@ QList<ExternalApp> applications (const QFileInfo &file)
 {
   if (!isInited)
   {
+    ERROR () << "External apps not initialized";
     return {};
   }
   QMimeDatabase db;
@@ -154,6 +156,7 @@ void openWith (const QFileInfo &file, const ExternalApp &app)
 {
   if (app.command.isEmpty ())
   {
+    ERROR () << "External app has not command" << LARG (app.name);
     return;
   }
 
@@ -176,7 +179,8 @@ void openWith (const QFileInfo &file, const ExternalApp &app)
   {
     command += " " + quoted (path);
   }
-  QProcess::startDetached (command);
+  auto ok = QProcess::startDetached (command);
+  ERROR_IF (!ok) << "Failed to start external app" << LARG (app.name) << LARG (command);
 }
 
 

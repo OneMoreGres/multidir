@@ -1,12 +1,12 @@
 #include "mainwindow.h"
 #include "openwith.h"
 #include "shortcutmanager.h"
+#include "debug.h"
 
 #include <QApplication>
 #include <QDir>
 #include <QLockFile>
 #include <QTranslator>
-#include <QDebug>
 
 int main (int argc, char *argv[])
 {
@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
   QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
   if (!f.tryLock ())
   {
-    qDebug () << "Another instance is running. Lock file is busy.";
+    WARNING () << "Another instance is running. Lock file is busy.";
     return 0;
   }
 

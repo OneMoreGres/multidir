@@ -8,6 +8,7 @@
 #include "openwith.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
+#include "debug.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -23,8 +24,6 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QProcess>
-
-#include <QDebug>
 
 namespace
 {

@@ -1,8 +1,6 @@
 #include "filedelegate.h"
 #include "constants.h"
 
-#include <QDebug>
-
 FileDelegate::FileDelegate (QObject *parent) :
   QStyledItemDelegate (parent)
 {

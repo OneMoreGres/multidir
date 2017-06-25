@@ -1,5 +1,6 @@
 #include "backgroundreader.h"
 #include "constants.h"
+#include "debug.h"
 
 #include <QImageReader>
 #include <QPixmap>
@@ -19,5 +20,9 @@ void BackgroundReader::readIcon (const QString &fileName)
   {
     const auto pixmap = QPixmap::fromImage (image);
     emit iconRead (fileName, pixmap);
+  }
+  else
+  {
+    WARNING () << "Icon read error" << LARG (fileName) << LARG (reader.errorString ());
   }
 }

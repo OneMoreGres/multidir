@@ -1,4 +1,5 @@
 #include "notifier.h"
+#include "debug.h"
 
 #include <qstatusbar.h>
 
@@ -11,6 +12,7 @@ void Notifier::setMain (QStatusBar *bar)
 
 void Notifier::error (const QString &text)
 {
+  ERROR () << text;
   const auto timeout = 2000;
   if (bar_)
   {
