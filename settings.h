@@ -3,19 +3,17 @@
 #include <QDialog>
 #include <QKeySequence>
 
-class QKeySequenceEdit;
 class QLineEdit;
 class QCheckBox;
 class QSpinBox;
+class QTabWidget;
+class QTableWidget;
 
 class Settings : public QDialog
 {
 Q_OBJECT
 public:
   explicit Settings (QWidget *parent = nullptr);
-
-  QKeySequence hotkey () const;
-  void setHotkey (const QKeySequence &hotkey);
 
   QString console () const;
   void setConsole (const QString &console);
@@ -30,9 +28,13 @@ public:
   void setEditor (const QString &editor);
 
 private:
-  QKeySequenceEdit *hotkey_;
+  void loadShortcuts ();
+  void saveShortcuts ();
+
+  QTabWidget *tabs_;
   QLineEdit *console_;
   QLineEdit *editor_;
   QCheckBox *checkUpdates_;
   QSpinBox *imageCache_;
+  QTableWidget *shortcuts_;
 };
