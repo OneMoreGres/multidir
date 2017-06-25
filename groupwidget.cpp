@@ -188,6 +188,7 @@ void GroupWidget::clone (DirWidget *widget)
 {
   auto w = addWidget ();
   w->setPath (widget->path ());
+  w->activate ();
 }
 
 void GroupWidget::add (const QFileInfo &path)
