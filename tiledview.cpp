@@ -777,11 +777,22 @@ bool TiledView::spanTile (Tile &tile, const QPoint &diff, bool isRow)
   {
     for (auto i = 0; i < otherSpan; ++i)
     {
-      if (auto *widget = remove ((isRow ? index + 1 : otherIndex + i),
-                                 (isRow ? otherIndex + i : index + 1)))
+      const auto r = (isRow ? index + 1 : otherIndex + i);
+      const auto c = (isRow ? otherIndex + i : index + 1);
+      auto *tile = findTile (r,c);
+      ASSERT (tile);
+      if (tile->widget)
       {
-        add (*widget);
+        return false;
       }
+    }
+
+    for (auto i = 0; i < otherSpan; ++i)
+    {
+      const auto r = (isRow ? index + 1 : otherIndex + i);
+      const auto c = (isRow ? otherIndex + i : index + 1);
+      auto *widget = remove (r, c);
+      ASSERT (!widget);
     }
     position += sizes[index + 1] + spacing_;
     changed = true;
