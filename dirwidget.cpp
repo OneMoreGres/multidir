@@ -66,8 +66,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
   copyPathAction_ (nullptr),
-  up_ (new QToolButton (this)),
-  newFolder_ (new QToolButton (this)),
+  upAction_ (nullptr),
+  newFolderAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
   proxy_->setDynamicSortFilter (true);
@@ -222,16 +222,18 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
 
-
-  up_->setIcon (QIcon (":/up.png"));
-  up_->setToolTip (tr ("Move up"));
-  connect (up_, &QToolButton::pressed,
+  upAction_ = new QAction (QIcon (":/up.png"), tr ("Move up"));
+  connect (upAction_, &QAction::triggered,
            this, [this] {openPath (view_->rootIndex ().parent ());});
+  auto up = new QToolButton (this);
+  up->setDefaultAction (upAction_);
 
-  newFolder_->setIcon (QIcon (":/newFolder.png"));
-  newFolder_->setToolTip (tr ("Create folder"));
-  connect (newFolder_, &QToolButton::pressed,
+  newFolderAction_ = new QAction (QIcon (":/newFolder.png"), tr ("Create folder"));
+  registerShortcut (ShortcutManager::CreateFolder, newFolderAction_);
+  connect (newFolderAction_, &QAction::triggered,
            this, &DirWidget::newFolder);
+  auto newFolder = new QToolButton (this);
+  newFolder->setDefaultAction (newFolderAction_);
 
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
@@ -248,6 +250,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   togglePathEdition (false);
 
+  controlsLayout_->addWidget (newFolder);
   controlsLayout_->addStretch (1);
   controlsLayout_->addWidget (indexLabel_);
   controlsLayout_->addWidget (pathLabel_);
@@ -255,8 +258,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_->addWidget (pathEdit_);
   controlsLayout_->addStretch (1);
   controlsLayout_->addWidget (viewMenuButton);
-  controlsLayout_->addWidget (newFolder_);
-  controlsLayout_->addWidget (up_);
+  controlsLayout_->addWidget (up);
 
   controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 
@@ -274,7 +276,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (view_, &DirView::activated,
            this, &DirWidget::openPath);
   connect (view_, &DirView::movedBackward,
-           up_, &QToolButton::pressed);
+           upAction_, &QAction::trigger);
 }
 
 DirWidget::~DirWidget ()
@@ -693,8 +695,8 @@ void DirWidget::updateActions ()
 {
   const auto dirs = showDirs_->isChecked ();
   const auto lock = isLocked_->isChecked ();
-  newFolder_->setEnabled (dirs && !lock);
-  up_->setEnabled (!lock);
+  newFolderAction_->setEnabled (dirs && !lock);
+  upAction_->setEnabled (!lock);
 
   pasteAction_->setEnabled (!lock);
   cutAction_->setEnabled (!lock);

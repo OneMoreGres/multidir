@@ -112,7 +112,7 @@ private:
   QAction *pasteAction_;
   QAction *copyPathAction_;
 
-  QToolButton *up_;
-  QToolButton *newFolder_;
+  QAction *upAction_;
+  QAction *newFolderAction_;
   QBoxLayout *controlsLayout_;
 };
