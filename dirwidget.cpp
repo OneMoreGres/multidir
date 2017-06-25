@@ -404,7 +404,7 @@ QString DirWidget::fittedPath () const
     return {};
   }
 
-  const auto stretchWidth = controlsLayout_->itemAt (0)->geometry ().width ();
+  const auto stretchWidth = controlsLayout_->itemAt (1)->geometry ().width ();
   const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
   const QString prepend = QLatin1String (".../");
   const auto searchStartIndex = prepend.length ();
