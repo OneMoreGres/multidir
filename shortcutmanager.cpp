@@ -31,13 +31,13 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::Rename] = {{QS ("F2")}, QObject::tr ("Rename item")};
   shortcuts[SM::OpenInExplorer] = {{QS ("Alt+E")}, QObject::tr ("Open tab in explorer")};
   shortcuts[SM::OpenConsole] = {{QS ("Alt+C")}, QObject::tr ("Open tab in console")};
-  shortcuts[SM::ChangePath] = {{QS ("Alt+P,E")}, QObject::tr ("Edit tab's path")};
+  shortcuts[SM::ChangePath] = {{QS ("Alt+D")}, QObject::tr ("Edit tab's path")};
   shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy tab's path to clipboard")};
   shortcuts[SM::LockTab] = {{QS ("Ctrl+L")}, QObject::tr ("Lock tab")};
   shortcuts[SM::CloneTab] = {{QS ("Ctrl+D")}, QObject::tr ("Duplicate tab")};
   shortcuts[SM::CloseTab] = {{QS ("Ctrl+W")}, QObject::tr ("Close tab")};
   shortcuts[SM::OpenInTab] = {{QS ("Alt+Return")}, QObject::tr ("Open item in new tab")};
-  shortcuts[SM::OpenInEditor] = {{QS ("Ctrl+Return")}, QObject::tr ("Open item in editor")};
+  shortcuts[SM::OpenInEditor] = {{QS ("F4")}, QObject::tr ("Open item in editor")};
   shortcuts[SM::Trash] = {{QS ("Del")}, QObject::tr ("Move item to trash")};
   shortcuts[SM::Remove] = {{QS ("Shift+Del")}, QObject::tr ("Remove item")};
   shortcuts[SM::ShowDirectories] = {{QS ("Alt+V,D")}, QObject::tr ("Toggle show directories")};
