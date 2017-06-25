@@ -379,7 +379,7 @@ void MainWindow::showAbout ()
         "but WITHOUT ANY WARRANTY; without even the implied warranty of "
         "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
   };
-  QMessageBox about (QMessageBox::Information, windowTitle (),
+  QMessageBox about (QMessageBox::Information, tr ("About"),
                      lines.join ("<br>"), QMessageBox::Ok);
   about.setIconPixmap (QPixmap (":/app.png").scaledToHeight (100, Qt::SmoothTransformation));
   about.exec ();
