@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "debug.h"
 #include "notifier.h"
+#include "shortcutmanager.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -27,8 +28,8 @@
 
 namespace
 {
+const QString qs_shortcuts = "shortcuts";
 const QString qs_geometry = "geometry";
-const QString qs_hotkey = "hotkey";
 const QString qs_console = "console";
 const QString qs_editor = "editor";
 const QString qs_updates = "checkUpdates";
@@ -79,11 +80,11 @@ MainWindow::MainWindow (QWidget *parent) :
   auto fileMenu = menuBar->addMenu (tr ("File"));
 
   auto add = fileMenu->addAction (QIcon (":/add.png"), tr ("Add"));
-  add->setShortcut (QKeySequence::AddTab);
+  ShortcutManager::add (ShortcutManager::AddDir, add);
   connect (add, &QAction::triggered, this, &MainWindow::addWidget);
 
   auto find = fileMenu->addAction (QIcon (":/find.png"), tr ("Find"));
-  find->setShortcut (QKeySequence::Find);
+  ShortcutManager::add (ShortcutManager::Find, find);
   connect (find, &QAction::triggered, this, &MainWindow::activateFindMode);
 
   fileMenu->addSeparator ();
@@ -166,9 +167,12 @@ MainWindow::~MainWindow ()
 
 void MainWindow::save (QSettings &settings) const
 {
+  settings.beginGroup (qs_shortcuts);
+  ShortcutManager::save (settings);
+  settings.endGroup ();
+
   settings.setValue (qs_geometry, saveGeometry ());
 
-  settings.setValue (qs_hotkey, toggleAction_->shortcut ().toString ());
   settings.setValue (qs_console, consoleCommand_);
   settings.setValue (qs_editor, editorCommand_);
   settings.setValue (qs_updates, checkUpdates_);
@@ -179,10 +183,13 @@ void MainWindow::save (QSettings &settings) const
 
 void MainWindow::restore (QSettings &settings)
 {
+  settings.beginGroup (qs_shortcuts);
+  ShortcutManager::restore (settings);
+  settings.endGroup ();
+
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-  QKeySequence hotkey (settings.value (qs_hotkey, QLatin1String ("Ctrl+Alt+D")).toString ());
-  toggleAction_->setShortcut (hotkey);
+  toggleAction_->setShortcut (ShortcutManager::get (ShortcutManager::ToggleGui));
   GlobalAction::makeGlobal (toggleAction_);
 
 #ifdef Q_OS_LINUX
@@ -236,7 +243,6 @@ void MainWindow::toggleVisible ()
 void MainWindow::editSettings ()
 {
   Settings settings;
-  settings.setHotkey (toggleAction_->shortcut ());
   settings.setConsole (consoleCommand_);
   settings.setCheckUpdates (checkUpdates_);
   settings.setEditor (editorCommand_);
@@ -245,7 +251,7 @@ void MainWindow::editSettings ()
   if (settings.exec () == QDialog::Accepted)
   {
     GlobalAction::removeGlobal (toggleAction_);
-    toggleAction_->setShortcut (settings.hotkey ());
+    toggleAction_->setShortcut (ShortcutManager::get (ShortcutManager::ToggleGui));
     consoleCommand_ = settings.console ();
     editorCommand_ = settings.editor ();
     setCheckUpdates (settings.checkUpdates ());

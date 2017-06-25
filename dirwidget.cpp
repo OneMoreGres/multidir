@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "openwith.h"
 #include "notifier.h"
+#include "shortcutmanager.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -130,21 +131,21 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, [this]() {emit editorRequested (current ().absoluteFilePath ());});
 
   cutAction_ = viewMenu_->addAction (QIcon::fromTheme ("cut"), tr ("Cut"));
-  cutAction_->setShortcut (QKeySequence::Cut);
+  ShortcutManager::add (ShortcutManager::Cut, cutAction_);
   cutAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
   this->addAction (cutAction_);
   connect (cutAction_, &QAction::triggered,
            this, &DirWidget::cut);
 
   copyAction_ = viewMenu_->addAction (QIcon::fromTheme ("copy"), tr ("Copy"));
-  copyAction_->setShortcut (QKeySequence::Copy);
+  ShortcutManager::add (ShortcutManager::Copy, copyAction_);
   copyAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
   this->addAction (copyAction_);
   connect (copyAction_, &QAction::triggered,
            this, &DirWidget::copy);
 
   pasteAction_ = viewMenu_->addAction (QIcon::fromTheme ("paste"), tr ("Paste"));
-  pasteAction_->setShortcut (QKeySequence::Paste);
+  ShortcutManager::add (ShortcutManager::Paste, pasteAction_);
   pasteAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
   this->addAction (pasteAction_);
   connect (pasteAction_, &QAction::triggered,
@@ -157,7 +158,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_->addSeparator ();
 
   renameAction_ = viewMenu_->addAction (QIcon (":/rename.png"), tr ("Rename"));
-  renameAction_->setShortcut (QKeySequence (Qt::Key_F2));
+  ShortcutManager::add (ShortcutManager::Rename, renameAction_);
   renameAction_->setShortcutContext (Qt::WidgetWithChildrenShortcut);
   this->addAction (renameAction_);
   connect (renameAction_, &QAction::triggered,

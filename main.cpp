@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "openwith.h"
+#include "shortcutmanager.h"
 
 #include <QApplication>
 #include <QDir>
@@ -40,6 +41,8 @@ int main (int argc, char *argv[])
     }
     last->deleteLater ();
   }
+
+  ShortcutManager::setDefaults ();
 
   QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
   if (!f.tryLock ())

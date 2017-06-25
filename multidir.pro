@@ -67,7 +67,8 @@ SOURCES += \
     groupcontrol.cpp \
     fileconflictresolver.cpp \
     utils.cpp \
-    groupholder.cpp
+    groupholder.cpp \
+    shortcutmanager.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -94,7 +95,8 @@ HEADERS  += \
     groupcontrol.h \
     fileconflictresolver.h \
     utils.h \
-    groupholder.h
+    groupholder.h \
+    shortcutmanager.h
 
 RESOURCES += \
     resources.qrc
