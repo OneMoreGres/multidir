@@ -131,6 +131,8 @@ Settings::Settings (QWidget *parent) :
   connect (buttons, &QDialogButtonBox::rejected,
            this, &QDialog::reject);
   layout->addWidget (buttons);
+
+  resize (400,300);
 }
 
 QString Settings::console () const
