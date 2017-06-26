@@ -26,15 +26,18 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   connect (actions_, &QActionGroup::triggered,
            this, &GroupControl::setCurrent);
 
-  auto addGroup = menu_->addAction (tr ("Add"));
+  auto addGroup = new QAction (this);
+  menu_->addAction (addGroup);
   ShortcutManager::add (ShortcutManager::AddGroup, addGroup);
   connect (addGroup, &QAction::triggered, this, &GroupControl::add);
 
-  renameAction_ = menu_->addAction (tr ("Rename..."));
+  renameAction_ = new QAction (this);
+  menu_->addAction (renameAction_);
   ShortcutManager::add (ShortcutManager::RenameGroup, renameAction_);
   connect (renameAction_, &QAction::triggered, this, &GroupControl::renameCurrent);
 
-  closeAction_ = menu_->addAction (tr ("Close..."));
+  closeAction_ = new QAction (this);
+  menu_->addAction (closeAction_);
   ShortcutManager::add (ShortcutManager::RemoveGroup, closeAction_);
   connect (closeAction_, &QAction::triggered, this, &GroupControl::removeCurrent);
 

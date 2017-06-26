@@ -79,20 +79,26 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto fileMenu = menuBar->addMenu (tr ("File"));
 
-  auto add = fileMenu->addAction (QIcon (":/add.png"), tr ("Add"));
+  auto add = new QAction (this);
+  fileMenu->addAction (add);
   ShortcutManager::add (ShortcutManager::AddTab, add);
   connect (add, &QAction::triggered, this, &MainWindow::addWidget);
 
-  auto find = fileMenu->addAction (QIcon (":/find.png"), tr ("Find"));
+  auto find = new QAction (this);
+  fileMenu->addAction (find);
   ShortcutManager::add (ShortcutManager::Find, find);
   connect (find, &QAction::triggered, this, &MainWindow::activateFindMode);
 
   fileMenu->addSeparator ();
 
-  auto settings = fileMenu->addAction (QIcon (":/settings.png"), tr ("Settings"));
+  auto settings = new QAction (this);
+  fileMenu->addAction (settings);
+  ShortcutManager::add (ShortcutManager::Settings, settings);
   connect (settings, &QAction::triggered, this, &MainWindow::editSettings);
 
-  auto quit = fileMenu->addAction (QIcon (":/quit.png"), tr ("Quit"));
+  auto quit = new QAction (this);
+  fileMenu->addAction (quit);
+  ShortcutManager::add (ShortcutManager::Quit, quit);
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
@@ -101,11 +107,15 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
 
-  auto debug = helpMenu->addAction (tr ("Debug mode"));
+  auto debug = new QAction (this);
   debug->setCheckable (true);
+  helpMenu->addAction (debug);
+  ShortcutManager::add (ShortcutManager::Debug, debug);
   connect (debug, &QAction::toggled, this, [](bool isOn) {debug::setDebugMode (isOn);});
 
-  auto about = helpMenu->addAction (QIcon::fromTheme ("about"), tr ("About"));
+  auto about = new QAction (this);
+  helpMenu->addAction (about);
+  ShortcutManager::add (ShortcutManager::About, about);
   connect (about, &QAction::triggered, this, &MainWindow::showAbout);
 
 
@@ -119,7 +129,10 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (trayMenu, &QMenu::aboutToShow,
            this, &MainWindow::updateTrayMenu);
 
-  toggleAction_ = trayMenu->addAction (QIcon (":/popup.png"), tr ("Toggle"));
+  toggleAction_ = new QAction (this);
+  trayMenu->addAction (toggleAction_);
+  ShortcutManager::add (ShortcutManager::ToggleGui, toggleAction_);   // just to init
+  ShortcutManager::remove (ShortcutManager::ToggleGui, toggleAction_);
   toggleAction_->setCheckable (true);
   toggleAction_->setChecked (true);
   GlobalAction::init ();

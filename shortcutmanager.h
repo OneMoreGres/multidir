@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QIcon>
 #include <QKeySequence>
 
 class QSettings;
@@ -14,7 +15,7 @@ public:
     ChangePath, LockTab, CloneTab, CloseTab, OpenInTab, OpenInEditor, CopyPath,
     Trash, Remove, ShowDirectories, ShowHidden, ExtensiveMode, ListMode, ShowThumbnails,
     AddGroup, RenameGroup, RemoveGroup, CreateFolder, SwitchGroup, SwitchTab,
-    NextTab,
+    NextTab, OpenItem, MoveUp, Settings, Quit, Debug, About,
     ShortcutCount
   };
 
