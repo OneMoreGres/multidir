@@ -8,50 +8,65 @@
 
 namespace
 {
+using SM = ShortcutManager;
 struct Shortcut
 {
   QKeySequence key;
   QString name;
+  SM::Context context;
 };
 
-using SM = ShortcutManager;
 QVector<QList<QAction *> > actions (SM::ShortcutCount);
 QVector<Shortcut> shortcuts (SM::ShortcutCount);
+QVector<QString> contexts (SM::ContextCount);
 }
 
 void ShortcutManager::setDefaults ()
 {
   using QS = QLatin1String;
-  shortcuts[SM::ToggleGui] = {{QS ("Ctrl+Alt+D")}, QObject::tr ("Toggle GUI")};
-  shortcuts[SM::AddTab] = {{QS ("Ctrl+N")}, QObject::tr ("Add tab to group")};
-  shortcuts[SM::Find] = {{QS ("Ctrl+F")}, QObject::tr ("Find")};
-  shortcuts[SM::Copy] = {{QS ("Ctrl+C")}, QObject::tr ("Copy")};
-  shortcuts[SM::Paste] = {{QS ("Ctrl+V")}, QObject::tr ("Paste")};
-  shortcuts[SM::Cut] = {{QS ("Ctrl+X")}, QObject::tr ("Cut")};
-  shortcuts[SM::Rename] = {{QS ("F2")}, QObject::tr ("Rename item")};
-  shortcuts[SM::OpenInExplorer] = {{QS ("Alt+E")}, QObject::tr ("Open tab in explorer")};
-  shortcuts[SM::OpenConsole] = {{QS ("Alt+C")}, QObject::tr ("Open tab in console")};
-  shortcuts[SM::ChangePath] = {{QS ("Alt+D")}, QObject::tr ("Edit tab's path")};
-  shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy tab's path to clipboard")};
-  shortcuts[SM::LockTab] = {{QS ("Ctrl+L")}, QObject::tr ("Lock tab")};
-  shortcuts[SM::CloneTab] = {{QS ("Ctrl+D")}, QObject::tr ("Duplicate tab")};
-  shortcuts[SM::CloseTab] = {{QS ("Ctrl+W")}, QObject::tr ("Close tab")};
-  shortcuts[SM::OpenInTab] = {{QS ("Alt+Return")}, QObject::tr ("Open item in new tab")};
-  shortcuts[SM::OpenInEditor] = {{QS ("F4")}, QObject::tr ("Open item in editor")};
-  shortcuts[SM::Trash] = {{QS ("Del")}, QObject::tr ("Move item to trash")};
-  shortcuts[SM::Remove] = {{QS ("Shift+Del")}, QObject::tr ("Remove item")};
-  shortcuts[SM::ShowDirectories] = {{QS ("Alt+V,D")}, QObject::tr ("Toggle show directories")};
-  shortcuts[SM::ShowHidden] = {{QS ("Alt+V,H")}, QObject::tr ("Toggle show hidden")};
-  shortcuts[SM::ExtensiveMode] = {{QS ("Alt+V,E")}, QObject::tr ("Toggle extensive view")};
-  shortcuts[SM::ListMode] = {{QS ("Alt+V,L")}, QObject::tr ("Toggle list mode")};
-  shortcuts[SM::ShowThumbnails] = {{QS ("Alt+V,I")}, QObject::tr ("Toggle show thumbnails")};
-  shortcuts[SM::AddGroup] = {{QS ("Ctrl+G,A")}, QObject::tr ("Add new tabs group")};
-  shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename tabs group")};
-  shortcuts[SM::RemoveGroup] = {{QS ("Ctrl+G,D")}, QObject::tr ("Delete tabs group")};
-  shortcuts[SM::CreateFolder] = {{QS ("F7")}, QObject::tr ("Create folder")};
-  shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch group (plus ', ID')")};
-  shortcuts[SM::SwitchTab] = {{QS ("Ctrl+E")}, QObject::tr ("Switch tab (plus ', ID')")};
-  shortcuts[SM::NextTab] = {{QS ("Tab")}, QObject::tr ("Move to next tab")};
+  contexts[SM::General] = {QObject::tr ("General")};
+  contexts[SM::Group] = {QObject::tr ("Group")};
+  contexts[SM::Tab] = {QObject::tr ("Tab")};
+  contexts[SM::Item] = {QObject::tr ("Item")};
+
+
+  auto c = SM::General;
+  shortcuts[SM::ToggleGui] = {{QS ("Ctrl+Alt+D")}, QObject::tr ("Toggle GUI"), c};
+  shortcuts[SM::Find] = {{QS ("Ctrl+F")}, QObject::tr ("Find"), c};
+
+  c = SM::Group;
+  shortcuts[SM::AddGroup] = {{QS ("Ctrl+G,A")}, QObject::tr ("Add"), c};
+  shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename.."), c};
+  shortcuts[SM::RemoveGroup] = {{QS ("Ctrl+G,D")}, QObject::tr ("Delete..."), c};
+  shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch (plus ID)"), c};
+
+  c = SM::Tab;
+  shortcuts[SM::AddTab] = {{QS ("Ctrl+N")}, QObject::tr ("Add tab"), c};
+  shortcuts[SM::OpenInExplorer] = {{QS ("Alt+E")}, QObject::tr ("Open in explorer"), c};
+  shortcuts[SM::OpenConsole] = {{QS ("Alt+C")}, QObject::tr ("Open in console"), c};
+  shortcuts[SM::ChangePath] = {{QS ("Alt+D")}, QObject::tr ("Edit path"), c};
+  shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy path to clipboard"), c};
+  shortcuts[SM::LockTab] = {{QS ("Ctrl+L")}, QObject::tr ("Lock"), c};
+  shortcuts[SM::CloneTab] = {{QS ("Ctrl+D")}, QObject::tr ("Duplicate"), c};
+  shortcuts[SM::CloseTab] = {{QS ("Ctrl+W")}, QObject::tr ("Close"), c};
+  shortcuts[SM::ShowDirectories] = {{QS ("Alt+V,D")}, QObject::tr ("Show directories"), c};
+  shortcuts[SM::ShowHidden] = {{QS ("Alt+V,H")}, QObject::tr ("Show hidden"), c};
+  shortcuts[SM::ExtensiveMode] = {{QS ("Alt+V,E")}, QObject::tr ("Extensive view"), c};
+  shortcuts[SM::ListMode] = {{QS ("Alt+V,L")}, QObject::tr ("List mode"), c};
+  shortcuts[SM::ShowThumbnails] = {{QS ("Alt+V,I")}, QObject::tr ("Show thumbnails"), c};
+  shortcuts[SM::CreateFolder] = {{QS ("F7")}, QObject::tr ("Create folder"), c};
+  shortcuts[SM::NextTab] = {{QS ("Tab")}, QObject::tr ("Switch to next"), c};
+  shortcuts[SM::SwitchTab] = {{QS ("Ctrl+E")}, QObject::tr ("Switch tab (plus ID)"), c};
+
+  c = SM::Item;
+  shortcuts[SM::Copy] = {{QS ("Ctrl+C")}, QObject::tr ("Copy"), c};
+  shortcuts[SM::Paste] = {{QS ("Ctrl+V")}, QObject::tr ("Paste"), c};
+  shortcuts[SM::Cut] = {{QS ("Ctrl+X")}, QObject::tr ("Cut"), c};
+  shortcuts[SM::Rename] = {{QS ("F2")}, QObject::tr ("Rename"), c};
+  shortcuts[SM::OpenInTab] = {{QS ("Alt+Return")}, QObject::tr ("Open in tab"), c};
+  shortcuts[SM::OpenInEditor] = {{QS ("F4")}, QObject::tr ("Open in editor"), c};
+  shortcuts[SM::Trash] = {{QS ("Del")}, QObject::tr ("Move to trash..."), c};
+  shortcuts[SM::Remove] = {{QS ("Shift+Del")}, QObject::tr ("Remove..."), c};
 }
 
 void ShortcutManager::save (QSettings &settings)
@@ -108,4 +123,12 @@ QString ShortcutManager::name (ShortcutManager::Shortcut type)
 {
   ASSERT (type >= 0 && type < SM::ShortcutCount);
   return shortcuts[type].name;
+}
+
+QString ShortcutManager::contextName (ShortcutManager::Shortcut type)
+{
+  ASSERT (type >= 0 && type < SM::ShortcutCount);
+  const auto context = shortcuts[type].context;
+  ASSERT (context >= 0 && context < SM::ContextCount);
+  return contexts[context];
 }

@@ -16,7 +16,7 @@ namespace
 {
 enum ShortcutColumn
 {
-  Id, Name, Key, Count
+  Id, Name, Context, Key, Count
 };
 
 
@@ -98,7 +98,7 @@ Settings::Settings (QWidget *parent) :
     auto row = 0;
     layout->addWidget (shortcuts_, row, 0, 1, 2);
     shortcuts_->setColumnCount (ShortcutColumn::Count);
-    shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Shortcut")});
+    shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Context"), tr ("Shortcut")});
     shortcuts_->hideColumn (ShortcutColumn::Id);
     loadShortcuts ();
     shortcuts_->resizeColumnsToContents ();
@@ -107,14 +107,15 @@ Settings::Settings (QWidget *parent) :
     shortcuts_->setSelectionBehavior (QTableWidget::SelectRows);
     shortcuts_->setItemDelegateForColumn (ShortcutColumn::Key,new ShortcutDelegate (shortcuts_));
 
+
     ++row;
-    layout->addWidget (new QLabel ("Group ids:"), row, 0);
+    layout->addWidget (new QLabel (tr ("Group ids:")), row, 0);
     layout->addWidget (groupShortcuts_, row, 1);
     groupShortcuts_->setToolTip (tr ("Each character represents ID part of group"
                                      " switch shortcut"));
 
     ++row;
-    layout->addWidget (new QLabel ("Tab ids:"), row, 0);
+    layout->addWidget (new QLabel (tr ("Tab ids:")), row, 0);
     layout->addWidget (tabShortcuts_, row, 1);
     tabShortcuts_->setToolTip (tr ("Each character represents ID part of tab"
                                    " switch shortcut"));
@@ -197,13 +198,18 @@ void Settings::loadShortcuts ()
   using SM = ShortcutManager;
   using Item = QTableWidgetItem;
   shortcuts_->setRowCount (SM::ShortcutCount);
+  const auto nonEditable = [](const QString &text) {
+                             auto item = new Item (text);
+                             item->setFlags (item->flags () ^ Qt::ItemIsEditable);
+                             return item;
+                           };
+
   for (auto i = 0; i < SM::ShortcutCount; ++i)
   {
     const auto type = SM::Shortcut (i);
     shortcuts_->setItem (i, ShortcutColumn::Id, new Item (Item::UserType + i));
-    auto name = new Item (SM::name (type));
-    name->setFlags (name->flags () ^ Qt::ItemIsEditable);
-    shortcuts_->setItem (i, ShortcutColumn::Name, name);
+    shortcuts_->setItem (i, ShortcutColumn::Name, nonEditable (SM::name (type)));
+    shortcuts_->setItem (i, ShortcutColumn::Context, nonEditable (SM::contextName (type)));
     shortcuts_->setItem (i, ShortcutColumn::Key, new Item (SM::get (type).toString ()));
   }
 }

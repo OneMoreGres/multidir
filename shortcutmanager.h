@@ -18,6 +18,12 @@ public:
     ShortcutCount
   };
 
+  enum Context
+  {
+    General, Group, Tab, Item,
+    ContextCount
+  };
+
   static void setDefaults ();
 
   static void save (QSettings &settings);
@@ -29,4 +35,6 @@ public:
   static QKeySequence get (Shortcut type);
   static void set (Shortcut type, QKeySequence key);
   static QString name (Shortcut type);
+
+  static QString contextName (Shortcut type);
 };
