@@ -301,6 +301,24 @@ QWidget * TiledView::remove (int row, int col)
   return widget;
 }
 
+void TiledView::split (Tile &tile)
+{
+  for (auto i = 0; i < tile.rowSpan; ++i)
+  {
+    for (auto j = 0; j < tile.colSpan; ++j)
+    {
+      if (i == 0 && j == 0)
+      {
+        continue;
+      }
+      const auto newRow = tile.row + i;
+      const auto newCol = tile.col + j;
+      add (newRow, newCol);
+    }
+  }
+  tile.rowSpan = tile.colSpan = 1;
+}
+
 void TiledView::shift (bool isRow, int change, int start, int end)
 {
   int Tile::*field = isRow ? &Tile::row : &Tile::col;
@@ -444,8 +462,10 @@ void TiledView::remove (QWidget &widget)
 {
   auto tile = findTile (&widget);
   ASSERT (tile);
+  split (*tile);
   tile->widget = nullptr;
   cleanupDimensions ();
+  updateTilesGeometry ();
   updateGeometry ();
 }
 
@@ -941,6 +961,12 @@ void TiledView::dropEvent (QDropEvent *event)
 
   if (event->dropAction () == Qt::MoveAction)
   {
+    if (!target->widget)
+    {
+      split (*source);
+      updateTilesBorders ();
+      updateTilesGeometry ();
+    }
     source->setWidget (target->widget);
     target->setWidget (sourceWidget);
     cleanupDimensions ();

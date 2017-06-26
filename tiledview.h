@@ -61,6 +61,7 @@ private:
   void add (int row, int col);
   // Returns widget of tile if removed.
   QWidget * remove (int row, int col);
+  void split (Tile &tile);
 
   //! Shift all tiles in range for given number of rows/cols.
   void shift (bool isRow, int change, int start, int end = -1);
