@@ -213,24 +213,26 @@ void GroupWidget::clone (DirWidget *widget)
 
 void GroupWidget::nextTab (DirWidget *widget)
 {
-  ASSERT (!widgets_.isEmpty ());
+  const auto order = view_->widgets ();
+  ASSERT (!order.isEmpty ());
   auto found = false;
-  DirWidget *target = widgets_.first ().widget;
-  for (auto &i: widgets_)
+  auto *target = order.first ();
+  for (auto i: order)
   {
-    if (i.widget == widget)
+    if (i == widget)
     {
       found = true;
     }
     else if (found)
     {
-      target = i.widget;
+      target = i;
       break;
     }
   }
 
-  ASSERT (target);
-  target->activate ();
+  auto casted = qobject_cast<DirWidget *>(target);
+  ASSERT (casted);
+  casted->activate ();
 }
 
 void GroupWidget::add (const QFileInfo &path)
