@@ -134,6 +134,10 @@ QWidget * TiledView::childAt (const QPoint &pos) const
     auto w = widget (i);
     if (w->geometry ().contains (pos))
     {
+      if (cast (w))
+      {
+        return nullptr;
+      }
       return w;
     }
   }
@@ -273,8 +277,7 @@ void TiledView::dropEvent (QDropEvent *event)
   mime->zoneWidget->hide ();
   ASSERT (mime->widget);
   auto target = childAt (event->pos ());
-  ASSERT (target);
-  if (target == mime->widget)
+  if (!target || target == mime->widget)
   {
     return;
   }
