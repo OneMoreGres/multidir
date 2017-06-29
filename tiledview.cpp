@@ -10,6 +10,8 @@
 #include <QSettings>
 #include <QFrame>
 
+#include <array>
+
 
 using namespace std;
 using namespace nonstd;
