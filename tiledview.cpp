@@ -27,8 +27,40 @@ int square (const QSize &size)
 
 }
 
+//! Class for drag-n-drop support.
+class TileMime : public QMimeData
+{
+Q_OBJECT
+public:
+  TileMime (QWidget *widget);
+  ~TileMime ();
+
+  QWidget *widget;
+  QWidget *zoneWidget;
+};
+
+TileMime::TileMime (QWidget *widget) :
+  widget (widget),
+  zoneWidget (new QWidget)
+{
+  zoneWidget->setWindowFlags (Qt::Tool | Qt::FramelessWindowHint
+                              | Qt::WindowTransparentForInput
+                              | Qt::BypassWindowManagerHint);
+  zoneWidget->setWindowOpacity (0.2);
+  zoneWidget->setAutoFillBackground (true);
+  zoneWidget->setBackgroundRole (QPalette::Highlight);
+}
+
+TileMime::~TileMime ()
+{
+  zoneWidget->deleteLater ();
+}
+
+
+
 TiledView::TiledView (QWidget *parent) :
-  QSplitter (parent)
+  QSplitter (parent),
+  dragStartPos_ ()
 {
   setAcceptDrops (true);
   setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -42,13 +74,8 @@ void TiledView::add (QWidget &widget)
 {
   if (count () < 2)
   {
-    setOrientation (height () > width () ? Qt::Vertical : Qt::Horizontal);
-    addWidget (&widget);
-    if (count () == 2)
-    {
-      const auto size = max (height (), width ()) / 2;
-      setSizes ({size, size});
-    }
+    const auto zone = (height () > width () ? Zone::Bottom : Zone::Right);
+    insert (&widget, zone, nullptr);
   }
   else
   {
@@ -56,45 +83,35 @@ void TiledView::add (QWidget &widget)
     ASSERT (place);
     auto *parent = cast (place->parentWidget ());
     ASSERT (parent);
-    if (parent != this)
-    {
-      parent->add (widget);
-      return;
-    }
-
-    const auto placeIndex = indexOf (place);
-    ASSERT (placeIndex != -1);
-    auto *replacement = new TiledView;
-    replacement->resize (place->size ());
-    replacement->add (*place);
-    replacement->add (widget);
-    insertWidget (placeIndex, replacement);
+    const auto zone = (place->height () > place->width () ? Zone::Bottom : Zone::Right);
+    parent->insert (&widget, zone, place);
   }
 }
 
 void TiledView::remove (QWidget &widget)
 {
-  auto *parent = cast (widget.parentWidget ());
-  if (parent != this)
+  if (auto *parent = cast (widget.parentWidget ()))
   {
-    parent->remove (widget);
-    return;
+    parent->take (&widget);
   }
+}
 
-  ASSERT (!cast (&widget));
-  if (auto selfParent = cast (parentWidget ()))
+void TiledView::take (QWidget *widget)
+{
+  ASSERT (widget->parentWidget () == this);
+  ASSERT (!cast (widget));
+
+  widget->setParent (nullptr);
+
+  if (auto parent = cast (parentWidget ()))
   {
-    const auto selfIndex = selfParent->indexOf (this);
-    if (count () == 2)
+    if (count () == 1)
     {
-      const auto leftIndex = 1 - indexOf (&widget);
-      selfParent->insertWidget (selfIndex, this->widget (leftIndex));
+      const auto selfIndex = parent->indexOf (this);
+      parent->insertWidget (selfIndex, this->widget (0));
     }
+    setParent (nullptr);
     deleteLater ();
-  }
-  else
-  {
-    widget.setParent (nullptr);
   }
 }
 
@@ -108,6 +125,19 @@ QWidget * TiledView::biggest () const
   return *max_element (cbegin (items), cend (items), [](const QWidget *l, const QWidget *r) {
     return square (l->size ()) < square (r->size ());
   });
+}
+
+QWidget * TiledView::childAt (const QPoint &pos) const
+{
+  for (auto i = 0, end = count (); i < end; ++i)
+  {
+    auto w = widget (i);
+    if (w->geometry ().contains (pos))
+    {
+      return w;
+    }
+  }
+  return nullptr;
 }
 
 QList<QWidget *> TiledView::widgets () const
@@ -142,3 +172,200 @@ TiledView * TiledView::cast (QWidget *widget) const
 {
   return qobject_cast<TiledView *>(widget);
 }
+
+
+void TiledView::mousePressEvent (QMouseEvent *event)
+{
+  if (event->button () == Qt::LeftButton)
+  {
+    dragStartPos_ = event->pos ();
+  }
+}
+
+void TiledView::mouseReleaseEvent (QMouseEvent *event)
+{
+  if (event->button () == Qt::LeftButton)
+  {
+    dragStartPos_ = {};
+  }
+}
+
+void TiledView::mouseMoveEvent (QMouseEvent *event)
+{
+  if (dragStartPos_.isNull () ||
+      (event->pos () - dragStartPos_).manhattanLength () < QApplication::startDragDistance ())
+  {
+    return;
+  }
+
+  auto *item = childAt (dragStartPos_);
+  if (!item)
+  {
+    dragStartPos_ = {};
+    return;
+  }
+
+  auto *drag = new QDrag (this);
+  drag->setPixmap (item->grab ());
+
+  auto *mime = new TileMime (item);
+  drag->setMimeData (mime);
+
+  drag->exec (Qt::MoveAction);
+}
+
+void TiledView::dragEnterEvent (QDragEnterEvent *event)
+{
+  if (qobject_cast<const TileMime *>(event->mimeData ()))
+  {
+    event->acceptProposedAction ();
+  }
+}
+
+void TiledView::dragMoveEvent (QDragMoveEvent *event)
+{
+  auto *mime = qobject_cast<const TileMime *>(event->mimeData ());
+  if (!mime)
+  {
+    return;
+  }
+  ASSERT (mime->widget);
+  auto target = childAt (event->pos ());
+  if (!target || target == mime->widget)
+  {
+    mime->zoneWidget->hide ();
+    return;
+  }
+
+  const auto zone = dropZone (target->mapFromParent (event->pos ()), target->size ());
+  if (zone == Zone::None)
+  {
+    mime->zoneWidget->hide ();
+    return;
+  }
+
+  else if (zone == Zone::Center)
+  {
+    mime->zoneWidget->setGeometry ({mapToGlobal (target->pos ()), target->size ()});
+  }
+  else
+  {
+    const auto orientation = (zone == Zone::Left || zone == Zone::Right
+                              ? Qt::Horizontal : Qt::Vertical);
+    const QSize s ((orientation == Qt::Vertical) ? target->width () : target->width () / 3,
+                   (orientation == Qt::Vertical) ? target->height () / 3 : target->height ());
+    mime->zoneWidget->resize (s);
+    const auto x = (zone == Zone::Right ? s.width () * 2 : 0);
+    const auto y = (zone == Zone::Bottom ? s.height () * 2 : 0);
+    mime->zoneWidget->move (target->mapToGlobal ({x, y}));
+  }
+  mime->zoneWidget->show ();
+  event->acceptProposedAction ();
+}
+
+void TiledView::dropEvent (QDropEvent *event)
+{
+  auto *mime = qobject_cast<const TileMime *>(event->mimeData ());
+  if (!mime)
+  {
+    return;
+  }
+  mime->zoneWidget->hide ();
+  ASSERT (mime->widget);
+  auto target = childAt (event->pos ());
+  ASSERT (target);
+  if (target == mime->widget)
+  {
+    return;
+  }
+
+  const auto zone = dropZone (target->mapFromParent (event->pos ()), target->size ());
+  if (zone == Zone::None)
+  {
+    return;
+  }
+
+  if (zone == Zone::Center)
+  {
+    swap (mime->widget, target);
+  }
+  else
+  {
+    insert (mime->widget, zone, target);
+  }
+  event->acceptProposedAction ();
+  emit tileSwapped ();
+}
+
+TiledView::Zone TiledView::dropZone (const QPoint &pos, const QSize &size) const
+{
+  const auto xThreshold = size.width () / 3;
+  const auto xPart = pos.x () / xThreshold;
+  const auto yThreshold = size.height () / 3;
+  const auto yPart = pos.y () / yThreshold;
+  const array<Zone, 9> zones {{Zone::None, Zone::Top, Zone::None,
+                               Zone::Left, Zone::Center, Zone::Right,
+                               Zone::None, Zone::Bottom, Zone::None}};
+  const auto index = xPart + 3 * yPart;
+  ASSERT (index < 9);
+  return zones[index];
+}
+
+void TiledView::swap (QWidget *first, QWidget *second)
+{
+  auto firstParent = cast (first->parentWidget ());
+  ASSERT (firstParent);
+  const auto firstSizes = firstParent->sizes ();
+  const auto firstIndex = firstParent->indexOf (first);
+
+  auto secondParent = cast (second->parentWidget ());
+  ASSERT (secondParent);
+  const auto secondSizes = secondParent->sizes ();
+  const auto secondIndex = secondParent->indexOf (second);
+
+  second->resize (first->size ());
+  firstParent->insertWidget (firstIndex, second);
+  secondParent->insertWidget (secondIndex, first);
+  firstParent->setSizes (firstSizes);
+  secondParent->setSizes (secondSizes);
+}
+
+void TiledView::insert (QWidget *widget, TiledView::Zone zone, QWidget *target)
+{
+  ASSERT (widget);
+  ASSERT (zone != Zone::None);
+  ASSERT (zone != Zone::Center);
+
+  const auto newIndex = (zone == Zone::Left || zone == Zone::Top ? 0 : 1);
+  const auto orientation = (zone == Zone::Left || zone == Zone::Right
+                            ? Qt::Horizontal : Qt::Vertical);
+
+  if (widget->parentWidget () == this)
+  {
+    widget->setParent (nullptr);
+  }
+  else
+  {
+    remove (*widget);
+  }
+
+  if (count () < 2)
+  {
+    setOrientation (orientation);
+    insertWidget (newIndex, widget);
+  }
+  else
+  {
+    ASSERT (target);
+    const auto targetIndex = indexOf (target);
+    ASSERT (targetIndex != -1);
+    auto *targetReplacement = new TiledView;
+    connect (targetReplacement, &TiledView::tileSwapped, this, &TiledView::tileSwapped);
+    targetReplacement->setOrientation (orientation);
+    targetReplacement->insertWidget (newIndex, widget);
+    targetReplacement->insertWidget (1 - newIndex, target);
+    insertWidget (targetIndex, targetReplacement);
+  }
+}
+
+#include "tiledview.moc"
