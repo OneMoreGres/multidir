@@ -56,5 +56,7 @@ private:
   QWidget * biggest () const;
   QWidget * childAt (const QPoint &pos) const;
 
+  void restoreImpl (QSettings &settings, QHash<QString, QWidget *> &widgetByName);
+
   QPoint dragStartPos_;
 };

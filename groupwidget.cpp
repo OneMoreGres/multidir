@@ -92,6 +92,8 @@ void GroupWidget::restore (QSettings &settings)
   }
 
   view_->restore (settings);
+
+  updateWidgetShortcuts ();
 }
 
 void GroupWidget::setNameFilter (const QString &filter)

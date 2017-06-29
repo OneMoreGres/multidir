@@ -16,8 +16,9 @@ using namespace nonstd;
 
 namespace
 {
-const QString qs_rows = "rows";
-const QString qs_cols = "cols";
+const QString qs_state = "state";
+const QString qs_tile = "tile";
+const QString qs_name = "name";
 const QString qs_tiles = "tiles";
 
 int square (const QSize &size)
@@ -160,16 +161,6 @@ QList<QWidget *> TiledView::widgets () const
     }
   }
   return result;
-}
-
-void TiledView::save (QSettings &settings) const
-{
-
-}
-
-void TiledView::restore (QSettings &settings)
-{
-
 }
 
 TiledView * TiledView::cast (QWidget *widget) const
@@ -368,6 +359,78 @@ void TiledView::insert (QWidget *widget, TiledView::Zone zone, QWidget *target)
     targetReplacement->insertWidget (newIndex, widget);
     targetReplacement->insertWidget (1 - newIndex, target);
     insertWidget (targetIndex, targetReplacement);
+  }
+}
+
+void TiledView::save (QSettings &settings) const
+{
+  settings.setValue (qs_state, saveState ());
+  settings.beginWriteArray (qs_tiles, count ());
+  for (auto i = 0, end = count (); i < end; ++i)
+  {
+    settings.setArrayIndex (i);
+    auto w = widget (i);
+    if (auto tile = cast (w))
+    {
+      settings.setValue (qs_name, "");
+      tile->save (settings);
+    }
+    else
+    {
+      settings.setValue (qs_name, w->objectName ());
+    }
+  }
+  settings.endArray ();
+}
+
+void TiledView::restore (QSettings &settings)
+{
+  QHash<QString, QWidget *> widgetByName;
+  for (auto *i: widgets ())
+  {
+    ASSERT (!i->objectName ().isEmpty ());
+    ASSERT (!widgetByName.contains (i->objectName ()));
+    widgetByName.insert (i->objectName (), i);
+    i->setParent (nullptr);
+  }
+
+  for (auto *i: findChildren<TiledView *>())
+  {
+    i->setParent (nullptr);
+    i->deleteLater ();
+  }
+
+  restoreImpl (settings, widgetByName);
+
+  for (auto *i: widgetByName)
+  {
+    add (*i);
+  }
+}
+
+void TiledView::restoreImpl (QSettings &settings, QHash<QString, QWidget *> &widgetByName)
+{
+  auto count = settings.beginReadArray (qs_tiles);
+  for (auto i = 0; i < count && i < 2; ++i)
+  {
+    settings.setArrayIndex (i);
+    const auto name = settings.value (qs_name).toString ();
+    if (name.isEmpty ())
+    {
+      auto tile = new TiledView (this);
+      connect (tile, &TiledView::tileSwapped, this, &TiledView::tileSwapped);
+      tile->restoreImpl (settings, widgetByName);
+    }
+    else if (auto *w = widgetByName.take (name))
+    {
+      add (*w);
+    }
+  }
+  settings.endArray ();
+
+  if (settings.contains (qs_state))
+  {
+    restoreState (settings.value (qs_state).toByteArray ());
   }
 }
 
