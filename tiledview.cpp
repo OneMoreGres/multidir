@@ -299,9 +299,9 @@ void TiledView::dropEvent (QDropEvent *event)
 
 TiledView::Zone TiledView::dropZone (const QPoint &pos, const QSize &size) const
 {
-  const auto xThreshold = size.width () / 3;
+  const auto xThreshold = size.width () / 3 + 1; // +1 for boundary case
   const auto xPart = pos.x () / xThreshold;
-  const auto yThreshold = size.height () / 3;
+  const auto yThreshold = size.height () / 3 + 1;
   const auto yPart = pos.y () / yThreshold;
   const array<Zone, 9> zones {{Zone::None, Zone::Top, Zone::None,
                                Zone::Left, Zone::Center, Zone::Right,
