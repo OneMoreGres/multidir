@@ -56,6 +56,14 @@ void DirView::activate ()
   view ()->setFocus ();
 }
 
+void DirView::adjustItems ()
+{
+  if (table_)
+  {
+    table_->resizeColumnsToContents ();
+  }
+}
+
 QModelIndex DirView::currentIndex () const
 {
   return view ()->currentIndex ();

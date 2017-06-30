@@ -127,6 +127,7 @@ DirWidget * GroupWidget::addWidget ()
 
   w->setPath (QDir::homePath ());
   view_->add (*w);
+  w->adjustItems ();
 
   action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
   addAction (action);

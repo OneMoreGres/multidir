@@ -21,6 +21,7 @@ public:
   void restore (QSettings &settings);
 
   void activate ();
+  void adjustItems ();
 
   QModelIndex currentIndex () const;
   void setCurrentIndex (const QModelIndex &index);

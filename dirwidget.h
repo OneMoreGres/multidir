@@ -36,6 +36,7 @@ public:
   bool eventFilter (QObject *watched, QEvent *event) override;
 
   void activate ();
+  void adjustItems ();
 
 signals:
   void closeRequested (DirWidget *widget);

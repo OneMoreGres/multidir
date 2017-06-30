@@ -476,6 +476,11 @@ void DirWidget::activate ()
   view_->activate ();
 }
 
+void DirWidget::adjustItems ()
+{
+  view_->adjustItems ();
+}
+
 void DirWidget::togglePathEdition (bool isOn)
 {
   pathEdit_->setVisible (isOn);
