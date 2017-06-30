@@ -17,7 +17,7 @@ public:
     : major_ (0), minor_ (0), patch_ (0)
   {
     auto parts = version.split ('.');
-    if (parts.size () != 3)
+    if (parts.size () < 3)
     {
       return;
     }
