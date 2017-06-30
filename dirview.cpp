@@ -2,6 +2,7 @@
 #include "filesystemmodel.h"
 #include "constants.h"
 #include "filedelegate.h"
+#include "debug.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -77,7 +78,10 @@ void DirView::setRootIndex (const QModelIndex &index)
 
 QModelIndexList DirView::selectedRows () const
 {
-  auto items = view ()->selectionModel ()->selectedRows (FileSystemModel::Column::Name);
+  auto selection = view ()->selectionModel ();
+  auto items = (table_
+                ? selection->selectedRows (FileSystemModel::Column::Name)
+                : selection->selectedIndexes ());
   for (const auto &i: items)
   {
     if (i.data () == constants::dotdot)
