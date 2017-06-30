@@ -1,7 +1,9 @@
 #include "utils.h"
+#include "debug.h"
 
 #include <QDir>
 #include <QObject>
+#include <QUrl>
 
 namespace
 {
@@ -71,6 +73,17 @@ QString uniqueChars (const QString &source)
     }
   }
   return result;
+}
+
+QList<QUrl> toUrls (const Infos &infos)
+{
+  QList<QUrl> urls;
+  urls.reserve (infos.size ());
+  for (const auto &i: infos)
+  {
+    urls << QUrl::fromLocalFile (i.absoluteFilePath ());
+  }
+  return urls;
 }
 
 }

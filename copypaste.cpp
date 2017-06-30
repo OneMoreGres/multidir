@@ -1,4 +1,6 @@
 #include "copypaste.h"
+#include "utils.h"
+#include "debug.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -39,23 +41,12 @@ QStringList names (const QList<QUrl> &urls)
   return result;
 }
 
-QList<QUrl> toUrls (const QList<QFileInfo> &infos)
-{
-  QList<QUrl> urls;
-  urls.reserve (infos.size ());
-  for (const auto &i: infos)
-  {
-    urls << QUrl::fromLocalFile (i.absoluteFilePath ());
-  }
-  return urls;
-}
-
 }
 
 void CopyPaste::copy (const QList<QFileInfo> &sources)
 {
   auto mime = new QMimeData;
-  const auto urls = toUrls (sources);
+  const auto urls = utils::toUrls (sources);
   mime->setUrls (urls);
 #ifdef Q_OS_LINUX
   mime->setData (gnomeCut, gnomeCopyValue + names (urls).join ("\n").toUtf8 ());
@@ -66,7 +57,7 @@ void CopyPaste::copy (const QList<QFileInfo> &sources)
 void CopyPaste::cut (const QList<QFileInfo> &sources)
 {
   auto mime = new QMimeData;
-  const auto urls = toUrls (sources);
+  const auto urls = utils::toUrls (sources);
   mime->setUrls (urls);
 #ifdef Q_OS_LINUX
   mime->setData (kdeCut, kdeCutValue);
