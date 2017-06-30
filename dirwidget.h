@@ -29,6 +29,9 @@ public:
   void setPath (const QFileInfo &path);
   QFileInfo path () const;
 
+  void setSiblings (const QList<DirWidget *> siblings);
+
+  QString index () const;
   void setIndex (const QString &index);
 
   void setNameFilter (const QString &filter);
@@ -55,7 +58,7 @@ private:
   void newFolder ();
   QAction * makeShortcut (int shortcutType, QMenu *menu, bool isCheckable = false);
 
-  QString fittedPath () const;
+  QString fittedPath (int maxWidth) const;
   QList<QFileInfo> selected () const;
   QFileInfo current () const;
   QFileInfo fileInfo (const QModelIndex &index) const;
@@ -73,6 +76,7 @@ private:
   void copyPath ();
 
   void showViewContextMenu ();
+  void updateSiblingActions ();
 
   bool isLocked () const;
   void setLocked (bool isLocked);
@@ -80,6 +84,7 @@ private:
   void setShowDirs (bool on);
 
   void updateActions ();
+  void updatePathLabel ();
   void checkDirExistence ();
   void handleDirRename (const QString &path, const QString &old, const QString &now);
 
@@ -113,8 +118,13 @@ private:
   QAction *copyAction_;
   QAction *pasteAction_;
   QAction *copyPathAction_;
+  QMenu *copyToMenu_;
+  QMenu *moveToMenu_;
+  QMenu *linkToMenu_;
 
   QAction *upAction_;
   QAction *newFolderAction_;
   QBoxLayout *controlsLayout_;
 };
+
+Q_DECLARE_METATYPE (DirWidget *)

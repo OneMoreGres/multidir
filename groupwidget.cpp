@@ -156,6 +156,7 @@ void GroupWidget::updateWidgetShortcuts ()
   const auto count = ids_.length ();
   const auto order = view_->widgets ();
   const auto commonPart = ShortcutManager::get (ShortcutManager::SwitchTab).toString ();
+  QMap<int, DirWidget *> siblings;
   for (auto &i: widgets_)
   {
     const auto index = order.indexOf (i.widget);
@@ -163,12 +164,17 @@ void GroupWidget::updateWidgetShortcuts ()
     i.widget->setIndex (key);
     if (!key.isNull () && !commonPart.isEmpty ())
     {
+      siblings[index] = i.widget;
       i.action->setShortcut (QString ("%1,%2").arg (commonPart).arg (ids_.at (index)));
     }
     else
     {
       i.action->setShortcut ({});
     }
+  }
+  for (auto &i: widgets_)
+  {
+    i.widget->setSiblings (siblings.values ());
   }
 }
 

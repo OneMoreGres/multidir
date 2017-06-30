@@ -8,6 +8,7 @@
 #include "openwith.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
+#include "utils.h"
 #include "debug.h"
 
 #include <QBoxLayout>
@@ -65,6 +66,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
   copyPathAction_ (nullptr),
+  copyToMenu_ (nullptr),
+  moveToMenu_ (nullptr),
+  linkToMenu_ (nullptr),
   upAction_ (nullptr),
   newFolderAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
@@ -118,6 +122,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::promptClose);
 
   // view menu
+  connect (viewMenu_, &QMenu::aboutToShow,
+           this, &DirWidget::updateSiblingActions);
   openAction_ = makeShortcut (ShortcutManager::OpenItem, viewMenu_);
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
@@ -157,6 +163,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   copyPathAction_ = makeShortcut (ShortcutManager::CopyPath, viewMenu_);
   connect (copyPathAction_, &QAction::triggered,
            this, &DirWidget::copyPath);
+
+  copyToMenu_ = viewMenu_->addMenu (tr ("Copy to..."));
+  moveToMenu_ = viewMenu_->addMenu (tr ("Move to..."));
+  linkToMenu_ = viewMenu_->addMenu (tr ("Link to..."));
 
   viewMenu_->addSeparator ();
 
@@ -295,6 +305,70 @@ QFileInfo DirWidget::path () const
   return path_;
 }
 
+void DirWidget::setSiblings (const QList<DirWidget *> siblings)
+{
+  using SM = ShortcutManager;
+  auto handle = [this, siblings](SM::Shortcut s, QMenu *menu, Qt::DropAction drop) {
+                  for (auto *i: menu->actions ())
+                  {
+                    removeAction (i);
+                  }
+                  menu->clear ();
+
+                  const auto common = SM::get (s).toString ();
+                  for (auto *i: siblings)
+                  {
+                    auto action = menu->addAction (i->indexLabel_->text ());
+                    action->setData (QVariant::fromValue (i));
+                    if (!common.isEmpty ())
+                    {
+                      action->setShortcut ({common + ',' + i->index ()});
+                      action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+                      addAction (action);
+                    }
+                    connect (action, &QAction::triggered, this, [this, i, drop] {
+        using utils::toUrls;
+        emit fileOperation (FileOperation::paste (toUrls (selected ()), i->path (), drop));
+      });
+                  }
+                };
+
+  handle (SM::CopyTo, copyToMenu_, Qt::CopyAction);
+  handle (SM::MoveTo, moveToMenu_, Qt::MoveAction);
+  handle (SM::LinkTo, linkToMenu_, Qt::LinkAction);
+
+  updateSiblingActions ();
+}
+
+void DirWidget::updateSiblingActions ()
+{
+  auto handle = [this](QMenu *menu) {
+                  for (auto *i: menu->actions ())
+                  {
+                    auto *w = i->data ().value<DirWidget *>();
+                    ASSERT (w);
+                    const auto maxWidth = 100;
+                    const auto text = w->indexLabel_->text () + ' ' +
+                                      w->fittedPath (maxWidth) + w->dirLabel_->text ();
+                    i->setText (text);
+                  }
+                };
+
+  handle (copyToMenu_);
+  handle (moveToMenu_);
+  handle (linkToMenu_);
+}
+
+QString DirWidget::index () const
+{
+  auto index = indexLabel_->text ();
+  if (!index.isEmpty ())
+  {
+    index = index.mid (1,index.length () - 2);
+  }
+  return index;
+}
+
 void DirWidget::setIndex (const QString &index)
 {
   if (!index.isEmpty ())
@@ -365,14 +439,15 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
 
-    pathLabel_->setText (fittedPath ());
     const auto absolutePath = info.absoluteFilePath ();
     auto nameIndex = absolutePath.lastIndexOf (QLatin1Char ('/')) + 1;
     dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
+
+    updatePathLabel ();
   }
 }
 
-QString DirWidget::fittedPath () const
+QString DirWidget::fittedPath (int maxWidth) const
 {
   auto path = this->path ().absoluteFilePath ();
   const auto nameIndex = path.lastIndexOf (QLatin1Char ('/')) + 1;
@@ -381,8 +456,6 @@ QString DirWidget::fittedPath () const
     return {};
   }
 
-  const auto stretchWidth = controlsLayout_->itemAt (1)->geometry ().width ();
-  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
   const QString prepend = QLatin1String (".../");
   const auto searchStartIndex = prepend.length ();
 
@@ -437,11 +510,7 @@ QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu,bool isCheckabl
 
 void DirWidget::resizeEvent (QResizeEvent *)
 {
-  const auto newText = fittedPath ();
-  if (newText != pathLabel_->text ())
-  {
-    pathLabel_->setText (newText);
-  }
+  updatePathLabel ();
 }
 
 bool DirWidget::eventFilter (QObject *watched, QEvent *event)
@@ -690,6 +759,17 @@ void DirWidget::updateActions ()
 
   pasteAction_->setEnabled (!lock);
   cutAction_->setEnabled (!lock);
+}
+
+void DirWidget::updatePathLabel ()
+{
+  const auto stretchWidth = controlsLayout_->itemAt (1)->geometry ().width ();
+  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
+  const auto newPath = fittedPath (maxWidth);
+  if (newPath != pathLabel_->text ())
+  {
+    pathLabel_->setText (newPath);
+  }
 }
 
 void DirWidget::checkDirExistence ()

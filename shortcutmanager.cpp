@@ -110,6 +110,12 @@ void ShortcutManager::setDefaults ()
                            QIcon (":/remove.png"), c};
   shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy path to clipboard"),
                              {}, c};
+  shortcuts[SM::CopyTo] = {{QS ("F5")}, QObject::tr ("Copy to (plus ID)"),
+                           {}, c};
+  shortcuts[SM::MoveTo] = {{QS ("F6")}, QObject::tr ("Move to (plus ID)"),
+                           {}, c};
+  shortcuts[SM::LinkTo] = {{}, QObject::tr ("Link to (plus ID)"),
+                           {}, c};
 }
 
 void ShortcutManager::save (QSettings &settings)
