@@ -628,18 +628,14 @@ void DirWidget::copy ()
 
 void DirWidget::paste ()
 {
-  auto index = view_->currentIndex ();
-  if (!index.isValid ())
+  auto target = current ();
+  if (!target.exists () || !target.isDir ())
   {
-    index = view_->rootIndex ();
+    target = path ();
   }
   const auto urls = CopyPaste::clipboardUrls ();
-  if (!index.isValid () || urls.isEmpty ())
-  {
-    return;
-  }
   const auto action = CopyPaste::clipboardAction ();
-  emit fileOperation (FileOperation::paste (urls, fileInfo (index), action));
+  emit fileOperation (FileOperation::paste (urls, target, action));
 }
 
 void DirWidget::copyPath ()
