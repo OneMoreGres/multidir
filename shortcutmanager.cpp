@@ -106,7 +106,7 @@ void ShortcutManager::setDefaults ()
                                  {}, c};
   shortcuts[SM::Trash] = {{QS ("Del")}, QObject::tr ("Move to trash..."),
                           QIcon (":/trash.png"), c};
-  shortcuts[SM::Remove] = {{QS ("Shift+Del")}, QObject::tr ("Remove..."),
+  shortcuts[SM::Remove] = {{QS ("F8")}, QObject::tr ("Remove..."),
                            QIcon (":/remove.png"), c};
   shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy path to clipboard"),
                              {}, c};
