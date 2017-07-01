@@ -215,13 +215,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
 
-  upAction_ = makeShortcut (ShortcutManager::MoveUp, representMenu, true);
+  upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr, true);
   connect (upAction_, &QAction::triggered,
            this, [this] {openPath (view_->rootIndex ().parent ());});
   auto up = new QToolButton (this);
   up->setDefaultAction (upAction_);
 
-  newFolderAction_ = makeShortcut (ShortcutManager::CreateFolder, representMenu);
+  newFolderAction_ = makeShortcut (ShortcutManager::CreateFolder, nullptr);
   connect (newFolderAction_, &QAction::triggered,
            this, &DirWidget::newFolder);
   auto newFolder = new QToolButton (this);
