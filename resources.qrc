@@ -22,5 +22,15 @@
         <file alias="hidden.png">icons/view.png</file>
         <file alias="abort.png">icons/multiply-1.png</file>
         <file alias="view.png">icons/television.png</file>
+        <file alias="debug.png">icons/help.png</file>
+        <file alias="about.png">icons/info.png</file>
+        <file alias="minus.png">icons/minus.png</file>
+        <file alias="editor.png">icons/notepad-2.png</file>
+        <file alias="linkTo.png">icons/send-2.png</file>
+        <file alias="moveTo.png">icons/send-3.png</file>
+        <file alias="copyTo.png">icons/send.png</file>
+        <file alias="console.png">icons/command.png</file>
+        <file alias="path.png">icons/placeholder.png</file>
+        <file alias="open.png">icons/magic-wand.png</file>
     </qresource>
 </RCC>

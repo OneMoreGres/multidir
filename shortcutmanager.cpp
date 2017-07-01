@@ -41,17 +41,17 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::Quit] = {{}, QObject::tr ("Quit"),
                          QIcon (":/quit.png"), c};
   shortcuts[SM::Debug] = {{}, QObject::tr ("Debug mode"),
-                          {}, c};
+                          QIcon (":/debug.png"), c};
   shortcuts[SM::About] = {{}, QObject::tr ("About"),
-                          QIcon::fromTheme ("about"), c};
+                          QIcon (":/about.png"), c};
 
   c = SM::Group;
   shortcuts[SM::AddGroup] = {{QS ("Ctrl+G,A")}, QObject::tr ("Add"),
-                             {}, c};
+                             QIcon (":/add.png"), c};
   shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename.."),
-                                {}, c};
+                                QIcon (":/rename.png"), c};
   shortcuts[SM::RemoveGroup] = {{QS ("Ctrl+G,D")}, QObject::tr ("Delete..."),
-                                {}, c};
+                                QIcon (":/minus.png"), c};
   shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch (plus ID)"),
                                 {}, c};
 
@@ -61,7 +61,7 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::OpenInExplorer] = {{QS ("Alt+E")}, QObject::tr ("Open in explorer"),
                                    QIcon (":/openExternal.png"), c};
   shortcuts[SM::OpenConsole] = {{QS ("Alt+C")}, QObject::tr ("Open in console"),
-                                {}, c};
+                                QIcon (":/console.png"), c};
   shortcuts[SM::ChangePath] = {{QS ("Alt+D")}, QObject::tr ("Edit path"),
                                QIcon (":/rename.png"), c};
   shortcuts[SM::LockTab] = {{QS ("Ctrl+L")}, QObject::tr ("Lock"),
@@ -91,7 +91,7 @@ void ShortcutManager::setDefaults ()
 
   c = SM::Item;
   shortcuts[SM::OpenItem] = {{}, QObject::tr ("Open"),
-                             {}, c};
+                             QIcon (":/open.png"), c};
   shortcuts[SM::Copy] = {{QS ("Ctrl+C")}, QObject::tr ("Copy"),
                          QIcon::fromTheme ("copy"), c};
   shortcuts[SM::Paste] = {{QS ("Ctrl+V")}, QObject::tr ("Paste"),
@@ -103,19 +103,19 @@ void ShortcutManager::setDefaults ()
   shortcuts[SM::OpenInTab] = {{QS ("Alt+Return")}, QObject::tr ("Open in tab"),
                               {}, c};
   shortcuts[SM::OpenInEditor] = {{QS ("F4")}, QObject::tr ("Open in editor"),
-                                 {}, c};
+                                 QIcon (":/editor.png"), c};
   shortcuts[SM::Trash] = {{QS ("Del")}, QObject::tr ("Move to trash..."),
                           QIcon (":/trash.png"), c};
   shortcuts[SM::Remove] = {{QS ("F8")}, QObject::tr ("Remove..."),
                            QIcon (":/remove.png"), c};
-  shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy path to clipboard"),
-                             {}, c};
+  shortcuts[SM::CopyPath] = {{QS ("Alt+P,C")}, QObject::tr ("Copy path"),
+                             QIcon (":/path.png"), c};
   shortcuts[SM::CopyTo] = {{QS ("F5")}, QObject::tr ("Copy to (plus ID)"),
-                           {}, c};
+                           QIcon (":/copyTo.png"), c};
   shortcuts[SM::MoveTo] = {{QS ("F6")}, QObject::tr ("Move to (plus ID)"),
-                           {}, c};
+                           QIcon (":/moveTo.png"), c};
   shortcuts[SM::LinkTo] = {{}, QObject::tr ("Link to (plus ID)"),
-                           {}, c};
+                           QIcon (":/linkTo.png"), c};
 }
 
 void ShortcutManager::save (QSettings &settings)
@@ -174,6 +174,12 @@ QString ShortcutManager::name (ShortcutManager::Shortcut type)
 {
   ASSERT (type >= 0 && type < SM::ShortcutCount);
   return shortcuts[type].name;
+}
+
+QIcon ShortcutManager::icon (ShortcutManager::Shortcut type)
+{
+  ASSERT (type >= 0 && type < SM::ShortcutCount);
+  return shortcuts[type].icon;
 }
 
 QString ShortcutManager::contextName (ShortcutManager::Shortcut type)

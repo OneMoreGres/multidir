@@ -36,6 +36,7 @@ public:
   static QKeySequence get (Shortcut type);
   static void set (Shortcut type, QKeySequence key);
   static QString name (Shortcut type);
+  static QIcon icon (Shortcut type);
 
   static QString contextName (Shortcut type);
 };

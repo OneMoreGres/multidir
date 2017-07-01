@@ -165,8 +165,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::copyPath);
 
   copyToMenu_ = viewMenu_->addMenu (tr ("Copy to..."));
+  copyToMenu_->setIcon (ShortcutManager::icon (ShortcutManager::CopyTo));
+
   moveToMenu_ = viewMenu_->addMenu (tr ("Move to..."));
+  moveToMenu_->setIcon (ShortcutManager::icon (ShortcutManager::MoveTo));
+
   linkToMenu_ = viewMenu_->addMenu (tr ("Link to..."));
+  linkToMenu_->setIcon (ShortcutManager::icon (ShortcutManager::LinkTo));
 
   viewMenu_->addSeparator ();
 
