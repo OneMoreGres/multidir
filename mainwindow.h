@@ -51,4 +51,5 @@ private:
   QString consoleCommand_;
   QString editorCommand_;
   bool checkUpdates_;
+  bool startInBackground_;
 };

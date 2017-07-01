@@ -54,6 +54,5 @@ int main (int argc, char *argv[])
   OpenWith::init ();
 
   MainWindow window;
-  window.show ();
   return a.exec ();
 }

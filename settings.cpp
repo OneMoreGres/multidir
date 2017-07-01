@@ -55,6 +55,7 @@ Settings::Settings (QWidget *parent) :
   console_ (new QLineEdit (this)),
   editor_ (new QLineEdit (this)),
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
+  startInBackground_ (new QCheckBox (tr ("Start in background"), this)),
   imageCache_ (new QSpinBox (this)),
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
@@ -85,6 +86,7 @@ Settings::Settings (QWidget *parent) :
 
     ++row;
     layout->addWidget (checkUpdates_, row, 0);
+    layout->addWidget (startInBackground_, row, 1);
 
     ++row;
     layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
@@ -153,6 +155,16 @@ bool Settings::checkUpdates () const
 void Settings::setCheckUpdates (bool isOn)
 {
   checkUpdates_->setChecked (isOn);
+}
+
+bool Settings::startInBackground () const
+{
+  return startInBackground_->isChecked ();
+}
+
+void Settings::setStartInBackground (bool isOn)
+{
+  startInBackground_->setChecked (isOn);
 }
 
 int Settings::imageCacheSizeKb () const

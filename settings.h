@@ -21,6 +21,9 @@ public:
   bool checkUpdates () const;
   void setCheckUpdates (bool isOn);
 
+  bool startInBackground () const;
+  void setStartInBackground (bool isOn);
+
   int imageCacheSizeKb () const;
   void setImageCacheSize (int sizeKb);
 
@@ -41,6 +44,7 @@ private:
   QLineEdit *console_;
   QLineEdit *editor_;
   QCheckBox *checkUpdates_;
+  QCheckBox *startInBackground_;
   QSpinBox *imageCache_;
   QTableWidget *shortcuts_;
   QLineEdit *groupShortcuts_;

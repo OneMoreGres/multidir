@@ -33,6 +33,7 @@ const QString qs_geometry = "geometry";
 const QString qs_console = "console";
 const QString qs_editor = "editor";
 const QString qs_updates = "checkUpdates";
+const QString qs_background = "startBackground";
 const QString qs_imageCacheSize = "imageCacheSize";
 }
 
@@ -48,7 +49,8 @@ MainWindow::MainWindow (QWidget *parent) :
   toggleAction_ (nullptr),
   consoleCommand_ (),
   editorCommand_ (),
-  checkUpdates_ (false)
+  checkUpdates_ (false),
+  startInBackground_ (false)
 {
   setWindowIcon (QIcon (":/app.png"));
 
@@ -164,6 +166,11 @@ MainWindow::MainWindow (QWidget *parent) :
 
   QSettings qsettings;
   restore (qsettings);
+
+  if (!startInBackground_)
+  {
+    show ();
+  }
 }
 
 MainWindow::~MainWindow ()
@@ -189,6 +196,7 @@ void MainWindow::save (QSettings &settings) const
   settings.setValue (qs_console, consoleCommand_);
   settings.setValue (qs_editor, editorCommand_);
   settings.setValue (qs_updates, checkUpdates_);
+  settings.setValue (qs_background, startInBackground_);
   settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
 
   groupControl_->save (settings);
@@ -217,6 +225,7 @@ void MainWindow::restore (QSettings &settings)
   editorCommand_ = settings.value (qs_editor, editor).toString ();
 
   setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
+  startInBackground_ = settings.value (qs_background, false).toBool ();
 
   auto cacheSize = settings.value (qs_imageCacheSize, QPixmapCache::cacheLimit ()).toInt ();
   QPixmapCache::setCacheLimit (std::max (1, cacheSize));
@@ -258,6 +267,7 @@ void MainWindow::editSettings ()
   Settings settings;
   settings.setConsole (consoleCommand_);
   settings.setCheckUpdates (checkUpdates_);
+  settings.setStartInBackground (startInBackground_);
   settings.setEditor (editorCommand_);
   settings.setImageCacheSize (QPixmapCache::cacheLimit ());
   settings.setGroupShortcuts (groupControl_->ids ());
@@ -270,6 +280,7 @@ void MainWindow::editSettings ()
     consoleCommand_ = settings.console ();
     editorCommand_ = settings.editor ();
     setCheckUpdates (settings.checkUpdates ());
+    startInBackground_ = settings.startInBackground ();
     QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
     groupControl_->setIds (settings.groupShortcuts ());
     groups_->setWidgetIds (settings.tabShortcuts ());
