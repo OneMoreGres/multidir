@@ -194,6 +194,7 @@ void DirView::initList ()
   list_->setViewMode (QListView::IconMode);
   list_->setMovement (QListView::Snap);
   list_->setUniformItemSizes (true);
+  list_->setSelectionMode (QListView::ExtendedSelection);
 
   list_->setDragDropOverwriteMode (false);
   list_->setDefaultDropAction (Qt::MoveAction);
