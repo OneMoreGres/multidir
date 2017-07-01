@@ -274,6 +274,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::openPath);
   connect (view_, &DirView::movedBackward,
            upAction_, &QAction::trigger);
+
+  installEventFilter (this);
 }
 
 DirWidget::~DirWidget ()
@@ -520,6 +522,20 @@ void DirWidget::resizeEvent (QResizeEvent *)
 
 bool DirWidget::eventFilter (QObject *watched, QEvent *event)
 {
+  if (watched == this && event->type () == QEvent::MouseButtonPress)
+  {
+    auto casted = static_cast<QMouseEvent *>(event);
+    if (casted->button () == Qt::LeftButton)
+    {
+      activate ();
+    }
+    else if (casted->button () == Qt::MiddleButton)
+    {
+      emit cloneRequested (this);
+    }
+    return true;
+  }
+
   if (isLocked ())
   {
     return false;
