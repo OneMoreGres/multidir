@@ -35,6 +35,7 @@ const QString qs_isLocked = "locked";
 const QString qs_showDirs = "showDirs";
 const QString qs_showHidden = "showHidden";
 const QString qs_showThumbs = "showThumbs";
+const QString qs_minSize = "minSize";
 }
 
 DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
@@ -54,6 +55,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   extensiveAction_ (nullptr),
   listMode_ (nullptr),
   showThumbs_ (nullptr),
+  isMinSizeFixed_ (nullptr),
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   openWith_ (nullptr),
@@ -220,6 +222,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (showThumbs_, &QAction::toggled,
            proxy_, &ProxyModel::setShowThumbnails);
 
+  isMinSizeFixed_ = makeShortcut (ShortcutManager::FixMinSize, representMenu, true);
+  connect (isMinSizeFixed_, &QAction::toggled,
+           this, &DirWidget::fixMinSize);
+
   upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr, true);
   connect (upAction_, &QAction::triggered,
            this, [this] {openPath (view_->rootIndex ().parent ());});
@@ -294,6 +300,7 @@ void DirWidget::save (QSettings &settings) const
   settings.setValue (qs_showDirs, proxy_->showDirs ());
   settings.setValue (qs_showHidden, proxy_->showHidden ());
   settings.setValue (qs_showThumbs, showThumbs_->isChecked ());
+  settings.setValue (qs_minSize, isMinSizeFixed () ? minimumSize () : QSize ());
   view_->save (settings);
 }
 
@@ -306,6 +313,12 @@ void DirWidget::restore (QSettings &settings)
   showDirs_->setChecked (settings.value (qs_showDirs, true).toBool ());
   showHidden_->setChecked (settings.value (qs_showHidden, false).toBool ());
   showThumbs_->setChecked (settings.value (qs_showThumbs, false).toBool ());
+  const auto fixedSize = settings.value (qs_minSize).toSize ();
+  if (!fixedSize.isEmpty ())
+  {
+    resize (fixedSize);
+    isMinSizeFixed_->setChecked (true);
+  }
   view_->restore (settings);
 }
 
@@ -750,6 +763,23 @@ void DirWidget::openInBackground (const QModelIndex &index)
   else
   {
     openPath (index);
+  }
+}
+
+bool DirWidget::isMinSizeFixed () const
+{
+  return isMinSizeFixed_->isChecked ();
+}
+
+void DirWidget::fixMinSize (bool isOn)
+{
+  if (isOn)
+  {
+    setMinimumSize (size ());
+  }
+  else
+  {
+    setMinimumSize ({});
   }
 }
 

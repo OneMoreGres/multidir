@@ -80,6 +80,8 @@ void ShortcutManager::setDefaults ()
                              QIcon (":/listMode.png"), c};
   shortcuts[SM::ShowThumbnails] = {{QS ("Alt+V,I")}, QObject::tr ("Show thumbnails"),
                                    QIcon (":/showThumbs.png"), c};
+  shortcuts[SM::FixMinSize] = {{QS ("Alt+V,F")}, QObject::tr ("Fix min size"),
+                               QIcon (":/fixSize.png"), c};
   shortcuts[SM::CreateFolder] = {{QS ("F7")}, QObject::tr ("Create folder"),
                                  QIcon (":/newFolder.png"), c};
   shortcuts[SM::NextTab] = {{QS ("Tab")}, QObject::tr ("Switch to next"),

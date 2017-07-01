@@ -76,6 +76,9 @@ private:
   void copyPath ();
   void openInBackground (const QModelIndex &index);
 
+  bool isMinSizeFixed () const;
+  void fixMinSize (bool isOn);
+
   void showViewContextMenu ();
   void updateSiblingActions ();
 
@@ -106,6 +109,7 @@ private:
   QAction *extensiveAction_;
   QAction *listMode_;
   QAction *showThumbs_;
+  QAction *isMinSizeFixed_;
 
   QMenu *viewMenu_;
   QAction *openAction_;
