@@ -74,6 +74,7 @@ private:
   void copy ();
   void paste ();
   void copyPath ();
+  void openInBackground (const QModelIndex &index);
 
   void showViewContextMenu ();
   void updateSiblingActions ();

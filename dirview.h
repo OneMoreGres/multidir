@@ -47,6 +47,7 @@ public:
 signals:
   void movedBackward ();
   void activated (const QModelIndex &index);
+  void backgroundActivated (const QModelIndex &index);
   void contextMenuRequested ();
 
 private:

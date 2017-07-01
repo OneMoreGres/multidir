@@ -180,6 +180,7 @@ void DirView::initTable ()
            this, &DirView::showHeaderContextMenu);
 
   table_->installEventFilter (this);
+  table_->viewport ()->installEventFilter (this);
 
   layout ()->addWidget (table_);
 }
@@ -205,6 +206,7 @@ void DirView::initList ()
            this, &DirView::contextMenuRequested);
 
   list_->installEventFilter (this);
+  list_->viewport ()->installEventFilter (this);
 
   layout ()->addWidget (list_);
 }
@@ -273,7 +275,16 @@ QAbstractItemView * DirView::view () const
 
 bool DirView::eventFilter (QObject *watched, QEvent *event)
 {
-  if (event->type () == QEvent::KeyPress)
+  if (event->type () == QEvent::MouseButtonRelease)
+  {
+    auto casted = static_cast<QMouseEvent *>(event);
+    if (casted->button () == Qt::MiddleButton && casted->buttons () == Qt::NoButton)
+    {
+      emit backgroundActivated (currentIndex ());
+      return true;
+    }
+  }
+  else if (event->type () == QEvent::KeyPress)
   {
     auto casted = static_cast<QKeyEvent *>(event);
     if (casted->key () == Qt::Key_Backspace ||

@@ -274,6 +274,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::openPath);
   connect (view_, &DirView::movedBackward,
            upAction_, &QAction::trigger);
+  connect (view_, &DirView::backgroundActivated,
+           this, &DirWidget::openInBackground);
 
   installEventFilter (this);
 }
@@ -732,6 +734,23 @@ void DirWidget::copyPath ()
 {
   const auto info = fileInfo (view_->currentIndex ());
   QApplication::clipboard ()->setText (info.absoluteFilePath ());
+}
+
+void DirWidget::openInBackground (const QModelIndex &index)
+{
+  const auto info = fileInfo (index);
+  if (!info.exists ())
+  {
+    return;
+  }
+  if (info.isDir ())
+  {
+    emit newTabRequested (info);
+  }
+  else
+  {
+    openPath (index);
+  }
 }
 
 void DirWidget::showViewContextMenu ()
