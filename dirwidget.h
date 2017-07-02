@@ -82,6 +82,9 @@ private:
   void showViewContextMenu ();
   void updateSiblingActions ();
 
+  void showCommandPrompt ();
+  void execCommandPrompt ();
+
   bool isLocked () const;
   void setLocked (bool isLocked);
 
@@ -101,6 +104,7 @@ private:
   QLabel *pathLabel_;
   QLabel *dirLabel_;
   QLineEdit *pathEdit_;
+  QLineEdit *commandPrompt_;
 
   QMenu *menu_;
   QAction *isLocked_;

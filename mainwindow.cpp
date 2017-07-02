@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
+#include "utils.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -294,26 +295,8 @@ void MainWindow::openConsole (const QString &path)
   {
     auto command = consoleCommand_ + ' ';
     command.replace ("%d", path);
-    QStringList parts;
-    QChar separator;
-    auto startIndex = -1;
-    for (auto i = 0, end = command.size (); i < end; ++i)
-    {
-      if (separator.isNull ())
-      {
-        separator = (command[i] == '"' ? '"' : ' ');
-        startIndex = i + int (separator == '"');
-      }
-      else
-      {
-        if (command[i] == separator)
-        {
-          parts << command.mid (startIndex, i - startIndex);
-          separator = QChar ();
-        }
-      }
-    }
-    if (!QProcess::startDetached (parts[0], parts.mid (1), path))
+    const auto parts = utils::parseShellCommand (command);
+    if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
     {
       Notifier::error (tr ("Failed to open console '%1' in '%2'")
                        .arg (consoleCommand_, path));

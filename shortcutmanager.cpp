@@ -90,6 +90,8 @@ void ShortcutManager::setDefaults ()
                               {}, c};
   shortcuts[SM::MoveUp] = {{}, QObject::tr ("Move up"),
                            QIcon (":/up.png"), c};
+  shortcuts[SM::RunCommand] = {{QS ("Ctrl+R")}, QObject::tr ("Run command here..."),
+                               QIcon (":/command.png"), c};
 
   c = SM::Item;
   shortcuts[SM::OpenItem] = {{}, QObject::tr ("Open"),

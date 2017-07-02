@@ -86,4 +86,32 @@ QList<QUrl> toUrls (const Infos &infos)
   return urls;
 }
 
+QStringList parseShellCommand (const QString &command)
+{
+  QStringList parts;
+  QChar separator;
+  auto startIndex = -1;
+  for (auto i = 0, end = command.size (); i < end; ++i)
+  {
+    if (separator.isNull ())
+    {
+      separator = (command[i] == '"' ? '"' : ' ');
+      startIndex = i + int (separator == '"');
+    }
+    else
+    {
+      if (command[i] == separator)
+      {
+        parts << command.mid (startIndex, i - startIndex);
+        separator = QChar ();
+      }
+    }
+  }
+  if (startIndex != command.size ())
+  {
+    parts << command.mid (startIndex);
+  }
+  return parts;
+}
+
 }

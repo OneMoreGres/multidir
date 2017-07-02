@@ -29,9 +29,10 @@
         <file alias="linkTo.png">icons/send-2.png</file>
         <file alias="moveTo.png">icons/send-3.png</file>
         <file alias="copyTo.png">icons/send.png</file>
-        <file alias="console.png">icons/command.png</file>
+        <file alias="command.png">icons/command.png</file>
         <file alias="path.png">icons/placeholder.png</file>
         <file alias="open.png">icons/magic-wand.png</file>
         <file alias="fixSize.png">icons/push-pin.png</file>
+        <file alias="console.png">icons/console.png</file>
     </qresource>
 </RCC>

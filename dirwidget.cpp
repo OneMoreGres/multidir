@@ -48,6 +48,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathLabel_ (new QLabel (this)),
   dirLabel_ (new QLabel (this)),
   pathEdit_ (new QLineEdit (this)),
+  commandPrompt_ (new QLineEdit (this)),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
   showDirs_ (nullptr),
@@ -97,13 +98,22 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (
                                                       path ().absoluteFilePath ()));});
 
+  auto openConsole = makeShortcut (ShortcutManager::OpenConsole, menu_);
+  connect (openConsole, &QAction::triggered,
+           this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
+
   auto editPath = makeShortcut (ShortcutManager::ChangePath, menu_);
   connect (editPath, &QAction::triggered,
            this, [this] {togglePathEdition (true);});
 
-  auto openConsole = makeShortcut (ShortcutManager::OpenConsole, menu_);
-  connect (openConsole, &QAction::triggered,
-           this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
+  auto runCommand = makeShortcut (ShortcutManager::RunCommand, menu_);
+  connect (runCommand, &QAction::triggered,
+           this, &DirWidget::showCommandPrompt);
+
+  commandPrompt_->hide ();
+  commandPrompt_->installEventFilter (this);
+  connect (commandPrompt_, &QLineEdit::returnPressed,
+           this, &DirWidget::execCommandPrompt);
 
 
   menu_->addSeparator ();
@@ -149,6 +159,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
       emit editorRequested (current ().absoluteFilePath ());
     }
   });
+
+  viewMenu_->addSeparator ();
 
   cutAction_ =  makeShortcut (ShortcutManager::Cut, viewMenu_);
   connect (cutAction_, &QAction::triggered,
@@ -272,6 +284,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   layout->setSpacing (2);
   layout->addLayout (controlsLayout_);
   layout->addWidget (view_);
+  layout->addWidget (commandPrompt_);
 
 
   connect (view_, &DirView::contextMenuRequested,
@@ -379,6 +392,30 @@ void DirWidget::updateSiblingActions ()
   handle (copyToMenu_);
   handle (moveToMenu_);
   handle (linkToMenu_);
+}
+
+void DirWidget::showCommandPrompt ()
+{
+  commandPrompt_->clear ();
+  commandPrompt_->show ();
+  commandPrompt_->setFocus ();
+}
+
+void DirWidget::execCommandPrompt ()
+{
+  const auto parts = utils::parseShellCommand (commandPrompt_->text ());
+  if (!parts.isEmpty ())
+  {
+    const auto workDir = path ().absoluteFilePath ();
+    if (!QProcess::startDetached (parts[0], parts.mid (1), workDir))
+    {
+      Notifier::error (tr ("Failed to run command '%1' in '%2'")
+                       .arg (commandPrompt_->text (), workDir));
+      commandPrompt_->selectAll ();
+      return;
+    }
+  }
+  commandPrompt_->hide ();
 }
 
 QString DirWidget::index () const
@@ -565,11 +602,23 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
   {
     if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
     {
+      if (commandPrompt_->isVisible ())
+      {
+        commandPrompt_->hide ();
+      }
       if (pathEdit_->isModified ())
       {
         togglePathEdition (true); // reset changes
       }
       pathEdit_->hide (); // trigger editionFinished
+      return true;
+    }
+  }
+  else if (event->type () == QEvent::KeyPress && watched == commandPrompt_)
+  {
+    if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
+    {
+      commandPrompt_->hide ();
       return true;
     }
   }
