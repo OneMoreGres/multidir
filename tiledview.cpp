@@ -67,6 +67,7 @@ TiledView::TiledView (QWidget *parent) :
 {
   setAcceptDrops (true);
   setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+  setChildrenCollapsible (false);
 }
 
 TiledView::~TiledView ()
@@ -433,6 +434,7 @@ void TiledView::restoreImpl (QSettings &settings, QHash<QString, QWidget *> &wid
   if (settings.contains (qs_state))
   {
     restoreState (settings.value (qs_state).toByteArray ());
+    setChildrenCollapsible (false);
   }
 }
 
