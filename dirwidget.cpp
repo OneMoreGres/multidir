@@ -614,7 +614,7 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
     {
       emit cloneRequested (this);
     }
-    return true;
+    return false;
   }
 
   if (isLocked ())
