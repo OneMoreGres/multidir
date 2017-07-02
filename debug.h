@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include <assert.h>
+#include <atomic>
 
 #define ASSERT(XXX) if (debug::isOn && !(XXX)) { \
     qCritical () << "Assertion failed at" << __FILE__ << __LINE__ << ":" << #XXX; \

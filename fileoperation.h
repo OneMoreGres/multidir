@@ -3,6 +3,8 @@
 #include <QFileInfo>
 #include <QUrl>
 
+#include <atomic>
+
 class FileConflictResolver;
 
 class FileOperation : public QObject
