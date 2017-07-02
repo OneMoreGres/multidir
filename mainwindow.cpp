@@ -143,7 +143,7 @@ MainWindow::MainWindow (QWidget *parent) :
   trayMenu->addAction (quit);
 
   tray_->setContextMenu (trayMenu);
-  tray_->setToolTip (tr ("MultiDir"));
+  tray_->setToolTip (tr ("Multidir"));
   tray_->setIcon (QIcon (":/app.png"));
   tray_->show ();
   connect (tray_, &QSystemTrayIcon::activated,

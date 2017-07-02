@@ -48,7 +48,7 @@ void ShortcutManager::setDefaults ()
   c = SM::Group;
   shortcuts[SM::AddGroup] = {{QS ("Ctrl+G,A")}, QObject::tr ("Add"),
                              QIcon (":/add.png"), c};
-  shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename.."),
+  shortcuts[SM::RenameGroup] = {{QS ("Ctrl+G,R")}, QObject::tr ("Rename..."),
                                 QIcon (":/rename.png"), c};
   shortcuts[SM::RemoveGroup] = {{QS ("Ctrl+G,D")}, QObject::tr ("Delete..."),
                                 QIcon (":/minus.png"), c};
@@ -66,9 +66,9 @@ void ShortcutManager::setDefaults ()
                                QIcon (":/rename.png"), c};
   shortcuts[SM::LockTab] = {{QS ("Ctrl+L")}, QObject::tr ("Lock"),
                             QIcon (":/lockTab.png"), c};
-  shortcuts[SM::CloneTab] = {{QS ("Ctrl+D")}, QObject::tr ("Duplicate"),
+  shortcuts[SM::CloneTab] = {{QS ("Ctrl+D")}, QObject::tr ("Duplicate..."),
                              QIcon (":/cloneTab.png"), c};
-  shortcuts[SM::CloseTab] = {{QS ("Ctrl+W")}, QObject::tr ("Close"),
+  shortcuts[SM::CloseTab] = {{QS ("Ctrl+W")}, QObject::tr ("Close..."),
                              QIcon (":/closeTab.png"), c};
   shortcuts[SM::ShowDirectories] = {{QS ("Alt+V,D")}, QObject::tr ("Show directories"),
                                     QIcon (":/folder.png"), c};
