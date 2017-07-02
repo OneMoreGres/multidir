@@ -104,7 +104,7 @@ void ShortcutManager::setDefaults ()
                         QIcon::fromTheme ("cut"), c};
   shortcuts[SM::Rename] = {{QS ("F2")}, QObject::tr ("Rename"),
                            QIcon (":/rename.png"), c};
-  shortcuts[SM::OpenInTab] = {{QS ("Alt+Return")}, QObject::tr ("Open in tab"),
+  shortcuts[SM::OpenInTab] = {{QS ("Ctrl+Return")}, QObject::tr ("Open in tab"),
                               {}, c};
   shortcuts[SM::OpenInEditor] = {{QS ("F4")}, QObject::tr ("Open in editor"),
                                  QIcon (":/editor.png"), c};
