@@ -856,21 +856,7 @@ void DirWidget::fixMinSize (bool isOn)
 
 void DirWidget::showViewContextMenu ()
 {
-  const auto index = view_->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
-  const auto isDir = current ().isDir ();
-  openAction_->setEnabled (index.isValid ());
-  openWith_->setEnabled (index.isValid () && !isDir);
-  if (openWith_->isEnabled ())
-  {
-    OpenWith::popupateMenu (*openWith_, current ());
-  }
-  copyPathAction_->setEnabled (index.isValid ());
-  openInTabAction_->setEnabled (isDir);
-  renameAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
-  removeAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
-  trashAction_->setEnabled (index.isValid () && !isLocked () && !isDotDot);
-
+  updateActions ();
   viewMenu_->exec (QCursor::pos ());
 }
 
@@ -894,12 +880,37 @@ void DirWidget::setShowDirs (bool on)
 void DirWidget::updateActions ()
 {
   const auto dirs = showDirs_->isChecked ();
-  const auto lock = isLocked_->isChecked ();
-  newFolderAction_->setEnabled (dirs && !lock);
-  upAction_->setEnabled (!lock);
+  const auto locked = isLocked_->isChecked ();
+  const auto index = view_->currentIndex ();
+  const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
+  const auto isDir = current ().isDir ();
+  const auto isValid = view_->currentIndex ().isValid ();
 
-  pasteAction_->setEnabled (!lock);
-  cutAction_->setEnabled (!lock);
+  newFolderAction_->setEnabled (dirs && !locked);
+  upAction_->setEnabled (!locked);
+
+  openAction_->setEnabled (isValid);
+  openWith_->setEnabled (isValid && !isDir);
+  if (openWith_->isEnabled ())
+  {
+    OpenWith::popupateMenu (*openWith_, current ());
+  }
+  openInTabAction_->setEnabled (isValid && isDir);
+  openInEditorAction_->setEnabled (isValid && !isDir);
+
+  copyPathAction_->setEnabled (isValid);
+
+  cutAction_->setEnabled (!locked && isValid);
+  copyAction_->setEnabled (isValid);
+  pasteAction_->setEnabled (!locked);
+
+  copyToMenu_->setEnabled (isValid);
+  moveToMenu_->setEnabled (!locked && isValid);
+  linkToMenu_->setEnabled (isValid);
+
+  renameAction_->setEnabled (!locked && isValid && !isDotDot);
+  removeAction_->setEnabled (!locked && isValid && !isDotDot);
+  trashAction_->setEnabled (!locked && isValid && !isDotDot);
 }
 
 void DirWidget::updatePathLabel ()
