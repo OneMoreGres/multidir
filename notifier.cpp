@@ -12,7 +12,7 @@ void Notifier::setMain (QStatusBar *bar)
 
 void Notifier::error (const QString &text)
 {
-  ERROR () << text;
+  LERROR () << text;
   const auto timeout = 2000;
   if (bar_)
   {

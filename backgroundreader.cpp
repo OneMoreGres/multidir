@@ -23,6 +23,6 @@ void BackgroundReader::readIcon (const QString &fileName)
   }
   else
   {
-    WARNING () << "Icon read error" << LARG (fileName) << LARG (reader.errorString ());
+    LWARNING () << "Icon read error" << LARG (fileName) << LARG (reader.errorString ());
   }
 }

@@ -54,7 +54,7 @@ void UpdateChecker::parse (QNetworkReply *reply)
 {
   if (reply->error () != QNetworkReply::NoError)
   {
-    ERROR () << "Available version check failed" << LARG (reply->errorString ());
+    LERROR () << "Available version check failed" << LARG (reply->errorString ());
     return;
   }
   const auto data = reply->readAll ().trimmed ();

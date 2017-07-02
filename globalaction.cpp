@@ -34,7 +34,7 @@ bool GlobalAction::makeGlobal (QAction *action)
   }
   else
   {
-    ERROR () << "Failed to register global hotkey:" << LARG (hotKey.toString ());
+    LERROR () << "Failed to register global hotkey:" << LARG (hotKey.toString ());
   }
   return res;
 }
@@ -67,7 +67,7 @@ bool GlobalAction::removeGlobal (QAction *action)
   }
   else
   {
-    ERROR () << "Failed to unregister global hotkey:" << (hotKey.toString ());
+    LERROR () << "Failed to unregister global hotkey:" << (hotKey.toString ());
   }
   return res;
 }

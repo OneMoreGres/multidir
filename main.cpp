@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
   QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
   if (!f.tryLock ())
   {
-    WARNING () << "Another instance is running. Lock file is busy.";
+    LWARNING () << "Another instance is running. Lock file is busy.";
     return 0;
   }
 

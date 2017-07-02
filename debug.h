@@ -16,14 +16,14 @@
     assert (XXX); \
 }
 
-#define DEBUG if (debug::isOn) qDebug
-#define DEBUG_IF(XXX) if (XXX) qDebug ()
-#define WARNING qWarning
-#define WARNING_IF(XXX) if (XXX) qWarning ()
-#define ERROR qCritical
-#define ERROR_IF(XXX) if (XXX) qCritical ()
-#define INFO qInfo
-#define INFO_IF(XXX) if (XXX) qInfo ()
+#define LDEBUG if (debug::isOn) qDebug
+#define LDEBUG_IF(XXX) if (XXX) qDebug ()
+#define LWARNING qWarning
+#define LWARNING_IF(XXX) if (XXX) qWarning ()
+#define LERROR qCritical
+#define LERROR_IF(XXX) if (XXX) qCritical ()
+#define LINFO qInfo
+#define LINFO_IF(XXX) if (XXX) qInfo ()
 #define LARG(XXX) '(' << XXX << ')'
 
 namespace debug
