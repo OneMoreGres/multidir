@@ -16,9 +16,8 @@ const auto tb = 1024 * gb;
 namespace utils
 {
 
-QString sizeString (const QFileInfo &info)
+QString sizeString (qint64 bytes)
 {
-  const auto bytes = info.size ();
   if (bytes >= tb)
   {
     return QString::number (bytes / tb, 'f', 3) + QObject::tr ("Tb");

@@ -6,7 +6,7 @@ namespace utils
 {
 using Infos = QList<QFileInfo>;
 
-QString sizeString (const QFileInfo &info);
+QString sizeString (qint64 bytes);
 
 qint64 totalSize (const QFileInfo &info);
 

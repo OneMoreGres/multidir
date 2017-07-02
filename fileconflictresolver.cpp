@@ -79,7 +79,7 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
   auto labelText = [](const QFileInfo &i) {
                      return i.absoluteFilePath ()
                             + tr ("\nModified: ") + i.lastModified ().toString (Qt::ISODate)
-                            + tr (". Size: ") + utils::sizeString (i);
+                            + tr (". Size: ") + utils::sizeString (i.size ());
                    };
 
   switch (FileOperation::Action (action))

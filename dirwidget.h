@@ -75,6 +75,7 @@ private:
   void paste ();
   void copyPath ();
   void openInBackground (const QModelIndex &index);
+  void showProperties ();
 
   bool isMinSizeFixed () const;
   void fixMinSize (bool isOn);

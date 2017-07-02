@@ -120,6 +120,8 @@ void ShortcutManager::setDefaults ()
                            QIcon (":/moveTo.png"), c};
   shortcuts[SM::LinkTo] = {{}, QObject::tr ("Link to (plus ID)"),
                            QIcon (":/linkTo.png"), c};
+  shortcuts[SM::ShowProperties] = {{QS ("Alt+Return")}, QObject::tr ("Properties"),
+                                   QIcon (":/properties.png"), c};
 }
 
 void ShortcutManager::save (QSettings &settings)

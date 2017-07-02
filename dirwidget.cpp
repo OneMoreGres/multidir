@@ -10,6 +10,7 @@
 #include "shortcutmanager.h"
 #include "utils.h"
 #include "debug.h"
+#include "propertieswidget.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -195,6 +196,12 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   removeAction_ = makeShortcut (ShortcutManager::Remove, viewMenu_);
   connect (removeAction_, &QAction::triggered,
            this, &DirWidget::promptRemove);
+
+  viewMenu_->addSeparator ();
+
+  auto showProperties = makeShortcut (ShortcutManager::ShowProperties, viewMenu_);
+  connect (showProperties, &QAction::triggered,
+           this, &DirWidget::showProperties);
 
 
   // controls
@@ -835,6 +842,16 @@ void DirWidget::openInBackground (const QModelIndex &index)
   {
     openPath (index);
   }
+}
+
+void DirWidget::showProperties ()
+{
+  const auto info = view_->currentIndex ().isValid () ? current () : path_;
+  auto *w = new PropertiesWidget (info);
+  w->setAttribute (Qt::WA_DeleteOnClose, true);
+  w->show ();
+  auto global = mapToGlobal (rect ().center ());
+  w->move (global.x () - w->width () / 2, global.y () - w->height () / 2);
 }
 
 bool DirWidget::isMinSizeFixed () const
