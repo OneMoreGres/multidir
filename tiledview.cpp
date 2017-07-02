@@ -51,7 +51,7 @@ TileMime::TileMime (QWidget *widget) :
                               | Qt::BypassWindowManagerHint);
   zoneWidget->setWindowOpacity (0.2);
   zoneWidget->setAutoFillBackground (true);
-  zoneWidget->setBackgroundRole (QPalette::Highlight);
+  zoneWidget->setStyleSheet ("QWidget {background: #0099cc}");
 }
 
 TileMime::~TileMime ()
