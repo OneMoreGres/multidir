@@ -317,7 +317,7 @@ void MainWindow::openInEditor (const QString &path)
     {
       command += path;
     }
-    if (QProcess::startDetached (command))
+    if (!QProcess::startDetached (command))
     {
       Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
     }
