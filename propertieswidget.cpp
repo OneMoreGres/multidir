@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 
+#include <array>
+
 
 namespace
 {
