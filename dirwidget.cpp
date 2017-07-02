@@ -110,11 +110,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (runCommand, &QAction::triggered,
            this, &DirWidget::showCommandPrompt);
 
-  commandPrompt_->hide ();
-  commandPrompt_->installEventFilter (this);
-  connect (commandPrompt_, &QLineEdit::returnPressed,
-           this, &DirWidget::execCommandPrompt);
-
 
   menu_->addSeparator ();
 
@@ -278,6 +273,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 
 
+  commandPrompt_->hide ();
+  commandPrompt_->installEventFilter (this);
+  commandPrompt_->setToolTip (tr ("Substitutions: %ID% - tab with ID, %-ID% - current item of tab"));
+  connect (commandPrompt_, &QLineEdit::returnPressed,
+           this, &DirWidget::execCommandPrompt);
+
+
   // defaults
   auto layout = new QVBoxLayout (this);
   layout->setMargin (4);
@@ -403,7 +405,7 @@ void DirWidget::showCommandPrompt ()
 
 void DirWidget::execCommandPrompt ()
 {
-  const auto parts = utils::parseShellCommand (commandPrompt_->text ());
+  const auto parts = utils::parseShellCommand (preprocessedCommand ());
   if (!parts.isEmpty ())
   {
     const auto workDir = path ().absoluteFilePath ();
@@ -416,6 +418,26 @@ void DirWidget::execCommandPrompt ()
     }
   }
   commandPrompt_->hide ();
+}
+
+QString DirWidget::preprocessedCommand () const
+{
+  const QString pathPlaceholder ("%%1%");
+  const QString itemPlaceholder ("%-%1%");
+
+  auto text = commandPrompt_->text ();
+  text.replace (pathPlaceholder.arg (""), path ().absoluteFilePath ());
+  text.replace (itemPlaceholder.arg (""), current ().absoluteFilePath ());
+
+  for (const auto *i: copyToMenu_->actions ())
+  {
+    auto *sibling = i->data ().value<DirWidget *>();
+    ASSERT (sibling);
+    const auto index = sibling->index ();
+    text.replace (pathPlaceholder.arg (index), sibling->path ().absoluteFilePath ());
+    text.replace (itemPlaceholder.arg (index), sibling->current ().absoluteFilePath ());
+  }
+  return text;
 }
 
 QString DirWidget::index () const

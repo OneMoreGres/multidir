@@ -84,6 +84,7 @@ private:
 
   void showCommandPrompt ();
   void execCommandPrompt ();
+  QString preprocessedCommand () const;
 
   bool isLocked () const;
   void setLocked (bool isLocked);
