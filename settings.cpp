@@ -11,6 +11,7 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QStyledItemDelegate>
+#include <QSettings>
 
 namespace
 {
@@ -18,6 +19,9 @@ enum ShortcutColumn
 {
   Id, Name, Context, Key, Count
 };
+
+const QString qs_ground = "settings";
+const QString qs_size = "size";
 
 
 class ShortcutDelegate : public QStyledItemDelegate
@@ -134,7 +138,20 @@ Settings::Settings (QWidget *parent) :
            this, &QDialog::reject);
   layout->addWidget (buttons);
 
-  resize (400,300);
+  QSettings settings;
+  settings.beginGroup (qs_ground);
+  const auto size = settings.value (qs_size).toSize ();
+  if (!size.isEmpty ())
+  {
+    resize (size);
+  }
+}
+
+Settings::~Settings ()
+{
+  QSettings settings;
+  settings.beginGroup (qs_ground);
+  settings.setValue (qs_size, size ());
 }
 
 QString Settings::console () const
