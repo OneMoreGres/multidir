@@ -293,7 +293,7 @@ void MainWindow::openConsole (const QString &path)
 {
   if (!consoleCommand_.isEmpty () && !path.isEmpty ())
   {
-    auto command = consoleCommand_ + ' ';
+    auto command = consoleCommand_;
     command.replace ("%d", path);
     const auto parts = utils::parseShellCommand (command);
     if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
@@ -308,14 +308,14 @@ void MainWindow::openInEditor (const QString &path)
 {
   if (!editorCommand_.isEmpty () && !path.isEmpty ())
   {
-    auto command = editorCommand_ + ' ';
+    auto command = editorCommand_;
     if (command.contains ("%p"))
     {
       command.replace ("%p", path);
     }
     else
     {
-      command += path;
+      command += ' ' + path;
     }
     if (!QProcess::startDetached (command))
     {
