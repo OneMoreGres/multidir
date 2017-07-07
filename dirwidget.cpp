@@ -405,7 +405,7 @@ void DirWidget::updateSiblingActions ()
 
 void DirWidget::showCommandPrompt ()
 {
-  commandPrompt_->clear ();
+  commandPrompt_->selectAll ();
   commandPrompt_->show ();
   commandPrompt_->setFocus ();
 }
