@@ -360,9 +360,12 @@ void TiledView::insert (QWidget *widget, TiledView::Zone zone, QWidget *target)
     auto *targetReplacement = new TiledView;
     connect (targetReplacement, &TiledView::tileSwapped, this, &TiledView::tileSwapped);
     targetReplacement->setOrientation (orientation);
+
+    const auto state = sizes ();
     targetReplacement->insertWidget (newIndex, widget);
     targetReplacement->insertWidget (1 - newIndex, target);
     insertWidget (targetIndex, targetReplacement);
+    setSizes (state);
   }
 }
 
