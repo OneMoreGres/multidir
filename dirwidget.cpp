@@ -432,7 +432,7 @@ QString DirWidget::preprocessedCommand () const
   const QString pathPlaceholder ("%%1%");
   const QString itemPlaceholder ("%-%1%");
 
-  auto text = commandPrompt_->text ();
+  auto text = commandPrompt_->text ().trimmed ();
   text.replace (pathPlaceholder.arg (""), path ().absoluteFilePath ());
   text.replace (itemPlaceholder.arg (""), current ().absoluteFilePath ());
 
