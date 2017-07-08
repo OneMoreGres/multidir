@@ -104,7 +104,7 @@ RESOURCES += \
     resources.qrc
 
 TRANSLATIONS += \
-    translations/multidir_ru_RU.ts
+    translations/multidir_ru.ts
 
 QMAKE_TARGET_COMPANY = Gres
 QMAKE_TARGET_PRODUCT = MultiDir
