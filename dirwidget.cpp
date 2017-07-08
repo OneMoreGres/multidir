@@ -26,6 +26,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QProcess>
+#include <QRegularExpression>
 
 namespace
 {
@@ -282,7 +283,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   commandPrompt_->hide ();
   commandPrompt_->installEventFilter (this);
-  commandPrompt_->setToolTip (tr ("Substitutions: %ID% - tab with ID, %-ID% - current item of tab"));
+  commandPrompt_->setToolTip (tr ("Substitutions: %ID% - tab with ID, "
+                                  "%-ID% - current item of tab,"
+                                  "%<separator?>*ID% - selected items of tab"));
   connect (commandPrompt_, &QLineEdit::returnPressed,
            this, &DirWidget::execCommandPrompt);
 
@@ -429,22 +432,45 @@ void DirWidget::execCommandPrompt ()
 
 QString DirWidget::preprocessedCommand () const
 {
-  const QString pathPlaceholder ("%%1%");
-  const QString itemPlaceholder ("%-%1%");
+  auto handle = [](QString &command, const DirWidget &w, const QString &index) {
+                  const QString pathPlaceholder ("%%1%");
+                  command.replace (pathPlaceholder.arg (index), w.path ().absoluteFilePath ());
 
-  auto text = commandPrompt_->text ().trimmed ();
-  text.replace (pathPlaceholder.arg (""), path ().absoluteFilePath ());
-  text.replace (itemPlaceholder.arg (""), current ().absoluteFilePath ());
+                  const QString itemPlaceholder ("%-%1%");
+                  command.replace (itemPlaceholder.arg (index), w.current ().absoluteFilePath ());
 
+                  const QString selectedPlaceholder (R"(%(.)?\*%1%)");
+                  const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
+                  if (command.contains (selectedRegex))
+                  {
+                    QStringList items;
+                    for (const auto &i: w.selected ())
+                    {
+                      items << i.absoluteFilePath ();
+                    }
+
+                    auto match = selectedRegex.match (command);
+                    while (match.hasMatch ())
+                    {
+                      const auto separator = (!match.captured (1).isEmpty ()
+                                              ? match.captured (1) : " ");
+                      command.replace (match.capturedStart (0), match.capturedLength (0),
+                                       items.join (separator));
+                      match = selectedRegex.match (command);
+                    }
+                  }
+                };
+
+
+  auto command = commandPrompt_->text ().trimmed ();
+  handle (command, *this, "");
   for (const auto *i: copyToMenu_->actions ())
   {
     auto *sibling = i->data ().value<DirWidget *>();
     ASSERT (sibling);
-    const auto index = sibling->index ();
-    text.replace (pathPlaceholder.arg (index), sibling->path ().absoluteFilePath ());
-    text.replace (itemPlaceholder.arg (index), sibling->current ().absoluteFilePath ());
+    handle (command, *sibling, sibling->index ());
   }
-  return text;
+  return command.trimmed ();
 }
 
 QString DirWidget::index () const

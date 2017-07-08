@@ -29,9 +29,13 @@
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../dirwidget.cpp" line="285"/>
         <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab</source>
-        <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки</translation>
+        <translation type="vanished">Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки</translation>
+    </message>
+    <message>
+        <location filename="../dirwidget.cpp" line="286"/>
+        <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
+        <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
         <location filename="../dirwidget.cpp" line="421"/>
