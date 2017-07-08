@@ -222,8 +222,8 @@ void MainWindow::restore (QSettings &settings)
   const auto console = QString ("cmd");
   const auto editor = QString ("notepad.exe");
 #endif
-  consoleCommand_ = settings.value (qs_console, console).toString ();
-  editorCommand_ = settings.value (qs_editor, editor).toString ();
+  consoleCommand_ = settings.value (qs_console, console).toString ().trimmed ();
+  editorCommand_ = settings.value (qs_editor, editor).toString ().trimmed ();
 
   setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
   startInBackground_ = settings.value (qs_background, false).toBool ();
@@ -278,8 +278,8 @@ void MainWindow::editSettings ()
   {
     GlobalAction::removeGlobal (toggleAction_);
     toggleAction_->setShortcut (ShortcutManager::get (ShortcutManager::ToggleGui));
-    consoleCommand_ = settings.console ();
-    editorCommand_ = settings.editor ();
+    consoleCommand_ = settings.console ().trimmed ();
+    editorCommand_ = settings.editor ().trimmed ();
     setCheckUpdates (settings.checkUpdates ());
     startInBackground_ = settings.startInBackground ();
     QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
