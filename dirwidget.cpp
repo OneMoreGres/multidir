@@ -840,6 +840,10 @@ void DirWidget::paste ()
     target = path ();
   }
   const auto urls = CopyPaste::clipboardUrls ();
+  if (urls.isEmpty ())
+  {
+    return;
+  }
   const auto action = CopyPaste::clipboardAction ();
   emit fileOperation (FileOperation::paste (urls, target, action));
 }
