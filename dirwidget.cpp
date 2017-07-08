@@ -142,20 +142,20 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openInTabAction_ = makeShortcut (ShortcutManager::OpenInTab, viewMenu_);
   connect (openInTabAction_, &QAction::triggered,
            this, [this]() {
-    if (current ().isDir ())
-    {
-      emit newTabRequested (current ().absoluteFilePath ());
-    }
-  });
+             if (current ().isDir ())
+             {
+               emit newTabRequested (current ().absoluteFilePath ());
+             }
+           });
 
   openInEditorAction_ = makeShortcut (ShortcutManager::OpenInEditor, viewMenu_);
   connect (openInEditorAction_, &QAction::triggered,
            this, [this]() {
-    if (current ().isFile ())
-    {
-      emit editorRequested (current ().absoluteFilePath ());
-    }
-  });
+             if (current ().isFile ())
+             {
+               emit editorRequested (current ().absoluteFilePath ());
+             }
+           });
 
   viewMenu_->addSeparator ();
 

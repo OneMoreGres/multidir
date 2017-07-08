@@ -15,7 +15,7 @@ constexpr const T &clamp (const T &v, const T &lo, const T &hi, Compare comp)
 template<class T>
 constexpr const T &clamp (const T &v, const T &lo, const T &hi)
 {
-  return clamp (v, lo, hi, std::less<T>() );
+  return clamp (v, lo, hi, std::less<T>());
 }
 
 template< class C >
@@ -31,7 +31,7 @@ constexpr auto cend (const C &c)->decltype(std::end (c))
 }
 
 template <class T>
-constexpr typename std::add_const<T>::type & as_const (T & t) noexcept
+constexpr typename std::add_const<T>::type &as_const (T & t) noexcept
 {
   return t;
 }

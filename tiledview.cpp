@@ -128,8 +128,8 @@ QWidget * TiledView::biggest () const
   }
   return *max_element (nonstd::cbegin (items), nonstd::cend (items),
                        [](const QWidget *l, const QWidget *r) {
-    return square (l->size () - l->minimumSize ()) < square (r->size () - r->minimumSize ());
-  });
+                         return square (l->size () - l->minimumSize ()) < square (r->size () - r->minimumSize ());
+                       });
 }
 
 QWidget * TiledView::childAt (const QPoint &pos) const

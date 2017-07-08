@@ -338,8 +338,8 @@ void MainWindow::setCheckUpdates (bool isOn)
 
     connect (updater, &UpdateChecker::updateAvailable,
              this, [this](const QString &version) {
-      tray_->showMessage (tr ("Multidir update available"), tr ("New version: %1").arg (version));
-    });
+               tray_->showMessage (tr ("Multidir update available"), tr ("New version: %1").arg (version));
+             });
     connect (updater, &UpdateChecker::updateAvailable,
              updater, &QObject::deleteLater);
     connect (updater, &UpdateChecker::noUpdates,
