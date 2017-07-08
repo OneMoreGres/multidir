@@ -1,5 +1,6 @@
 #include "openwith.h"
 #include "debug.h"
+#include "notifier.h"
 
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -179,8 +180,11 @@ void openWith (const QFileInfo &file, const ExternalApp &app)
   {
     command += " " + quoted (path);
   }
-  auto ok = QProcess::startDetached (command);
-  LERROR_IF (!ok) << "Failed to start external app" << LARG (app.name) << LARG (command);
+  if (!QProcess::startDetached (command))
+  {
+    Notifier::error (QObject::tr ("Failed to start external app '%1' with command '%2'")
+                     .arg (app.name, command));
+  }
 }
 
 

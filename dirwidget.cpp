@@ -419,7 +419,7 @@ void DirWidget::execCommandPrompt ()
     if (!QProcess::startDetached (parts[0], parts.mid (1), workDir))
     {
       Notifier::error (tr ("Failed to run command '%1' in '%2'")
-                       .arg (commandPrompt_->text (), workDir));
+                       .arg (parts.join (' '), workDir));
       commandPrompt_->selectAll ();
       return;
     }
