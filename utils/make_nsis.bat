@@ -5,7 +5,7 @@ call %SELF_PATH%\make_win.bat
 
 mkdir content
 mkdir content\app
-mkdir content\translations
+mkdir content\app\translations
 copy /Y release\multidir.exe content\app
 
 windeployqt --release content\app\multidir.exe
