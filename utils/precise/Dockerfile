@@ -4,9 +4,9 @@ RUN apt-get -qq update && \
     apt-get -y -qq install git libgl1-mesa-dev fontconfig \
         build-essential clang-3.4 libxcb-util0-dev wget fuse libxi6 \
         libsm6 libxrender1 libegl1-mesa libjasper1 && \
-    apt-get -qq clean    
+    apt-get -qq clean
 
-    
+
 ENV QT_RUN qt-opensource-linux-x64-5.6.2.run
 #dl from https://download.qt.io/official_releases/qt/5.6/5.6.2/qt-opensource-linux-x64-5.6.2.run
 ENV APPIMAGE_RUN linuxdeployqt
