@@ -5,6 +5,7 @@ set -e
 SELF_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SELF_PATH"/make_ubuntu.sh
 
+strip multidir
 make INSTALL_ROOT=appdir install
 MAKER="linuxdeployqt"
 if [ -z `which $MAKER` ]; then
