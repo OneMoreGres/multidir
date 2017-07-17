@@ -6,7 +6,7 @@ services:
 
 script:
   - docker pull gres/multidir:precise
-  - docker run --name builder gres/multidir:precise --volume $PWD:/multidir "cd /build; /multidir/utils/make_appimage.sh;"
+  - docker run --name builder --volume $PWD:/multidir gres/multidir:precise "cd /build; /multidir/utils/make_appimage.sh;"
   - docker cp builder:/build/MultiDir-x86_64.AppImage MultiDir-x86_64.AppImage
 
 deploy:
