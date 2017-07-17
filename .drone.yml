@@ -4,20 +4,20 @@ workspace:
   
 pipeline:
   test:
-    image: multidir/precise
+    image: gres/multidir:precise
     commands:
-      - mkdir /base/build && cd /base/build
+      - cd /build
       - /base/src/utils/make_ubuntu.sh
 
   pack:
-    image: multidir/precise
+    image: gres/multidir:precise
     privileged: true
     devices:
       - /dev/fuse
     volumes:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
-      - cd /base/build
+      - cd /build
       - /base/src/utils/make_appimage.sh
       - mv *.AppImage /drone/dist
     when:
