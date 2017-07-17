@@ -105,16 +105,24 @@ void TiledView::take (QWidget *widget)
   ASSERT (widget->parentWidget () == this);
   ASSERT (!cast (widget));
 
+  auto parent = cast (parentWidget ());
+  QList<int> sizes;
+  if (parent)
+  {
+    sizes = parent->sizes ();
+  }
+
   widget->setParent (nullptr);
 
-  if (auto parent = cast (parentWidget ()))
+  if (parent)
   {
+    const auto selfIndex = parent->indexOf (this);
+    setParent (nullptr);
     if (count () == 1)
     {
-      const auto selfIndex = parent->indexOf (this);
       parent->insertWidget (selfIndex, this->widget (0));
+      parent->setSizes (sizes);
     }
-    setParent (nullptr);
     deleteLater ();
   }
 }
