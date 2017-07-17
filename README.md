@@ -41,7 +41,7 @@ replace traditional file managers.
 ### Requirements
 
 * c++ compiler with c++11 support
-* Qt 5.6+ and some additional libs (more concrete list [here](utils/precise/Dockerfile))
+* Qt 5.6+ and some additional libs (more concrete list [here](utils/precise/prepare.sh))
 
 ### Compilation
 
