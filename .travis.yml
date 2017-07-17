@@ -6,6 +6,8 @@ services:
 
 script:
   - docker pull gres/multidir:precise
+  - echo $TRAVIS_BUILD_DIR $PWD
+  - docker run --name builder --rm --volume $TRAVIS_BUILD_DIR:/multidir gres/multidir:precise "ls; ls /multidir"
   - docker run --name builder --volume $TRAVIS_BUILD_DIR:/multidir gres/multidir:precise "cd /build; /multidir/utils/make_appimage.sh;"
   - docker cp builder:/build/MultiDir-x86_64.AppImage MultiDir-x86_64.AppImage
 
