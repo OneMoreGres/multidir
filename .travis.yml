@@ -6,9 +6,10 @@ services:
 
 script:
   - docker pull gres/multidir:precise
-  - docker run --name builder gres/multidir:precise git clone --depth=50 --branch=$TRAVIS_BRANCH https://github.com/OneMoreGres/multidir.git /multidir
-  - docker run --name builder gres/multidir:precise /bin/bash /multidir/utils/make_appimage.sh
-  - docker cp builder:/MultiDir-x86_64.AppImage MultiDir-x86_64.AppImage
+  - docker run --name builder gres/multidir:precise /bin/bash -c "cd /build; if [ -f /multidir/utils/make_appimage.sh ]; then chmod +x /multidir/utils/make_appimage.sh; /multidir/utils/make_appimage.sh; fi"
+  - docker cp $TRAVIS_BUILD_DIR builder:/multidir
+  - docker start -a builder
+  - docker cp builder:/build/MultiDir-x86_64.AppImage MultiDir-x86_64.AppImage
 
 deploy:
   - provider: releases
