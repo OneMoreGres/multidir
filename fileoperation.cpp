@@ -16,12 +16,13 @@ QString uniqueFileName (const QFileInfo &info)
 {
   auto dir = info.absoluteDir ();
   const auto baseName = info.baseName ();
-  const auto extension = info.completeSuffix ();
+  const auto extension = info.completeSuffix ().isEmpty () ? QString ()
+                                                           : '.' + info.completeSuffix ();;
   auto attempt = 0;
   auto target = info.fileName ();
   while (dir.exists (target))
   {
-    target = baseName + '.' + QString::number (++attempt) + '.' + extension;
+    target = baseName + '.' + QString::number (++attempt) + extension;
   }
   return target;
 }
@@ -168,7 +169,15 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
     }
     auto name = source.fileName ();
     QFileInfo targetFile (targetDir.absoluteFilePath (name));
-    if (targetFile.exists () && !targetFile.isDir ())
+    if (targetFile.absoluteFilePath () == source.absoluteFilePath ())
+    {
+      if (action_ == FileOperation::Action::Move)
+      {
+        continue;
+      }
+      name = uniqueFileName (targetFile);
+    }
+    else if (targetFile.exists () && !targetFile.isDir ())
     {
       const auto resolution = resolveConflict (source, targetFile);
       if (isAborted_)
