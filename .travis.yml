@@ -1,0 +1,26 @@
+language: cpp
+dist: trusty
+sudo: required
+services:
+  - docker
+
+script:
+  - docker pull gres/multidir:precise
+  - docker run --name builder gres/multidir:precise /bin/bash -c "cd /build; if [ -f /multidir/utils/make_appimage.sh ]; then chmod +x /multidir/utils/make_appimage.sh; /multidir/utils/make_appimage.sh; fi"
+  - docker cp $TRAVIS_BUILD_DIR builder:/multidir
+  - docker start -a builder
+  - docker cp builder:/build/MultiDir-x86_64.AppImage MultiDir-x86_64.AppImage
+
+deploy:
+  - provider: releases
+    api_key:
+      secure: "K+jeDetf7fsc3N8bknZ9NNNfxNcm/r2+BAGMPr/sBGaPxMWhy0XW1Zj5w12j2MfQAVRB1ttRzwchmH3AfPZh0mRH4znjxdNlPY9zYv0vMC+KzsMaa51/3CgP6z3r0xq1X8HXaLsZt59qyqNBV/6vPiRSChRJmOUcyDkftlcCMERp2vjToW3BZDCx81Y8LoKsB+2xj9s9YpJhCNpiAydcfeTjd7uVoLQjJD4ZuMHBVLMjTDA9jUlhokHQiD4qo+SWfeRvSUPx6CIGVTFy4QFSGKz2voqk+iu+78K8Tux1bZOOgzbT/L66UP8BnfILPfqihRLs1IWHic3478/WE6+sZqjqhpzTRwd8ns52EEBpkrBTDlsClMHS8gjLN7jwiJCR+U5mHjTn4gkk99hu9GSQ/gjrdcNrD/+iqceKV5U0P6e6qirrQSJI1/kLMOroqMvW+zTYhh5tbYzpXagxSEihEjeH1MuBzV2GuwkOuRZJ7L16UZVx9xR2+nQWCnlHbVcd94mud1ost8VEBN+yo7qypsePJpXp1FxkhfDz17D+J+r6UIqiFshE3nAJw4+7hQefs/39rmeguT+0MRbFGGTrVIS3C8EuIODuBAFUdiRkMXmMuaG2rPEuJ5kT8eA029oPD3JLNp8GdmWiZolUruMkPzBq8s2rrLjM7+rNe5G33oI="
+    file: MultiDir-x86_64.AppImage
+    skip_cleanup: true
+    on:
+      tags: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
