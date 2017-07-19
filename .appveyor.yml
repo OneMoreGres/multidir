@@ -9,7 +9,7 @@ build_script:
   - call "utils\make_nsis.bat"
 
 artifacts:
-  - path: utils\content\multidir-installer.exe
+  - path: multidir-installer.exe
     name: installer
 
 deploy:
