@@ -4,6 +4,7 @@
 #include "notifier.h"
 #include "debug.h"
 #include "utils.h"
+#include "constants.h"
 
 #include <QDir>
 #include <QtConcurrentRun>
@@ -70,7 +71,10 @@ FileOperation::Ptr FileOperation::paste (const QList<QUrl> &urls, const QFileInf
   auto result = QSharedPointer<FileOperation>::create ();
   for (const auto &i: urls)
   {
-    result->sources_ << QFileInfo (i.toLocalFile ());
+    if (!i.toString ().endsWith (constants::dotdot))
+    {
+      result->sources_ << QFileInfo (i.toLocalFile ());
+    }
   }
   result->target_ = target;
   result->action_ = QMap<Qt::DropAction,Action>{
