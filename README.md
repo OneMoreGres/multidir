@@ -4,6 +4,9 @@
 ![license](https://img.shields.io/github/license/OneMoreGres/multidir.svg)
 ![github downloads](https://img.shields.io/github/downloads/OneMoreGres/multidir/latest/total.svg)
 
+**CI:** ![travis](https://img.shields.io/travis/OneMoreGres/multidir.svg)
+![appveyor](https://img.shields.io/appveyor/ci/OneMoreGres/multidir.svg)
+
 
 Multiple directory management tool.
 Provides convinient way for simultaneous work with multiple folders.
