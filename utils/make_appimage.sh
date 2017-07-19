@@ -13,8 +13,10 @@ if [ -z `which $MAKER` ]; then
   export PATH="$PWD:$PATH"
   chmod a+x "$MAKER"
 fi
-$MAKER ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+$MAKER --appimage-extract
+MAKER="./squashfs-root/AppRun"
 unset QTDIR
 unset QT_PLUGIN_PATH
 unset LD_LIBRARY_PATH
+$MAKER ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
 $MAKER ./appdir/usr/share/applications/*.desktop -appimage
