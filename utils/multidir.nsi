@@ -133,9 +133,9 @@ SectionEnd
 
 Section $(SECT_REDIST) SECT_REDIST_ID
     SetOutPath "$TEMP"
-    File ${CONTENT_DIR}\app\vcredist_x86.exe
-    ExecWait '"$TEMP\vcredist_x86.exe"'
-    Delete "$TEMP\vcredist_x86.exe"
+    File ${CONTENT_DIR}\app\vcredist_x64.exe
+    ExecWait '"$TEMP\vcredist_x64.exe"'
+    Delete "$TEMP\vcredist_x64.exe"
     SetOutPath "$INSTDIR"
 SectionEnd
 
