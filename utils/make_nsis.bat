@@ -38,5 +38,5 @@ copy /Y %SELF_PATH%\..\icons\icon.ico content
 
 makensis.exe content/multidir.nsi
 
-copy /b /Y content\multidir-*.exe multidir-latest.exe
+copy /b /Y content\multidir-*.exe multidir-installer.exe
 
