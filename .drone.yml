@@ -11,9 +11,6 @@ pipeline:
 
   pack:
     image: gres/multidir:precise
-    privileged: true
-    devices:
-      - /dev/fuse
     volumes:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
