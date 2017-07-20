@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QLockFile>
 #include <QTranslator>
+#include <QLibraryInfo>
 
 int main (int argc, char *argv[])
 {
@@ -19,10 +20,12 @@ int main (int argc, char *argv[])
 
   {
     QStringList dirs {
-      QLatin1String ("translations")
+      QLatin1String ("translations"),
+      QLibraryInfo::location (QLibraryInfo::TranslationsPath)
 #ifdef Q_OS_LINUX
       , QLatin1String ("/usr/share/multidir/translations"),
-      qgetenv ("APPDIR") + QLatin1String ("/usr/share/multidir/translations") // appimage
+      qgetenv ("APPDIR") + QLatin1String ("/usr/share/multidir/translations"), // appimage
+      qgetenv ("APPDIR") + QLatin1String ("/translations"), // appimage
 #endif
     };
     QStringList names {QLatin1String ("qt"), QLatin1String ("qtbase"),
