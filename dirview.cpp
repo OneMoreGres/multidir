@@ -33,6 +33,8 @@ DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   setLayout (new QVBoxLayout);
   layout ()->setMargin (0);
   setIsList (isList_);
+  connect (&model, &QAbstractItemModel::rowsInserted,
+           this, &DirView::selectFirst);
 }
 
 void DirView::save (QSettings &settings) const
@@ -62,6 +64,12 @@ void DirView::adjustItems ()
   {
     table_->resizeColumnsToContents ();
   }
+}
+
+QModelIndex DirView::firstItem () const
+{
+  return model_->rowCount (rootIndex ()) > 0 ? model_->index (0,0, rootIndex ())
+                                             : QModelIndex ();
 }
 
 QModelIndex DirView::currentIndex () const
@@ -271,6 +279,14 @@ QAbstractItemView * DirView::view () const
   return (table_
           ? static_cast<QAbstractItemView *>(table_)
           : static_cast<QAbstractItemView *>(list_) );
+}
+
+void DirView::selectFirst ()
+{
+  if (!currentIndex ().isValid ())
+  {
+    setCurrentIndex (firstItem ());
+  }
 }
 
 bool DirView::eventFilter (QObject *watched, QEvent *event)
