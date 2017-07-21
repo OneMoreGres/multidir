@@ -248,6 +248,7 @@ void GroupWidget::add (const QFileInfo &path)
 {
   auto w = addWidget ();
   w->setPath (path);
+  w->activate ();
 }
 
 bool GroupWidget::Widget::operator== (const GroupWidget::Widget &r) const
