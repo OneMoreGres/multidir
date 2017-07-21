@@ -23,6 +23,7 @@ public:
   void activate ();
   void adjustItems ();
 
+  QModelIndex firstItem () const;
   QModelIndex currentIndex () const;
   void setCurrentIndex (const QModelIndex &index);
 
@@ -53,6 +54,7 @@ signals:
 private:
   void showHeaderContextMenu ();
   QAbstractItemView * view () const;
+  void selectFirst ();
   void initTable ();
   void initList ();
 

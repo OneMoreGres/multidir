@@ -549,7 +549,7 @@ void DirWidget::openPath (const QModelIndex &index)
     const auto previous = view_->rootIndex ();
     const auto moveUp = previous.parent () == newIndex;
     view_->setRootIndex (newIndex);
-    view_->setCurrentIndex (moveUp ? previous : QModelIndex ());
+    view_->setCurrentIndex (moveUp ? previous : view_->firstItem ());
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
 
