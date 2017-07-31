@@ -704,7 +704,12 @@ Modified: </source>
         <translation>Горячие клавиши</translation>
     </message>
     <message>
-        <location filename="../settings.cpp" line="118"/>
+        <location filename="../src/settings.cpp" line="108"/>
+        <source>Global</source>
+        <translation>Глобальная</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.cpp" line="119"/>
         <source>Group ids:</source>
         <translation>Идентификаторы групп:</translation>
     </message>
@@ -722,6 +727,11 @@ Modified: </source>
         <location filename="../settings.cpp" line="126"/>
         <source>Each character represents ID part of tab switch shortcut</source>
         <translation>Каждый символ соответствует ID вкладки в горячих клавишах</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.cpp" line="247"/>
+        <source>Yes</source>
+        <translation>Да</translation>
     </message>
 </context>
 </TS>

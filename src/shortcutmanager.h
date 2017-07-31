@@ -38,6 +38,7 @@ public:
   static void set (Shortcut type, QKeySequence key);
   static QString name (Shortcut type);
   static QIcon icon (Shortcut type);
+  static bool isGlobal (Shortcut type);
 
   static QString contextName (Shortcut type);
 };

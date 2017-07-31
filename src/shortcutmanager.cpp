@@ -225,6 +225,12 @@ QIcon ShortcutManager::icon (ShortcutManager::Shortcut type)
   return shortcuts[type].icon;
 }
 
+bool ShortcutManager::isGlobal (ShortcutManager::Shortcut type)
+{
+  ASSERT (type >= 0 && type < SM::ShortcutCount);
+  return shortcuts[type].isGlobal;
+}
+
 QString ShortcutManager::contextName (ShortcutManager::Shortcut type)
 {
   ASSERT (type >= 0 && type < SM::ShortcutCount);

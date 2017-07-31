@@ -17,7 +17,7 @@ namespace
 {
 enum ShortcutColumn
 {
-  Id, Name, Context, Key, Count
+  Id, Name, Context, Key, IsGlobal, Count
 };
 
 const QString qs_ground = "settings";
@@ -104,7 +104,8 @@ Settings::Settings (QWidget *parent) :
     auto row = 0;
     layout->addWidget (shortcuts_, row, 0, 1, 2);
     shortcuts_->setColumnCount (ShortcutColumn::Count);
-    shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Context"), tr ("Shortcut")});
+    shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Context"),
+                                            tr ("Shortcut"), tr ("Global")});
     shortcuts_->hideColumn (ShortcutColumn::Id);
     loadShortcuts ();
     shortcuts_->resizeColumnsToContents ();
@@ -242,6 +243,8 @@ void Settings::loadShortcuts ()
     shortcuts_->setItem (i, ShortcutColumn::Name, nonEditable (SM::name (type)));
     shortcuts_->setItem (i, ShortcutColumn::Context, nonEditable (SM::contextName (type)));
     shortcuts_->setItem (i, ShortcutColumn::Key, new Item (SM::get (type).toString ()));
+    shortcuts_->setItem (i, ShortcutColumn::IsGlobal,
+                         nonEditable (SM::isGlobal (type) ? tr ("Yes") : QLatin1String ("")));
   }
 }
 
