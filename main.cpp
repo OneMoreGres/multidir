@@ -18,7 +18,6 @@ int main (int argc, char *argv[])
   a.setQuitOnLastWindowClosed (false);
 #endif
 
-  qDebug () << QLibraryInfo::location (QLibraryInfo::TranslationsPath);
   {
     QStringList dirs {
       QLatin1String ("translations"),
