@@ -1,4 +1,5 @@
 #include "shortcutmanager.h"
+#include "globalaction.h"
 #include "debug.h"
 
 #include <QMap>
@@ -9,13 +10,29 @@
 namespace
 {
 using SM = ShortcutManager;
+
 struct Shortcut
 {
+  Shortcut (const QKeySequence &key = {}, const QString &name = {}, const QIcon &icon = {},
+            SM::Context context = {}, bool isGlobal = false);
+
   QKeySequence key;
   QString name;
   QIcon icon;
   SM::Context context;
+  bool isGlobal;
 };
+
+Shortcut::Shortcut (const QKeySequence &key, const QString &name, const QIcon &icon,
+                    ShortcutManager::Context context, bool isGlobal) :
+  key (key),
+  name (name),
+  icon (icon),
+  context (context),
+  isGlobal (isGlobal)
+{
+}
+
 
 QVector<QList<QAction *> > actions (SM::ShortcutCount);
 QVector<Shortcut> shortcuts (SM::ShortcutCount);
@@ -24,6 +41,8 @@ QVector<QString> contexts (SM::ContextCount);
 
 void ShortcutManager::setDefaults ()
 {
+  GlobalAction::init ();
+
   using QS = QLatin1String;
   contexts[SM::General] = {QObject::tr ("General")};
   contexts[SM::Group] = {QObject::tr ("Group")};
@@ -33,7 +52,7 @@ void ShortcutManager::setDefaults ()
 
   auto c = SM::General;
   shortcuts[SM::ToggleGui] = {{QS ("Ctrl+Alt+D")}, QObject::tr ("Toggle"),
-                              QIcon (":/popup.png"), c};
+                              QIcon (":/popup.png"), c, true};
   shortcuts[SM::Find] = {{QS ("Ctrl+F")}, QObject::tr ("Find"),
                          QIcon (":/find.png"), c};
   shortcuts[SM::Settings] = {{}, QObject::tr ("Settings"),
@@ -148,8 +167,13 @@ void ShortcutManager::add (Shortcut type, QAction *action)
   ASSERT (type >= 0 && type < SM::ShortcutCount);
   actions[type] << action;
   action->setShortcut (get (type));
-  action->setText (shortcuts[type].name);
-  action->setIcon (shortcuts[type].icon);
+  auto &shortcut = shortcuts[type];
+  action->setText (shortcut.name);
+  action->setIcon (shortcut.icon);
+  if (shortcut.isGlobal)
+  {
+    GlobalAction::makeGlobal (action);
+  }
   QObject::connect (action, &QObject::destroyed,
                     [type, action] {ShortcutManager::remove (type, action);});
 }
@@ -158,6 +182,10 @@ void ShortcutManager::remove (Shortcut type, QAction *action)
 {
   ASSERT (type >= 0 && type < SM::ShortcutCount);
   actions[type].removeOne (action);
+  if (shortcuts[type].isGlobal)
+  {
+    GlobalAction::removeGlobal (action);
+  }
 }
 
 QKeySequence ShortcutManager::get (ShortcutManager::Shortcut type)
@@ -169,10 +197,19 @@ QKeySequence ShortcutManager::get (ShortcutManager::Shortcut type)
 void ShortcutManager::set (ShortcutManager::Shortcut type, QKeySequence key)
 {
   ASSERT (type >= 0 && type < SM::ShortcutCount);
-  shortcuts[type].key = key;
+  auto &shortcut = shortcuts[type];
+  shortcut.key = key;
   for (auto *i: actions[type])
   {
+    if (shortcut.isGlobal)
+    {
+      GlobalAction::removeGlobal (i);
+    }
     i->setShortcut (key);
+    if (shortcut.isGlobal)
+    {
+      GlobalAction::makeGlobal (i);
+    }
   }
 }
 

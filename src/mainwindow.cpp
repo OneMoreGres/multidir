@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "groupholder.h"
 #include "groupcontrol.h"
-#include "globalaction.h"
 #include "settings.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
@@ -134,11 +133,9 @@ MainWindow::MainWindow (QWidget *parent) :
 
   toggleAction_ = new QAction (this);
   trayMenu->addAction (toggleAction_);
-  ShortcutManager::add (ShortcutManager::ToggleGui, toggleAction_);   // just to init
-  ShortcutManager::remove (ShortcutManager::ToggleGui, toggleAction_);
+  ShortcutManager::add (ShortcutManager::ToggleGui, toggleAction_);
   toggleAction_->setCheckable (true);
   toggleAction_->setChecked (true);
-  GlobalAction::init ();
 
   trayMenu->addAction (quit);
 
@@ -211,9 +208,6 @@ void MainWindow::restore (QSettings &settings)
 
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-  toggleAction_->setShortcut (ShortcutManager::get (ShortcutManager::ToggleGui));
-  GlobalAction::makeGlobal (toggleAction_);
-
 #ifdef Q_OS_LINUX
   const auto console = QString ("xterm");
   const auto editor = QString ("gedit");
@@ -276,8 +270,6 @@ void MainWindow::editSettings ()
 
   if (settings.exec () == QDialog::Accepted)
   {
-    GlobalAction::removeGlobal (toggleAction_);
-    toggleAction_->setShortcut (ShortcutManager::get (ShortcutManager::ToggleGui));
     consoleCommand_ = settings.console ().trimmed ();
     editorCommand_ = settings.editor ().trimmed ();
     setCheckUpdates (settings.checkUpdates ());
@@ -285,7 +277,6 @@ void MainWindow::editSettings ()
     QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
     groupControl_->setIds (settings.groupShortcuts ());
     groups_->setWidgetIds (settings.tabShortcuts ());
-    GlobalAction::makeGlobal (toggleAction_);
   }
 }
 
