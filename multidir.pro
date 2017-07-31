@@ -69,7 +69,8 @@ SOURCES += \
     src/utils.cpp \
     src/groupholder.cpp \
     src/shortcutmanager.cpp \
-    src/propertieswidget.cpp
+    src/propertieswidget.cpp \
+    src/translationloader.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -98,7 +99,8 @@ HEADERS  += \
     src/utils.h \
     src/groupholder.h \
     src/shortcutmanager.h \
-    src/propertieswidget.h
+    src/propertieswidget.h \
+    src/translationloader.h
 
 RESOURCES += \
     resources.qrc

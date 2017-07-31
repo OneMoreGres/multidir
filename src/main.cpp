@@ -2,12 +2,12 @@
 #include "openwith.h"
 #include "shortcutmanager.h"
 #include "debug.h"
+#include "translationloader.h"
 
 #include <QApplication>
 #include <QDir>
 #include <QLockFile>
-#include <QTranslator>
-#include <QLibraryInfo>
+
 
 int main (int argc, char *argv[])
 {
@@ -18,32 +18,7 @@ int main (int argc, char *argv[])
   a.setQuitOnLastWindowClosed (false);
 #endif
 
-  {
-    QStringList dirs {
-      QLatin1String ("translations"),
-      QLibraryInfo::location (QLibraryInfo::TranslationsPath)
-#ifdef Q_OS_LINUX
-      , QLatin1String ("/usr/share/multidir/translations"),
-      qgetenv ("APPDIR") + QLatin1String ("/usr/share/multidir/translations"), // appimage
-      qgetenv ("APPDIR") + QLatin1String ("/translations"), // appimage
-#endif
-    };
-    QStringList names {QLatin1String ("qt"), QLatin1String ("qtbase"),
-                       QLatin1String ("multidir")};
-    auto last = new QTranslator (&a);
-    for (const auto &name: names)
-    {
-      for (const auto &dir: dirs)
-      {
-        if (last->load (QLocale (), name, QLatin1String ("_"), dir))
-        {
-          a.installTranslator (last);
-          last = new QTranslator (&a);
-        }
-      }
-    }
-    last->deleteLater ();
-  }
+  TranslationLoader::load ();
 
   ShortcutManager::setDefaults ();
 
