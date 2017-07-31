@@ -14,7 +14,7 @@ else
 fi
 
 apt-get -qq update
-apt-get -y -qq install wget libfontconfig libgl1-mesa-dev make libxcb-util0-dev g++-5 qt56base qt56x11extras qt56imageformats qt56tools qt56translations
+apt-get -y -qq install wget ca-certificates libfontconfig libgl1-mesa-dev make libxcb-util0-dev g++-5 qt56base qt56x11extras qt56imageformats qt56tools qt56translations
 
 
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50 \
@@ -41,7 +41,7 @@ appimage_target="/usr/bin/linuxdeployqt"
 appimage_dist="linuxdeployqt-continuous-x86_64.AppImage"
 appimage_host="https://github.com/probonopd/linuxdeployqt/releases/download/continuous"
 cache_host="http://172.17.0.1:8000"
-if ! wget -q "$cache_host/$appimage_dist" -O "$appimage_target"; then
+if ! wget -q -t 1 --connect-timeout=5 "$cache_host/$appimage_dist" -O "$appimage_target"; then
   wget -cq "$appimage_host/$appimage_dist" -O "$appimage_target"
 fi
 chmod +x "$appimage_target"
