@@ -171,6 +171,14 @@ Modified: </source>
     </message>
 </context>
 <context>
+    <name>FileSystemModel</name>
+    <message>
+        <location filename="../src/filesystemmodel.cpp" line="43"/>
+        <source>Permissions</source>
+        <translation>Разрешения</translation>
+    </message>
+</context>
+<context>
     <name>GroupControl</name>
     <message>
         <location filename="../groupcontrol.cpp" line="22"/>
@@ -328,19 +336,9 @@ Modified: </source>
         <translation>Группа: </translation>
     </message>
     <message>
-        <location filename="../propertieswidget.cpp" line="73"/>
-        <source>Access user: </source>
-        <translation>Права пользователя: </translation>
-    </message>
-    <message>
-        <location filename="../propertieswidget.cpp" line="74"/>
-        <source>Access group: </source>
-        <translation>Права группы: </translation>
-    </message>
-    <message>
-        <location filename="../propertieswidget.cpp" line="75"/>
-        <source>Access other: </source>
-        <translation>Права остальных: </translation>
+        <location filename="../src/propertieswidget.cpp" line="47"/>
+        <source>Access rights: </source>
+        <translation>Права доступа: </translation>
     </message>
 </context>
 <context>
