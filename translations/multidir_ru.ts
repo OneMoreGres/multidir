@@ -389,9 +389,9 @@ Modified: </source>
         <translation>Показать</translation>
     </message>
     <message>
-        <location filename="../shortcutmanager.cpp" line="37"/>
-        <source>Find</source>
-        <translation>Поиск</translation>
+        <location filename="../src/shortcutmanager.cpp" line="56"/>
+        <source>Filter</source>
+        <translation>Фильтровать</translation>
     </message>
     <message>
         <location filename="../shortcutmanager.cpp" line="39"/>

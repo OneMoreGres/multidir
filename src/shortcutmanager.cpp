@@ -53,7 +53,7 @@ void ShortcutManager::setDefaults ()
   auto c = SM::General;
   shortcuts[SM::ToggleGui] = {{QS ("Ctrl+Alt+D")}, QObject::tr ("Toggle"),
                               QIcon (":/popup.png"), c, true};
-  shortcuts[SM::Find] = {{QS ("Ctrl+F")}, QObject::tr ("Find"),
+  shortcuts[SM::Find] = {{QS ("Ctrl+F")}, QObject::tr ("Filter"),
                          QIcon (":/find.png"), c};
   shortcuts[SM::Settings] = {{}, QObject::tr ("Settings"),
                              QIcon (":/settings.png"), c};
