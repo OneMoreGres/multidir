@@ -1,6 +1,7 @@
 
 set SELF_PATH=%~dp0
 call %SELF_PATH%\make_win.bat
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 
 mkdir content
