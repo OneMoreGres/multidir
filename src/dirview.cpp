@@ -117,6 +117,14 @@ void DirView::renameCurrent ()
   view ()->edit (nameIndex);
 }
 
+void DirView::changeCurrentPermissions ()
+{
+  const auto index = currentIndex ();
+  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Permissions);
+  setCurrentIndex (nameIndex);
+  view ()->edit (nameIndex);
+}
+
 bool DirView::isList () const
 {
   return isList_;

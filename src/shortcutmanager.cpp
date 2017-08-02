@@ -141,6 +141,8 @@ void ShortcutManager::setDefaults ()
                            QIcon (":/linkTo.png"), c};
   shortcuts[SM::ShowProperties] = {{QS ("Alt+Return")}, QObject::tr ("Properties"),
                                    QIcon (":/properties.png"), c};
+  shortcuts[SM::ChangePermissions] = {{QS ("Ctrl+M")}, QObject::tr ("Change permissions"),
+                                      QIcon (":/permissions.png"), c};
 }
 
 void ShortcutManager::save (QSettings &settings)

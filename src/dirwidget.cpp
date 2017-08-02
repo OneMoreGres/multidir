@@ -65,6 +65,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   openInEditorAction_ (nullptr),
   openInTabAction_ (nullptr),
   renameAction_ (nullptr),
+  permissionsAction_ (nullptr),
   trashAction_ (nullptr),
   removeAction_ (nullptr),
   cutAction_ (nullptr),
@@ -189,6 +190,10 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   renameAction_ = makeShortcut (ShortcutManager::Rename, viewMenu_);
   connect (renameAction_, &QAction::triggered,
            view_, &DirView::renameCurrent);
+
+  permissionsAction_ = makeShortcut (ShortcutManager::ChangePermissions, viewMenu_);
+  connect (permissionsAction_, &QAction::triggered,
+           view_, &DirView::changeCurrentPermissions);
 
   trashAction_ = makeShortcut (ShortcutManager::Trash, viewMenu_);
   connect (trashAction_, &QAction::triggered,

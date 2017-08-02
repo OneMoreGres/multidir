@@ -123,6 +123,7 @@ private:
   QAction *openInEditorAction_;
   QAction *openInTabAction_;
   QAction *renameAction_;
+  QAction *permissionsAction_;
   QAction *trashAction_;
   QAction *removeAction_;
   QAction *cutAction_;

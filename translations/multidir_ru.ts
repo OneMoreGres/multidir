@@ -4,68 +4,68 @@
 <context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirwidget.cpp" line="140"/>
+        <location filename="../src/dirwidget.cpp" line="141"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="178"/>
+        <location filename="../src/dirwidget.cpp" line="179"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="181"/>
+        <location filename="../src/dirwidget.cpp" line="182"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="184"/>
+        <location filename="../src/dirwidget.cpp" line="185"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="212"/>
+        <location filename="../src/dirwidget.cpp" line="217"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="286"/>
+        <location filename="../src/dirwidget.cpp" line="291"/>
         <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
         <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="424"/>
+        <location filename="../src/dirwidget.cpp" line="429"/>
         <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
         <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="516"/>
+        <location filename="../src/dirwidget.cpp" line="521"/>
         <source>Drives</source>
         <translation>Диски</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="527"/>
+        <location filename="../src/dirwidget.cpp" line="532"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="596"/>
-        <location filename="../src/dirwidget.cpp" line="600"/>
+        <location filename="../src/dirwidget.cpp" line="601"/>
+        <location filename="../src/dirwidget.cpp" line="605"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="727"/>
+        <location filename="../src/dirwidget.cpp" line="732"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="742"/>
+        <location filename="../src/dirwidget.cpp" line="747"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="762"/>
+        <location filename="../src/dirwidget.cpp" line="767"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
     </message>
@@ -588,6 +588,11 @@ Modified: </source>
         <location filename="../src/shortcutmanager.cpp" line="142"/>
         <source>Properties</source>
         <translation>Свойства</translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutmanager.cpp" line="144"/>
+        <source>Change permissions</source>
+        <translation>Изменить права</translation>
     </message>
     <message>
         <location filename="../src/utils.cpp" line="23"/>

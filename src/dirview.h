@@ -33,6 +33,7 @@ public:
   QModelIndexList selectedRows () const;
 
   void renameCurrent ();
+  void changeCurrentPermissions ();
 
   bool isList () const;
   void setIsList (bool isList);

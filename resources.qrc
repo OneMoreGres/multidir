@@ -35,5 +35,6 @@
         <file alias="fixSize.png">icons/push-pin.png</file>
         <file alias="console.png">icons/console.png</file>
         <file alias="properties.png">icons/id-card-5.png</file>
+        <file alias="permissions.png">icons/fingerprint.png</file>
     </qresource>
 </RCC>
