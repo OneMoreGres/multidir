@@ -1,5 +1,10 @@
 image: Visual Studio 2015
 
+environment:
+  matrix:
+  - ARCH: x64
+  - ARCH: x86
+    
 clone_depth: 1
 
 platform:
@@ -9,7 +14,7 @@ build_script:
   - call "utils\make_nsis.bat"
 
 artifacts:
-  - path: multidir-installer.exe
+  - path: multidir-installer-$(ARCH).exe
     name: installer
 
 deploy:

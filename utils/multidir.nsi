@@ -21,13 +21,25 @@
 !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_WORK_NAME}"
 !define REG_AUTOSTART "Software\Microsoft\Windows\CurrentVersion\Run"
 !define REG_SM_VALUE "StartMenuFolder"
+!ifndef ARCH
+!define ARCH "x64"
+!endif
+!if "${ARCH}" == "x64"
+!define VC_REDIST "vcredist_x64.exe"
+!define INSTALL_PATH "$PROGRAMFILES64"
+!define OUT_FILE "${APP_WORK_NAME}-${VERSION}-x64.exe"
+!else
+!define VC_REDIST "vcredist_x86.exe"
+!define INSTALL_PATH "$PROGRAMFILES32"
+!define OUT_FILE "${APP_WORK_NAME}-${VERSION}-x86.exe"
+!endif
 
 ; base
 
 Unicode true
 Name ${APP_BRAND_NAME}
-OutFile "${APP_WORK_NAME}-${VERSION}.exe"
-InstallDir "$PROGRAMFILES32\${APP_WORK_NAME}"
+OutFile "${OUT_FILE}"
+InstallDir "${INSTALL_PATH}\${APP_WORK_NAME}"
 InstallDirRegKey ${REG_ROOT} ${REG_APP} ""
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
@@ -133,9 +145,9 @@ SectionEnd
 
 Section $(SECT_REDIST) SECT_REDIST_ID
     SetOutPath "$TEMP"
-    File ${CONTENT_DIR}\app\vcredist_x64.exe
-    ExecWait '"$TEMP\vcredist_x64.exe"'
-    Delete "$TEMP\vcredist_x64.exe"
+    File ${CONTENT_DIR}\app\${VC_REDIST}
+    ExecWait '"$TEMP\${VC_REDIST}"'
+    Delete "$TEMP\${VC_REDIST}"
     SetOutPath "$INSTDIR"
 SectionEnd
 

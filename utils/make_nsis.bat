@@ -29,6 +29,7 @@ set /p VERSION=<%SELF_PATH%\..\version
 del content\defines.nsi
 echo !undef VERSION >> content\defines.nsi
 echo !define VERSION "%VERSION%" >> content\defines.nsi
+echo !define ARCH "%ARCH%" >> content\defines.nsi
 
 copy /Y %SELF_PATH%\..\translations\*.qm content\app\translations
 copy /Y %SELF_PATH%\multidir.nsi content
@@ -40,5 +41,5 @@ copy /Y %SELF_PATH%\..\icons\icon.ico content
 
 makensis.exe content/multidir.nsi
 
-copy /b /Y content\multidir-*.exe multidir-installer.exe
+copy /b /Y content\multidir-*.exe multidir-installer-%ARCH%.exe
 
