@@ -34,7 +34,8 @@ copy /Y %SELF_PATH%\..\translations\*.qm content\app\translations
 copy /Y %SELF_PATH%\multidir.nsi content
 copy /Y %SELF_PATH%\..\LICENSE.md content\LICENSE_en.md
 copy /Y %SELF_PATH%\LICENSE_ru.md content\LICENSE_ru.md
-copy /Y %SELF_PATH%\Changelog* content
+TYPE %SELF_PATH%\Changelog_en.txt | MORE /P > content\Changelog_en.txt
+TYPE %SELF_PATH%\Changelog_ru.txt | MORE /P > content\Changelog_ru.txt
 copy /Y %SELF_PATH%\..\icons\icon.ico content
 
 makensis.exe content/multidir.nsi
