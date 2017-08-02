@@ -42,6 +42,10 @@ QVariant FileSystemModel::headerData (int section, Qt::Orientation orientation, 
       {
         return tr ("Permissions");
       }
+      if (section == Column::LinkTarget)
+      {
+        return tr ("Link target");
+      }
     }
     return {};
   }
@@ -58,6 +62,11 @@ QVariant FileSystemModel::data (const QModelIndex &index, int role) const
       if (column == Column::Permissions)
       {
         return int (permissions (index));
+      }
+      if (column == Column::LinkTarget)
+      {
+        const auto info = fileInfo (index);
+        return info.isSymLink () ? info.symLinkTarget () : QString ();
       }
     }
     return {};

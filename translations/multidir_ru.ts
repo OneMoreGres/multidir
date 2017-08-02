@@ -173,6 +173,11 @@ Modified: </source>
         <source>Permissions</source>
         <translation>Разрешения</translation>
     </message>
+    <message>
+        <location filename="../src/filesystemmodel.cpp" line="47"/>
+        <source>Link target</source>
+        <translation>Назначение ссылки</translation>
+    </message>
 </context>
 <context>
     <name>GroupControl</name>

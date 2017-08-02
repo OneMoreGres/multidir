@@ -10,7 +10,7 @@ Q_OBJECT
 public:
   enum Column : int
   {
-    Name, Size, Type, Date, Permissions,
+    Name, Size, Type, Date, Permissions, LinkTarget,
     ColumnCount
   };
 
