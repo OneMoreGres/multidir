@@ -106,12 +106,13 @@ bool FileSystemModel::setData (const QModelIndex &index, const QVariant &value, 
 
 Qt::ItemFlags FileSystemModel::flags (const QModelIndex &index) const
 {
-  auto result = QAbstractItemModel::flags (index);
-  const auto name = index.sibling (index.row (), Column::Name).data ().toString ();
-  const auto isDotDot = (name == constants::dotdot);
-  if ((index.column () == Column::Name || index.column () == Column::Permissions) && !isDotDot)
+  const auto nameIndex = index.sibling (index.row (), Column::Name);
+  Qt::ItemFlags result = QFileSystemModel::flags (nameIndex);
+  const auto isDotDot = (nameIndex.data ().toString () == constants::dotdot);
+  if (!(index.column () == Column::Name || index.column () == Column::Permissions) ||
+      isDotDot)
   {
-    result |= Qt::ItemIsEditable;
+    result &= ~Qt::ItemIsEditable;
   }
   return result;
 }
