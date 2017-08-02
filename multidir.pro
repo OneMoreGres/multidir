@@ -70,7 +70,9 @@ SOURCES += \
     src/groupholder.cpp \
     src/shortcutmanager.cpp \
     src/propertieswidget.cpp \
-    src/translationloader.cpp
+    src/translationloader.cpp \
+    src/filepermissions.cpp \
+    src/filepermissiondelegate.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -100,7 +102,9 @@ HEADERS  += \
     src/groupholder.h \
     src/shortcutmanager.h \
     src/propertieswidget.h \
-    src/translationloader.h
+    src/translationloader.h \
+    src/filepermissions.h \
+    src/filepermissiondelegate.h
 
 RESOURCES += \
     resources.qrc

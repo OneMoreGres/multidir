@@ -1,5 +1,7 @@
 #include "filesystemmodel.h"
 #include "fileoperation.h"
+#include "constants.h"
+#include "debug.h"
 
 #include <QMimeData>
 #include <QUrl>
@@ -25,24 +27,91 @@ bool FileSystemModel::dropMimeData (const QMimeData *data, Qt::DropAction action
   return true;
 }
 
+int FileSystemModel::columnCount (const QModelIndex & /*parent*/) const
+{
+  return Column::ColumnCount;
+}
+
+QVariant FileSystemModel::headerData (int section, Qt::Orientation orientation, int role) const
+{
+  if (orientation == Qt::Horizontal && section >= Column::Permissions)
+  {
+    if (role == Qt::DisplayRole)
+    {
+      if (section == Column::Permissions)
+      {
+        return tr ("Permissions");
+      }
+    }
+    return {};
+  }
+  return QFileSystemModel::headerData (section, orientation, role);
+}
+
+QVariant FileSystemModel::data (const QModelIndex &index, int role) const
+{
+  if (index.isValid () && index.column () >= Column::Permissions)
+  {
+    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    {
+      const auto column = index.column ();
+      if (column == Column::Permissions)
+      {
+        return int (permissions (index));
+      }
+    }
+    return {};
+  }
+  return QFileSystemModel::data (index, role);
+}
+
 bool FileSystemModel::setData (const QModelIndex &index, const QVariant &value, int role)
 {
-  if (role != Qt::EditRole || index.column () != Column::Name)
-  {
-    return false;
-  }
-  const auto name = value.toString ();
-  auto dir = fileInfo (index).absoluteDir ();
-  if (name.isEmpty () || !dir.exists ())
+  if (role != Qt::EditRole)
   {
     return false;
   }
 
-  const auto old = index.data ().toString ();
-  auto ok = dir.rename (old, name);
-  if (ok)
+  const auto column = index.column ();
+  if (column == Column::Name)
   {
-    emit fileRenamed (dir.absolutePath (), old, name);
+    const auto name = value.toString ();
+    auto dir = fileInfo (index).absoluteDir ();
+    if (name.isEmpty () || !dir.exists ())
+    {
+      return false;
+    }
+
+    const auto old = index.data ().toString ();
+    auto ok = dir.rename (old, name);
+    if (ok)
+    {
+      emit fileRenamed (dir.absolutePath (), old, name);
+    }
+    return ok;
   }
-  return ok;
+
+  if (column == Column::Permissions)
+  {
+    auto permissions = QFile::Permissions (value.toInt ());
+    QFile file (fileInfo (index).absoluteFilePath ());
+    auto ok = file.setPermissions (permissions);
+    LWARNING_IF (!ok) << "Failed to set permissions for" << LARG (file.fileName ())
+                      << "to" << LARG (permissions);
+    return ok;
+  }
+
+  return false;
+}
+
+Qt::ItemFlags FileSystemModel::flags (const QModelIndex &index) const
+{
+  auto result = QAbstractItemModel::flags (index);
+  const auto name = index.sibling (index.row (), Column::Name).data ().toString ();
+  const auto isDotDot = (name == constants::dotdot);
+  if ((index.column () == Column::Name || index.column () == Column::Permissions) && !isDotDot)
+  {
+    result |= Qt::ItemIsEditable;
+  }
+  return result;
 }

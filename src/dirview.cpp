@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "filedelegate.h"
 #include "debug.h"
+#include "filepermissiondelegate.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -186,6 +187,9 @@ void DirView::initTable ()
   table_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (table_->horizontalHeader (), &QWidget::customContextMenuRequested,
            this, &DirView::showHeaderContextMenu);
+
+  table_->setItemDelegateForColumn (FileSystemModel::Permissions,
+                                    new FilePermissionDelegate (table_));
 
   table_->installEventFilter (this);
   table_->viewport ()->installEventFilter (this);
