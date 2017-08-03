@@ -121,7 +121,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
 VERSION = $$APP_VERSION.0
 RC_ICONS = icons/icon.ico
 
-unix {
+linux {
     PREFIX = /usr
 
     target.path = $$PREFIX/bin
@@ -134,4 +134,12 @@ unix {
     translations.path = $$PREFIX/share/multidir/translations
 
     INSTALLS += target shortcuts pixmaps translations
+}
+
+mac {
+    ICON = icons/multidir.icns
+
+    translations.files = $$[QT_INSTALL_TRANSLATIONS]/qtbase_ru.qm translations/multidir_ru.qm
+    translations.path = Contents/Translations
+    QMAKE_BUNDLE_DATA += translations
 }
