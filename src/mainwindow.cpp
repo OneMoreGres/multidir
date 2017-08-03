@@ -257,6 +257,7 @@ void MainWindow::toggleVisible ()
   else
   {
     show ();
+    raise ();
     activateWindow ();
   }
 }
