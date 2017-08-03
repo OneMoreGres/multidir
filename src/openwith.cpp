@@ -455,6 +455,147 @@ void openWith (const QFileInfo &file, const ExternalApp &app)
 #endif
 
 
+
+#ifdef Q_OS_MAC
+
+#  include <Carbon/Carbon.h>
+
+namespace
+{
+QString toString (CFStringRef string)
+{
+  if (!string)
+  {
+    return {};
+  }
+
+  const auto length = CFStringGetLength (string);
+  QString result (length, QChar (0));
+  CFRange range = {0, length};
+  CFStringGetCharacters (string, range, reinterpret_cast<UniChar *>(result.data ()));
+  return result;
+}
+
+
+ExternalApp parseBundle (const CFBundleRef bundle)
+{
+  ExternalApp app;
+
+  const auto url = CFBundleCopyBundleURL (bundle);
+  ASSERT (url);
+  const auto path = CFURLCopyFileSystemPath (url, kCFURLPOSIXPathStyle);
+  ASSERT (path);
+  const QFileInfo info (toString (path));
+  CFRelease (url);
+  CFRelease (path);
+  app.icon = QFileIconProvider ().icon (info);
+
+  const auto name = CFBundleGetValueForInfoDictionaryKey (bundle, kCFBundleNameKey);
+  ASSERT (name);
+  app.name = toString (reinterpret_cast<CFStringRef>(name));
+  if (app.name.isEmpty ())
+  {
+    app.name = info.baseName ();
+  }
+
+  const auto identifier = CFBundleGetIdentifier (bundle);
+  ASSERT (identifier);
+  app.command = QLatin1String ("open -b ") + toString (identifier);
+
+  return app;
+}
+
+}
+
+
+void OpenWith::init ()
+{
+
+}
+
+QList<ExternalApp> applications (const QFileInfo &file)
+{
+  QList<ExternalApp> result;
+
+  const auto fileUrl = QUrl::fromLocalFile (file.absoluteFilePath ()).toString ();
+  const auto urlString = CFStringCreateWithCharacters (
+    kCFAllocatorDefault, reinterpret_cast<const UniChar *>(fileUrl.constData ()),
+    fileUrl.length ());
+
+  const auto url = CFURLCreateWithString (kCFAllocatorDefault, urlString, 0);
+  CFRelease (urlString);
+  if (!url)
+  {
+    return result;
+  }
+
+  const auto bundles = LSCopyApplicationURLsForURL (url, kLSRolesAll);
+  CFRelease (url);
+
+  if (!bundles)
+  {
+    return result;
+  }
+
+  for (CFIndex i = 0, end = CFArrayGetCount (bundles); i < end; ++i)
+  {
+    const auto url = reinterpret_cast<CFURLRef>(CFArrayGetValueAtIndex (bundles, i));
+    const auto bundle = CFBundleCreate (kCFAllocatorDefault, url);
+    if (!bundle)
+    {
+      continue;
+    }
+
+    auto app = parseBundle (bundle);
+    if (app.isValid () && !result.contains (app))
+    {
+      result.append (app);
+    }
+
+    CFRelease (bundle);
+  }
+  CFRelease (bundles);
+
+  return result;
+}
+
+void openWith (const QFileInfo &file, const ExternalApp &app)
+{
+  if (app.command.isEmpty ())
+  {
+    LERROR () << "External app has not command" << LARG (app.name);
+    return;
+  }
+
+  auto command = app.command;
+  const auto path = file.absoluteFilePath ();
+  const auto quoted = [](const QString &in) {
+                        return QLatin1Char ('"') + in + QLatin1Char ('"');
+                      };
+  if (command.contains ('%'))
+  {
+    command.replace ("%i", QLatin1String (""));
+    command.replace ("%c", QLatin1String ("-"));
+    command.replace ("%k", QLatin1String (""));
+    command.replace ("%f", quoted (path));
+    command.replace ("%F", quoted (path));
+    command.replace ("%u", quoted (QUrl::fromLocalFile (path).toString ()));
+    command.replace ("%U", quoted (QUrl::fromLocalFile (path).toString ()));
+  }
+  else
+  {
+    command += " " + quoted (path);
+  }
+  if (!QProcess::startDetached (command))
+  {
+    Notifier::error (QObject::tr ("Failed to start external app '%1' with command '%2'")
+                     .arg (app.name, command));
+  }
+}
+
+#endif
+
+
 void OpenWith::popupateMenu (QMenu &menu, const QFileInfo &file)
 {
   menu.clear ();
