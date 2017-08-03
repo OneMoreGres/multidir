@@ -216,6 +216,10 @@ void MainWindow::restore (QSettings &settings)
   const auto console = QString ("cmd");
   const auto editor = QString ("notepad.exe");
 #endif
+#ifdef Q_OS_MAC
+  const auto console = QString ("open -a Terminal");
+  const auto editor = QString ("open -a TextEdit");
+#endif
   consoleCommand_ = settings.value (qs_console, console).toString ().trimmed ();
   editorCommand_ = settings.value (qs_editor, editor).toString ().trimmed ();
 
