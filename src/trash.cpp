@@ -68,6 +68,7 @@ bool Trash::trash (const QFileInfo &file)
   if (!QFile::rename (file.absoluteFilePath (), files.absoluteFilePath (trashedName)))
   {
     QFile::remove (infos.absoluteFilePath (infoName));
+    return false;
   }
   return true;
 }
