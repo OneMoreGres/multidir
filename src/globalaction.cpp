@@ -458,7 +458,7 @@ bool GlobalAction::registerHotKey (quint32 nativeKey, quint32 nativeMods)
 bool GlobalAction::unregisterHotKey (quint32 nativeKey, quint32 nativeMods)
 {
   EventHotKeyRef ref = hotkeyRefs.value (qMakePair (nativeKey, nativeMods));
-  Q_ASSERT (ref);
+  ASSERT (ref);
   OSStatus status = UnregisterEventHotKey (ref);
   if (status != noErr)
   {

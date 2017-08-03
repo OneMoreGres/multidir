@@ -27,7 +27,7 @@ QWidget * FilePermissionDelegate::createEditor (QWidget *parent,
 void FilePermissionDelegate::setEditorData (QWidget *editor, const QModelIndex &index) const
 {
   auto casted = qobject_cast<QLineEdit *>(editor);
-  Q_ASSERT (casted);
+  ASSERT (casted);
   const auto modelData = index.data (Qt::EditRole).toInt ();
   casted->setText (FilePermissions::toString (QFile::Permissions (modelData)));
 }
@@ -36,7 +36,7 @@ void FilePermissionDelegate::setModelData (QWidget *editor, QAbstractItemModel *
                                            const QModelIndex &index) const
 {
   auto casted = qobject_cast<QLineEdit *>(editor);
-  Q_ASSERT (casted);
+  ASSERT (casted);
   const auto text = casted->text ();
   if (text.isEmpty ())
   {
