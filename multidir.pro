@@ -15,6 +15,9 @@ linux{
 win32{
   LIBS += -lUser32
 }
+mac{
+  LIBS += -framework Carbon
+}
 
 TARGET = multidir
 TEMPLATE = app
