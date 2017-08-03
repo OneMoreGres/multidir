@@ -119,7 +119,10 @@ QMAKE_TARGET_COMPANY = Gres
 QMAKE_TARGET_PRODUCT = MultiDir
 QMAKE_TARGET_COPYRIGHT = Copyright (c) Gres
 VERSION = $$APP_VERSION.0
-RC_ICONS = icons/icon.ico
+
+win32 {
+    RC_ICONS = icons/icon.ico
+}
 
 linux {
     PREFIX = /usr
