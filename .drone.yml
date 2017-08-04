@@ -7,7 +7,7 @@ pipeline:
     image: gres/multidir:precise
     commands:
       - cd /build
-      - /base/src/utils/make_ubuntu.sh
+      - /base/src/utils/precise/build.sh
 
   pack:
     image: gres/multidir:precise
@@ -15,7 +15,6 @@ pipeline:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
       - cd /build
-      - /base/src/utils/make_appimage.sh
-      - mv *.AppImage /drone/dist
+      - mv *.appimage /drone/dist
     when:
       branch: [release/*, master, feature/ci-*]
