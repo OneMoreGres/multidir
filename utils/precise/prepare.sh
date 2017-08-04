@@ -17,14 +17,14 @@ apt-get -qq update
 apt-get -y -qq install wget ca-certificates libfontconfig libgl1-mesa-dev make libxcb-util0-dev g++-5 qt56base qt56x11extras qt56imageformats qt56tools qt56translations
 
 
-update-alternatives --install --force /usr/bin/gcc gcc /usr/bin/gcc-5 50 \
+update-alternatives --force --install /usr/bin/gcc gcc /usr/bin/gcc-5 50 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-5
 update-alternatives --set gcc /usr/bin/gcc-5
 echo `g++ --version`
 
 qt_path="/opt/qt56/"
 qt_bin="/opt/qt56/bin"
-alternatives="update-alternatives --install --force /usr/bin/qmake qt $qt_bin/qmake 56 "
+alternatives="update-alternatives --force --install /usr/bin/qmake qt $qt_bin/qmake 56 "
 for file in `find "$qt_bin" -maxdepth 1 -type f -executable`; do
     name=$(basename $file)
     if [ "$name" == "qmake" ]; then
