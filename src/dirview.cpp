@@ -192,6 +192,7 @@ void DirView::initTable ()
   connect (table_, &QWidget::customContextMenuRequested,
            this, &DirView::contextMenuRequested);
 
+  table_->horizontalHeader ()->setSectionsMovable (true);
   table_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (table_->horizontalHeader (), &QWidget::customContextMenuRequested,
            this, &DirView::showHeaderContextMenu);
