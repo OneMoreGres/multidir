@@ -27,7 +27,7 @@ const QString qs_size = "size";
 class ShortcutDelegate : public QStyledItemDelegate
 {
 public:
-  ShortcutDelegate (QWidget *parent) : QStyledItemDelegate (parent) {}
+  explicit ShortcutDelegate (QWidget *parent) : QStyledItemDelegate (parent) {}
 
   QWidget * createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/,
                           const QModelIndex & /*index*/) const override
