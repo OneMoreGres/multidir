@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "debug.h"
 #include "propertieswidget.h"
+#include "filesystemcompleter.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -268,6 +269,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   dirLabel_->installEventFilter (this);
 
   pathEdit_->installEventFilter (this);
+  pathEdit_->setCompleter (new FileSystemCompleter (model, this));
   connect (pathEdit_, &QLineEdit::editingFinished,
            this, &DirWidget::handleEditedPath);
 

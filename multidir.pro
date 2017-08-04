@@ -75,7 +75,8 @@ SOURCES += \
     src/propertieswidget.cpp \
     src/translationloader.cpp \
     src/filepermissions.cpp \
-    src/filepermissiondelegate.cpp
+    src/filepermissiondelegate.cpp \
+    src/filesystemcompleter.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -107,7 +108,8 @@ HEADERS  += \
     src/propertieswidget.h \
     src/translationloader.h \
     src/filepermissions.h \
-    src/filepermissiondelegate.h
+    src/filepermissiondelegate.h \
+    src/filesystemcompleter.h
 
 RESOURCES += \
     resources.qrc
