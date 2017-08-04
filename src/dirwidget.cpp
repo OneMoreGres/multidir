@@ -704,7 +704,7 @@ void DirWidget::togglePathEdition (bool isOn)
   pathLabel_->setVisible (!isOn);
   dirLabel_->setVisible (!isOn);
 
-  const auto path = this->path ().absoluteFilePath ();
+  const auto path = QDir::toNativeSeparators(this->path ().absoluteFilePath ());
   if (isOn)
   {
     pathEdit_->setText (path);
@@ -971,7 +971,7 @@ void DirWidget::updatePathLabel ()
   const auto newPath = fittedPath (maxWidth);
   if (newPath != pathLabel_->text ())
   {
-    pathLabel_->setText (newPath);
+    pathLabel_->setText (QDir::toNativeSeparators(newPath));
   }
 }
 

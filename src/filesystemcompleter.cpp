@@ -13,12 +13,16 @@ FileSystemCompleter::FileSystemCompleter (FileSystemModel *model, QObject *paren
   proxy_->setShowFiles (false);
   proxy_->setShowDotDot (false);
 
+  setCompletionRole (FileSystemModel::FileNameRole);
+#ifdef Q_OS_WIN
+  setCaseSensitivity (Qt::CaseInsensitive);
+#endif
   setModel (proxy_);
 
   connect (model, &QFileSystemModel::directoryLoaded, this, [this](const QString &path) {
              if (lastPath_ == path && completionCount () > 0)
              {
-               QApplication::instance ()->processEvents (QEventLoop::ExcludeUserInputEvents, 50);
+               QApplication::instance ()->processEvents (QEventLoop::ExcludeUserInputEvents, 100);
                complete ();
              }
            });
@@ -34,14 +38,19 @@ QString FileSystemCompleter::pathFromIndex (const QModelIndex &index) const
   const auto source = static_cast<FileSystemModel *>(proxy_->sourceModel ());
   ASSERT (source);
   const auto mapped = proxy_->mapToSource (index);
-  return source->filePath (mapped);
+  const auto path = source->filePath (mapped);
+  return QDir::toNativeSeparators (path);
 }
 
 QStringList FileSystemCompleter::splitPath (const QString &path) const
 {
   auto native = QDir::toNativeSeparators (path);
 #ifdef Q_OS_WIN
-  if (native == QLatin1String ("\\") || native == QLatin1String ("\\\\"))
+  if (native == QLatin1String ("\\"))
+  {
+    return {};
+  }
+  if (native == QLatin1String ("\\\\"))
   {
     return QStringList (native);
   }
@@ -63,14 +72,31 @@ QStringList FileSystemCompleter::splitPath (const QString &path) const
     parts[0] = QLatin1Char ('/');
   }
 #endif
-  lastPath_ = path.left (path.size () - 1);
+
+#ifdef Q_OS_WIN
+  if (startsWithDoubleSlash) // skip network address checks
+  {
+    return parts;
+  }
+#endif
+
+  if (!QFileInfo::exists (path))
+  {
+    return parts;
+  }
 
   const auto source = static_cast<FileSystemModel *>(proxy_->sourceModel ());
   ASSERT (source);
-  const auto index = source->index (path);
+  auto index = source->index (path);
+  if (index.isValid () && !native.endsWith (QDir::separator ()))
+  {
+    index = index.parent ();
+  }
   if (index.isValid ())
   {
+    lastPath_ = source->filePath (index);
     proxy_->setCurrent (proxy_->mapFromSource (index));
   }
+
   return parts;
 }
