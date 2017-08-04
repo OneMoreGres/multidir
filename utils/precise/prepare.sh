@@ -32,8 +32,11 @@ for file in `find "$qt_bin" -maxdepth 1 -type f -executable`; do
     fi
     alternatives="$alternatives --slave /usr/bin/$name $name $qt_bin/$name "
 done
-`$alternatives`
-update-alternatives --set qt $qt_bin/qmake
+if $alternatives; then
+    update-alternatives --set qt $qt_bin/qmake
+else
+    ln -s $qt_path /opt/qt
+fi
 echo `qmake --version`
 
 
