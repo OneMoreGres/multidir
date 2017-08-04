@@ -57,7 +57,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto status = new QStatusBar (this);
   Notifier::setMain (status);
 
-  model_->setRootPath (QDir::homePath ());
+  model_->setRootPath (QDir::rootPath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
   model_->setReadOnly (false);
   connect (model_, &FileSystemModel::fileOperation,
