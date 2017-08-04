@@ -11,10 +11,10 @@ platform:
   - x64
 
 build_script:
-  - call "utils\make_nsis.bat"
+  - call "utils\win\build.bat"
 
 artifacts:
-  - path: multidir-installer-$(ARCH).exe
+  - path: 'multidir-installer-*.exe'
     name: installer
 
 deploy:

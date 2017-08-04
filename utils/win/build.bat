@@ -45,5 +45,5 @@ copy /Y %ROOT%\icons\icon.ico content
 
 makensis.exe content/multidir.nsi
 
-copy /b /Y content\multidir-*.exe multidir-installer-%ARCH%.exe
+copy /b /Y content\multidir-*.exe multidir-installer-%VERSION%-%ARCH%.exe
 
