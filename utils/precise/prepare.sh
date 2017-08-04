@@ -9,8 +9,8 @@ if [ -z "`which apt-add-repository`" ]; then
   echo "deb http://ppa.launchpad.net/beineri/opt-qt562/ubuntu precise main" > /etc/apt/sources.list.d/qt.list
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E9977759
 else
-  apt-add-repository ppa:ubuntu-toolchain-r/test
-  apt-add-repository ppa:beineri/opt-qt562
+  apt-add-repository -y ppa:ubuntu-toolchain-r/test
+  apt-add-repository -y ppa:beineri/opt-qt562
 fi
 
 apt-get -qq update
