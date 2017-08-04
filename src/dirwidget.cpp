@@ -108,7 +108,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   auto editPath = makeShortcut (ShortcutManager::ChangePath, menu_);
   connect (editPath, &QAction::triggered,
-           this, [this] {togglePathEdition (true);});
+           this, &DirWidget::startPathEdition);
 
   auto runCommand = makeShortcut (ShortcutManager::RunCommand, menu_);
   connect (runCommand, &QAction::triggered,
@@ -271,9 +271,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathEdit_->installEventFilter (this);
   pathEdit_->setCompleter (new FileSystemCompleter (model, this));
   connect (pathEdit_, &QLineEdit::editingFinished,
-           this, &DirWidget::handleEditedPath);
+           this, [this] {finishPathEdition (true);});
 
-  togglePathEdition (false);
+  finishPathEdition (false);
 
   controlsLayout_->addWidget (newFolder);
   controlsLayout_->addStretch (1);
@@ -657,22 +657,15 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
   if (event->type () == QEvent::MouseButtonDblClick &&
       (watched == pathLabel_ || watched == dirLabel_))
   {
-    togglePathEdition (true);
+    startPathEdition ();
     return true;
   }
   if (event->type () == QEvent::KeyPress && watched == pathEdit_)
   {
     if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
     {
-      if (commandPrompt_->isVisible ())
-      {
-        commandPrompt_->hide ();
-      }
-      if (pathEdit_->isModified ())
-      {
-        togglePathEdition (true); // reset changes
-      }
-      pathEdit_->hide (); // trigger editionFinished
+      commandPrompt_->hide ();
+      finishPathEdition (false);
       return true;
     }
   }
@@ -697,35 +690,34 @@ void DirWidget::adjustItems ()
   view_->adjustItems ();
 }
 
-void DirWidget::togglePathEdition (bool isOn)
+void DirWidget::startPathEdition ()
 {
-  pathEdit_->setVisible (isOn);
-  indexLabel_->setVisible (!isOn);
-  pathLabel_->setVisible (!isOn);
-  dirLabel_->setVisible (!isOn);
+  pathEdit_->setVisible (true);
+  indexLabel_->setVisible (false);
+  pathLabel_->setVisible (false);
+  dirLabel_->setVisible (false);
 
-  const auto path = QDir::toNativeSeparators(this->path ().absoluteFilePath ());
-  if (isOn)
+  const auto path = QDir::toNativeSeparators (this->path ().absoluteFilePath ());
+  pathEdit_->setText (path);
+  pathEdit_->setFocus ();
+  pathEdit_->selectAll ();
+}
+
+void DirWidget::finishPathEdition (bool applyChanges)
+{
+  pathEdit_->setVisible (false);
+  indexLabel_->setVisible (true);
+  pathLabel_->setVisible (true);
+  dirLabel_->setVisible (true);
+
+  if (applyChanges)
   {
-    pathEdit_->setText (path);
-    pathEdit_->setFocus ();
-    pathEdit_->selectAll ();
-  }
-  else
-  {
+    const auto path = QDir::toNativeSeparators (this->path ().absoluteFilePath ());
     const auto newPath = pathEdit_->text ();
     if (newPath != path && QFile::exists (newPath))
     {
       setPath (newPath);
     }
-  }
-}
-
-void DirWidget::handleEditedPath ()
-{
-  if (QFile::exists (pathEdit_->text ()))
-  {
-    togglePathEdition (false);
   }
 }
 
@@ -971,7 +963,7 @@ void DirWidget::updatePathLabel ()
   const auto newPath = fittedPath (maxWidth);
   if (newPath != pathLabel_->text ())
   {
-    pathLabel_->setText (QDir::toNativeSeparators(newPath));
+    pathLabel_->setText (QDir::toNativeSeparators (newPath));
   }
 }
 

@@ -64,8 +64,9 @@ private:
   QFileInfo fileInfo (const QModelIndex &index) const;
   QStringList names (const QList<QModelIndex> &indexes) const;
 
-  void togglePathEdition (bool isOn);
-  void handleEditedPath ();
+  void startPathEdition ();
+  void finishPathEdition (bool applyChanges);
+
   void startRenaming ();
   void promptClose ();
   void promptTrash ();
