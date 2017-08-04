@@ -23,4 +23,5 @@ private:
   static bool unregisterHotKey (quint32 nativeKey, quint32 nativeMods);
   static void triggerHotKey (quint32 nativeKey, quint32 nativeMods);
 
+  friend struct ActionAdapter;
 };

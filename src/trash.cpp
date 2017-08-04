@@ -68,8 +68,31 @@ bool Trash::trash (const QFileInfo &file)
   if (!QFile::rename (file.absoluteFilePath (), files.absoluteFilePath (trashedName)))
   {
     QFile::remove (infos.absoluteFilePath (infoName));
+    return false;
   }
   return true;
+}
+
+#endif
+
+
+#ifdef Q_OS_MAC
+
+#  include <Carbon/Carbon.h>
+
+bool Trash::trash (const QFileInfo &file)
+{
+  if (!file.exists ())
+  {
+    return false;
+  }
+
+  const auto source = file.absoluteFilePath ().toUtf8 ();
+  char *newPath = 0;
+  auto result = FSPathMoveObjectToTrashSync (source.constData (), &newPath,
+                                             kFSFileOperationDoNotMoveAcrossVolumes);
+
+  return result == noErr;
 }
 
 #endif
