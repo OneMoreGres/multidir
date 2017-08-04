@@ -38,13 +38,12 @@ QVariant FileSystemModel::headerData (int section, Qt::Orientation orientation, 
   {
     if (role == Qt::DisplayRole)
     {
-      if (section == Column::Permissions)
+      switch (section)
       {
-        return tr ("Permissions");
-      }
-      if (section == Column::LinkTarget)
-      {
-        return tr ("Link target");
+        case Column::Owner: return tr ("Owner");
+        case Column::Group: return tr ("Group");
+        case Column::Permissions: return tr ("Permissions");
+        case Column::LinkTarget: return tr ("Link target");
       }
     }
     return {};
@@ -58,15 +57,13 @@ QVariant FileSystemModel::data (const QModelIndex &index, int role) const
   {
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-      const auto column = index.column ();
-      if (column == Column::Permissions)
+      const auto info = fileInfo (index);
+      switch (index.column ())
       {
-        return int (permissions (index));
-      }
-      if (column == Column::LinkTarget)
-      {
-        const auto info = fileInfo (index);
-        return info.isSymLink () ? info.symLinkTarget () : QString ();
+        case Column::Owner: return info.owner ();
+        case Column::Group: return info.group ();
+        case Column::Permissions: return int (info.permissions ());
+        case Column::LinkTarget: return info.isSymLink () ? info.symLinkTarget () : QString ();
       }
     }
     return {};

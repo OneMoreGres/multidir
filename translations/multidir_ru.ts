@@ -170,11 +170,21 @@ Modified: </source>
     <name>FileSystemModel</name>
     <message>
         <location filename="../src/filesystemmodel.cpp" line="43"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <location filename="../src/filesystemmodel.cpp" line="44"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location filename="../src/filesystemmodel.cpp" line="45"/>
         <source>Permissions</source>
         <translation>Разрешения</translation>
     </message>
     <message>
-        <location filename="../src/filesystemmodel.cpp" line="47"/>
+        <location filename="../src/filesystemmodel.cpp" line="46"/>
         <source>Link target</source>
         <translation>Назначение ссылки</translation>
     </message>
