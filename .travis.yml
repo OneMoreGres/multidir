@@ -14,8 +14,8 @@ matrix:
       dist: precise
   
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then chmod +x ./utils/osx/prepare.sh & ./utils/osx/prepare.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x ./utils/precise/prepare.sh & ./utils/precise/prepare.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then chmod +x ./utils/osx/prepare.sh & sudo ./utils/osx/prepare.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x ./utils/precise/prepare.sh & sudo ./utils/precise/prepare.sh; fi
   
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then chmod +x ./utils/osx/build.sh & ./utils/osx/build.sh ; fi
