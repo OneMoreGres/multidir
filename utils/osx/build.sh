@@ -32,7 +32,7 @@ cd ..
 # pack
 macdeployqt multidir.app -dmg
 mv multidir.dmg multidir-$VERSION.dmg
-ls -l `pwd`/multidir-$VERSION-x64.appimage
+ls -l `pwd`/multidir.dmg multidir-$VERSION.dmg
 
 
 echo "Finished"
