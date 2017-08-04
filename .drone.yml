@@ -10,4 +10,4 @@ pipeline:
     commands:
       - cd /build
       - /base/src/utils/precise/build.sh
-      - mv `ls *.appimage` /drone/dist/$(basename `ls *.appimage` .appimage)-$DRONE_BRANCH.appimage
+      - for f in `ls multidir-*.appimage`; do mv $f /drone/dist/$(basename $f .appimage)-$DRONE_BRANCH.appimage; done
