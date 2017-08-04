@@ -20,7 +20,6 @@ apt-get -y -qq install wget ca-certificates libfontconfig libgl1-mesa-dev make l
 update-alternatives --force --install /usr/bin/gcc gcc /usr/bin/gcc-5 50 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-5
 update-alternatives --set gcc /usr/bin/gcc-5
-echo `g++ --version`
 
 qt_path="/opt/qt56/"
 qt_bin="/opt/qt56/bin"
@@ -37,7 +36,6 @@ if $alternatives; then
 else
     ln -s $qt_path /opt/qt
 fi
-echo `qmake --version`
 
 
 

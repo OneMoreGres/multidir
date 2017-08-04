@@ -12,6 +12,8 @@ elif [ -d "/usr/local/opt/qt/bin" ]; then export PATH="/usr/local/opt/qt/bin:$PA
 fi
 ROOT="$SELF_PATH/../.."
 VERSION=`cat "$ROOT/version"`
+echo `g++ --version`
+echo `qmake --version`
 
 
 # build
