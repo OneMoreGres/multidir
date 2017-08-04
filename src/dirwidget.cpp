@@ -714,6 +714,12 @@ void DirWidget::finishPathEdition (bool applyChanges)
   {
     const auto path = QDir::toNativeSeparators (this->path ().absoluteFilePath ());
     const auto newPath = pathEdit_->text ();
+#ifdef Q_OS_WIN
+    if (newPath.startsWith (constants::networkDirStart))
+    {
+      return;
+    }
+#endif
     if (newPath != path && QFile::exists (newPath))
     {
       setPath (newPath);

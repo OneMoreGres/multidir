@@ -2,6 +2,7 @@
 #include "filesystemmodel.h"
 #include "constants.h"
 #include "backgroundreader.h"
+#include "debug.h"
 
 #include <QDateTime>
 #include <QPixmapCache>
@@ -111,6 +112,16 @@ void ProxyModel::setCurrent (const QModelIndex &current)
 
 bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const
 {
+#ifdef Q_OS_WIN
+  if (!sourceParent.isValid ())
+  {
+    const auto name = model_->fileName (model_->index (sourceRow, 0, sourceParent));
+    if (name.startsWith (constants::networkDirStart))
+    {
+      return false;
+    }
+  }
+#endif
   if (sourceParent == current_)
   {
     const auto canFilter = !showDirs_ || !showFiles_ || !showDotDot_ ||

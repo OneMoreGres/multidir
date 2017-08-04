@@ -1,6 +1,7 @@
 #include "filesystemcompleter.h"
 #include "filesystemmodel.h"
 #include "proxymodel.h"
+#include "constants.h"
 #include "debug.h"
 
 #include <QAbstractItemView>
@@ -50,21 +51,21 @@ QStringList FileSystemCompleter::splitPath (const QString &path) const
   {
     return {};
   }
-  if (native == QLatin1String ("\\\\"))
+  if (native == constants::networkDirStart)
   {
     return QStringList (native);
   }
-  const auto startsWithDoubleSlash = native.startsWith (QLatin1String ("\\\\"));
-  if (startsWithDoubleSlash)
+  const auto isNetworkDir = native.startsWith (constants::networkDirStart);
+  if (isNetworkDir)
   {
     native = native.mid (2);
   }
 #endif
   auto parts = native.split (QDir::separator ());
 #ifdef Q_OS_WIN
-  if (startsWithDoubleSlash)
+  if (isNetworkDir)
   {
-    parts[0].prepend (QLatin1String ("\\\\"));
+    parts[0].prepend (constants::networkDirStart);
   }
 #else
   if (native[0] == QDir::separator ()) // readd the "/" at the beginning as the split removed it
@@ -74,7 +75,7 @@ QStringList FileSystemCompleter::splitPath (const QString &path) const
 #endif
 
 #ifdef Q_OS_WIN
-  if (startsWithDoubleSlash) // skip network address checks
+  if (isNetworkDir)
   {
     return parts;
   }
