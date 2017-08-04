@@ -14,7 +14,7 @@ build_script:
   - call "utils\win\build.bat"
 
 artifacts:
-  - path: /multidir-installer-.*\.exe/
+  - path: 'multidir-installer-*.exe'
     name: installer
 
 deploy:
