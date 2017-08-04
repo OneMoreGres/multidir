@@ -39,6 +39,6 @@ unset LD_LIBRARY_PATH
 ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
 ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -appimage
 mv MultiDir-x86_64.AppImage multidir-$VERSION-x64.appimage 
-
+ls -l `pwd`/multidir-$VERSION-x64.appimage
 
 echo "Finished"
