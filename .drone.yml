@@ -5,16 +5,9 @@ workspace:
 pipeline:
   test:
     image: gres/multidir:precise
-    commands:
-      - cd /build
-      - /base/src/utils/precise/build.sh
-
-  pack:
-    image: gres/multidir:precise
     volumes:
       - /home/gres/Projects/filemanager/dist:/drone/dist
     commands:
       - cd /build
-      - mv *.appimage /drone/dist
-    when:
-      branch: [release/*, master, feature/ci-*]
+      - /base/src/utils/precise/build.sh
+      - for f in `ls multidir-*.appimage`; do mv $f /drone/dist/$(basename $f .appimage)-${DRONE_BRANCH//\//_}.appimage; done
