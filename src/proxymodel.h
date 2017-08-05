@@ -14,6 +14,12 @@ public:
   bool showDirs () const;
   void setShowDirs (bool showDirs);
 
+  bool showFiles () const;
+  void setShowFiles (bool showFiles);
+
+  bool showDotDot () const;
+  void setShowDotDot (bool showDotDot);
+
   bool showHidden () const;
   void setShowHidden (bool showHidden);
 
@@ -40,6 +46,8 @@ private:
 
   QFileSystemModel *model_;
   bool showDirs_;
+  bool showFiles_;
+  bool showDotDot_;
   bool showHidden_;
   bool showThumbnails_;
   QString nameFilter_;

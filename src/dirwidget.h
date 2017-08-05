@@ -7,6 +7,7 @@ class ProxyModel;
 class FileSystemModel;
 class DirView;
 class FileOperation;
+class PathWidget;
 
 class QLabel;
 class QMenu;
@@ -33,6 +34,7 @@ public:
 
   QString index () const;
   void setIndex (const QString &index);
+  QString fullName (int preferredWidth) const;
 
   void setNameFilter (const QString &filter);
 
@@ -58,14 +60,11 @@ private:
   void newFolder ();
   QAction * makeShortcut (int shortcutType, QMenu *menu, bool isCheckable = false);
 
-  QString fittedPath (int maxWidth) const;
   QList<QFileInfo> selected () const;
   QFileInfo current () const;
   QFileInfo fileInfo (const QModelIndex &index) const;
   QStringList names (const QList<QModelIndex> &indexes) const;
 
-  void togglePathEdition (bool isOn);
-  void handleEditedPath ();
   void startRenaming ();
   void promptClose ();
   void promptTrash ();
@@ -93,7 +92,6 @@ private:
   void setShowDirs (bool on);
 
   void updateActions ();
-  void updatePathLabel ();
   void checkDirExistence ();
   void handleDirRename (const QString &path, const QString &old, const QString &now);
 
@@ -101,11 +99,9 @@ private:
   FileSystemModel *model_;
   ProxyModel *proxy_;
   DirView *view_;
+  QString index_;
   QFileInfo path_;
-  QLabel *indexLabel_;
-  QLabel *pathLabel_;
-  QLabel *dirLabel_;
-  QLineEdit *pathEdit_;
+  PathWidget *pathWidget_;
   QLineEdit *commandPrompt_;
 
   QMenu *menu_;

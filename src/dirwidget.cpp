@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "debug.h"
 #include "propertieswidget.h"
+#include "pathwidget.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -45,11 +46,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
   view_ (new DirView (*proxy_, this)),
+  index_ (),
   path_ (),
-  indexLabel_ (new QLabel (this)),
-  pathLabel_ (new QLabel (this)),
-  dirLabel_ (new QLabel (this)),
-  pathEdit_ (new QLineEdit (this)),
+  pathWidget_ (new PathWidget (model, this)),
   commandPrompt_ (new QLineEdit (this)),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
@@ -107,7 +106,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   auto editPath = makeShortcut (ShortcutManager::ChangePath, menu_);
   connect (editPath, &QAction::triggered,
-           this, [this] {togglePathEdition (true);});
+           pathWidget_, &PathWidget::edit);
 
   auto runCommand = makeShortcut (ShortcutManager::RunCommand, menu_);
   connect (runCommand, &QAction::triggered,
@@ -120,6 +119,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   isLocked_ = makeShortcut (ShortcutManager::LockTab, menu_, true);
   connect (isLocked_, &QAction::toggled,
            this, &DirWidget::setLocked);
+  connect (isLocked_, &QAction::toggled,
+           pathWidget_, &PathWidget::setReadOnly);
 
   auto clone = makeShortcut (ShortcutManager::CloneTab, menu_);
   connect (clone, &QAction::triggered,
@@ -258,32 +259,13 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   auto newFolder = new QToolButton (this);
   newFolder->setDefaultAction (newFolderAction_);
 
-
-  pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
-  pathLabel_->installEventFilter (this);
-
-  auto dirFont = dirLabel_->font ();
-  dirFont.setBold (true);
-  dirLabel_->setFont (dirFont);
-  dirLabel_->installEventFilter (this);
-
-  pathEdit_->installEventFilter (this);
-  connect (pathEdit_, &QLineEdit::editingFinished,
-           this, &DirWidget::handleEditedPath);
-
-  togglePathEdition (false);
+  connect (pathWidget_, &PathWidget::pathChanged,
+           this, &DirWidget::setPath);
 
   controlsLayout_->addWidget (newFolder);
-  controlsLayout_->addStretch (1);
-  controlsLayout_->addWidget (indexLabel_);
-  controlsLayout_->addWidget (pathLabel_);
-  controlsLayout_->addWidget (dirLabel_);
-  controlsLayout_->addWidget (pathEdit_);
-  controlsLayout_->addStretch (1);
+  controlsLayout_->addWidget (pathWidget_);
   controlsLayout_->addWidget (viewMenuButton);
   controlsLayout_->addWidget (up);
-
-  controlsLayout_->setStretch (controlsLayout_->indexOf (pathEdit_), 40);
 
 
   commandPrompt_->hide ();
@@ -370,7 +352,7 @@ void DirWidget::setSiblings (const QList<DirWidget *> siblings)
                   const auto common = SM::get (s).toString ();
                   for (auto *i: siblings)
                   {
-                    auto action = menu->addAction (i->indexLabel_->text ());
+                    auto action = menu->addAction (i->index ());
                     action->setData (QVariant::fromValue (i));
                     if (!common.isEmpty ())
                     {
@@ -399,10 +381,7 @@ void DirWidget::updateSiblingActions ()
                   {
                     auto *w = i->data ().value<DirWidget *>();
                     ASSERT (w);
-                    const auto maxWidth = 100;
-                    const auto text = w->indexLabel_->text () + ' ' +
-                                      w->fittedPath (maxWidth) + w->dirLabel_->text ();
-                    i->setText (text);
+                    i->setText (w->fullName (100));
                   }
                 };
 
@@ -480,24 +459,18 @@ QString DirWidget::preprocessedCommand () const
 
 QString DirWidget::index () const
 {
-  auto index = indexLabel_->text ();
-  if (!index.isEmpty ())
-  {
-    index = index.mid (1,index.length () - 2);
-  }
-  return index;
+  return index_;
 }
 
 void DirWidget::setIndex (const QString &index)
 {
-  if (!index.isEmpty ())
-  {
-    indexLabel_->setText ('(' + index + ')');
-  }
-  else
-  {
-    indexLabel_->clear ();
-  }
+  index_ = index;
+  pathWidget_->setIndex (index);
+}
+
+QString DirWidget::fullName (int preferredWidth) const
+{
+  return pathWidget_->fullName (preferredWidth);
 }
 
 void DirWidget::setPath (const QFileInfo &path)
@@ -517,8 +490,7 @@ void DirWidget::openPath (const QModelIndex &index)
     // do not change proxy current path to disable possible dir filtering
     view_->setRootIndex ({});
     path_ = fileInfo (view_->rootIndex ());
-    pathLabel_->clear ();
-    dirLabel_->setText (tr ("Drives"));
+    pathWidget_->setPath (path_);
     return;
   }
 
@@ -557,42 +529,8 @@ void DirWidget::openPath (const QModelIndex &index)
     view_->setCurrentIndex (moveUp ? previous : view_->firstItem ());
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
-
-    const auto absolutePath = info.absoluteFilePath ();
-    auto nameIndex = absolutePath.lastIndexOf (QLatin1Char ('/')) + 1;
-    dirLabel_->setText (nameIndex ? absolutePath.mid (nameIndex) : absolutePath);
-
-    updatePathLabel ();
+    pathWidget_->setPath (path_);
   }
-}
-
-QString DirWidget::fittedPath (int maxWidth) const
-{
-  auto path = this->path ().absoluteFilePath ();
-  const auto nameIndex = path.lastIndexOf (QLatin1Char ('/')) + 1;
-  if (!nameIndex)
-  {
-    return {};
-  }
-
-  const QString prepend = QLatin1String (".../");
-  const auto searchStartIndex = prepend.length ();
-
-  QFontMetrics metrics (pathLabel_->font ());
-  path = path.left (nameIndex);
-  auto width = metrics.boundingRect (path).width ();
-
-  while (width > maxWidth)
-  {
-    auto index = path.indexOf (QLatin1Char ('/'), searchStartIndex);
-    if (index == -1)
-    {
-      break;
-    }
-    path = prepend + path.mid (index + 1);
-    width = metrics.boundingRect (path).width ();
-  }
-  return path;
 }
 
 void DirWidget::newFolder ()
@@ -629,7 +567,7 @@ QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu,bool isCheckabl
 
 void DirWidget::resizeEvent (QResizeEvent *)
 {
-  updatePathLabel ();
+  pathWidget_->adjust ();
 }
 
 bool DirWidget::eventFilter (QObject *watched, QEvent *event)
@@ -652,29 +590,8 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
   {
     return false;
   }
-  if (event->type () == QEvent::MouseButtonDblClick &&
-      (watched == pathLabel_ || watched == dirLabel_))
-  {
-    togglePathEdition (true);
-    return true;
-  }
-  if (event->type () == QEvent::KeyPress && watched == pathEdit_)
-  {
-    if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
-    {
-      if (commandPrompt_->isVisible ())
-      {
-        commandPrompt_->hide ();
-      }
-      if (pathEdit_->isModified ())
-      {
-        togglePathEdition (true); // reset changes
-      }
-      pathEdit_->hide (); // trigger editionFinished
-      return true;
-    }
-  }
-  else if (event->type () == QEvent::KeyPress && watched == commandPrompt_)
+
+  if (event->type () == QEvent::KeyPress && watched == commandPrompt_)
   {
     if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
     {
@@ -693,38 +610,6 @@ void DirWidget::activate ()
 void DirWidget::adjustItems ()
 {
   view_->adjustItems ();
-}
-
-void DirWidget::togglePathEdition (bool isOn)
-{
-  pathEdit_->setVisible (isOn);
-  indexLabel_->setVisible (!isOn);
-  pathLabel_->setVisible (!isOn);
-  dirLabel_->setVisible (!isOn);
-
-  const auto path = this->path ().absoluteFilePath ();
-  if (isOn)
-  {
-    pathEdit_->setText (path);
-    pathEdit_->setFocus ();
-    pathEdit_->selectAll ();
-  }
-  else
-  {
-    const auto newPath = pathEdit_->text ();
-    if (newPath != path && QFile::exists (newPath))
-    {
-      setPath (newPath);
-    }
-  }
-}
-
-void DirWidget::handleEditedPath ()
-{
-  if (QFile::exists (pathEdit_->text ()))
-  {
-    togglePathEdition (false);
-  }
 }
 
 void DirWidget::promptClose ()
@@ -960,17 +845,6 @@ void DirWidget::updateActions ()
   renameAction_->setEnabled (!locked && isValid && !isDotDot);
   removeAction_->setEnabled (!locked && isValid && !isDotDot);
   trashAction_->setEnabled (!locked && isValid && !isDotDot);
-}
-
-void DirWidget::updatePathLabel ()
-{
-  const auto stretchWidth = controlsLayout_->itemAt (1)->geometry ().width ();
-  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
-  const auto newPath = fittedPath (maxWidth);
-  if (newPath != pathLabel_->text ())
-  {
-    pathLabel_->setText (newPath);
-  }
 }
 
 void DirWidget::checkDirExistence ()

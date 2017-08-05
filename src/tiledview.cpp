@@ -35,7 +35,7 @@ class TileMime : public QMimeData
 {
 Q_OBJECT
 public:
-  TileMime (QWidget *widget);
+  explicit TileMime (QWidget *widget);
   ~TileMime ();
 
   QWidget *widget;

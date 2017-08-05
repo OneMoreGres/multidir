@@ -13,6 +13,7 @@ const int listItemWidth = 120;
 const int itemVerticalMargins = 8;
 
 const QString dotdot = "..";
+const QString networkDirStart = QLatin1String ("\\\\");
 
 const auto updateUrl = "https://github.com/OneMoreGres/multidir/raw/master/version";
 const auto version = STR (APP_VERSION);

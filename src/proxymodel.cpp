@@ -2,6 +2,7 @@
 #include "filesystemmodel.h"
 #include "constants.h"
 #include "backgroundreader.h"
+#include "debug.h"
 
 #include <QDateTime>
 #include <QPixmapCache>
@@ -13,6 +14,8 @@ ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
   showDirs_ (true),
+  showFiles_ (true),
+  showDotDot_ (true),
   showHidden_ (false),
   showThumbnails_ (false),
   nameFilter_ (),
@@ -50,6 +53,28 @@ void ProxyModel::setShowDirs (bool showDirs)
   invalidateFilter ();
 }
 
+bool ProxyModel::showFiles () const
+{
+  return showFiles_;
+}
+
+void ProxyModel::setShowFiles (bool showFiles)
+{
+  showFiles_ = showFiles;
+  invalidateFilter ();
+}
+
+bool ProxyModel::showDotDot () const
+{
+  return showDotDot_;
+}
+
+void ProxyModel::setShowDotDot (bool showDotDot)
+{
+  showDotDot_ = showDotDot;
+  invalidateFilter ();
+}
+
 bool ProxyModel::showHidden () const
 {
   return showHidden_;
@@ -60,7 +85,6 @@ void ProxyModel::setShowHidden (bool showHidden)
   showHidden_ = showHidden;
   invalidateFilter ();
 }
-
 
 bool ProxyModel::showThumbnails () const
 {
@@ -88,13 +112,32 @@ void ProxyModel::setCurrent (const QModelIndex &current)
 
 bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const
 {
+#ifdef Q_OS_WIN
+  if (!sourceParent.isValid ())
+  {
+    const auto name = model_->fileName (model_->index (sourceRow, 0, sourceParent));
+    if (name.startsWith (constants::networkDirStart))
+    {
+      return false;
+    }
+  }
+#endif
   if (sourceParent == current_)
   {
-    const auto canFilter = !showDirs_ || !showHidden_ || !nameFilter_.isEmpty ();
+    const auto canFilter = !showDirs_ || !showFiles_ || !showDotDot_ ||
+                           !showHidden_ || !nameFilter_.isEmpty ();
     if (canFilter)
     {
       const auto info = model_->fileInfo (model_->index (sourceRow, 0, sourceParent));
       if (!showDirs_ && info.isDir ())
+      {
+        return false;
+      }
+      if (!showFiles_ && info.isFile ())
+      {
+        return false;
+      }
+      if (!showDotDot_ && info.fileName () == constants::dotdot)
       {
         return false;
       }

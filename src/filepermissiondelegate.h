@@ -6,7 +6,7 @@ class FilePermissionDelegate : public QStyledItemDelegate
 {
 Q_OBJECT
 public:
-  FilePermissionDelegate (QObject *parent = nullptr);
+  explicit FilePermissionDelegate (QObject *parent = nullptr);
 
   QWidget * createEditor (QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const override;
