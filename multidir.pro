@@ -76,7 +76,8 @@ SOURCES += \
     src/translationloader.cpp \
     src/filepermissions.cpp \
     src/filepermissiondelegate.cpp \
-    src/filesystemcompleter.cpp
+    src/filesystemcompleter.cpp \
+    src/pathwidget.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -109,7 +110,8 @@ HEADERS  += \
     src/translationloader.h \
     src/filepermissions.h \
     src/filepermissiondelegate.h \
-    src/filesystemcompleter.h
+    src/filesystemcompleter.h \
+    src/pathwidget.h
 
 RESOURCES += \
     resources.qrc
