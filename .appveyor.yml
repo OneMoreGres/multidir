@@ -19,7 +19,7 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    description: $(APPVEYOR_REPO_TAG_NAME)
+    description: ''
     auth_token:
       secure: NnyUV44yNAx8ea1L46dVhE4kQxUGd5M1O+yVk+9ncsNHWtw/9JoCnDqNybnxTccP
     artifact: installer
