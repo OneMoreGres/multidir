@@ -408,3 +408,5 @@ void MainWindow::updateWindowTitle (const QString &groupName)
 {
   setWindowTitle (tr ("Multidir - ") + groupName);
 }
+
+#include "moc_mainwindow.cpp"

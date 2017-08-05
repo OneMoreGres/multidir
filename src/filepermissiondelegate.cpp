@@ -59,3 +59,5 @@ QString FilePermissionDelegate::displayText (const QVariant &value,
 {
   return FilePermissions::toFullString (QFile::Permissions (value.toInt ()));
 }
+
+#include "moc_filepermissiondelegate.cpp"

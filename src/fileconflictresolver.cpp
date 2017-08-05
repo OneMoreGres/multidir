@@ -108,3 +108,5 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
     *result |= All;
   }
 }
+
+#include "moc_fileconflictresolver.cpp"

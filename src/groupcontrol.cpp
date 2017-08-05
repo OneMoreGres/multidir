@@ -194,3 +194,5 @@ void GroupControl::setIds (const QString &ids)
   ids_ = utils::uniqueChars (ids);
   updateShortcuts ();
 }
+
+#include "moc_groupcontrol.cpp"

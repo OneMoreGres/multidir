@@ -255,3 +255,5 @@ bool GroupWidget::Widget::operator== (const GroupWidget::Widget &r) const
 {
   return widget == r.widget;
 }
+
+#include "moc_groupwidget.cpp"

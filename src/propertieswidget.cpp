@@ -52,3 +52,5 @@ PropertiesWidget::PropertiesWidget (const QFileInfo &info, QWidget *parent) :
            this, &QWidget::close);
   layout->addRow (buttons);
 }
+
+#include "moc_propertieswidget.cpp"

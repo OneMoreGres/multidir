@@ -260,3 +260,5 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
   }
   return QSortFilterProxyModel::lessThan (left, right);
 }
+
+#include "moc_proxymodel.cpp"

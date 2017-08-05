@@ -199,3 +199,5 @@ bool PathWidget::eventFilter (QObject *watched, QEvent *event)
   }
   return false;
 }
+
+#include "moc_pathwidget.cpp"

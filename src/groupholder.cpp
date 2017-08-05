@@ -146,3 +146,5 @@ void GroupHolder::renameCurrent (const QString &newName)
 
   emit currentChanged (newName);
 }
+
+#include "moc_groupholder.cpp"

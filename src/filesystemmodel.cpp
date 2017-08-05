@@ -122,3 +122,5 @@ Qt::ItemFlags FileSystemModel::flags (const QModelIndex &index) const
   }
   return result;
 }
+
+#include "moc_filesystemmodel.cpp"

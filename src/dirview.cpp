@@ -363,3 +363,5 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   }
   return false;
 }
+
+#include "moc_dirview.cpp"

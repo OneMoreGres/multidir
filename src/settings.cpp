@@ -259,3 +259,5 @@ void Settings::saveShortcuts ()
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
 }
+
+#include "moc_settings.cpp"

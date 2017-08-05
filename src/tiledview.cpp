@@ -451,3 +451,4 @@ void TiledView::restoreImpl (QSettings &settings, QHash<QString, QWidget *> &wid
 }
 
 #include "tiledview.moc"
+#include "moc_tiledview.cpp"

@@ -69,3 +69,5 @@ void UpdateChecker::parse (QNetworkReply *reply)
     emit noUpdates ();
   }
 }
+
+#include "moc_updatechecker.cpp"

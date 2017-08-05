@@ -101,3 +101,5 @@ QStringList FileSystemCompleter::splitPath (const QString &path) const
 
   return parts;
 }
+
+#include "moc_filesystemcompleter.cpp"

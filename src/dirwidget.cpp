@@ -881,3 +881,5 @@ void DirWidget::handleDirRename (const QString &path, const QString &old, const 
     setPath (path + '/' + now);
   }
 }
+
+#include "moc_dirwidget.cpp"

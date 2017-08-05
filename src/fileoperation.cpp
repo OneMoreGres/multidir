@@ -342,3 +342,5 @@ void FileOperation::abort ()
 {
   isAborted_ = true;
 }
+
+#include "moc_fileoperation.cpp"
