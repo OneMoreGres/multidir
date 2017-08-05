@@ -29,6 +29,7 @@ public:
 
 signals:
   void pathChanged (const QFileInfo &newPath);
+  void editionFinished ();
 
 private:
   QString fittedPath (int maxWidth) const;

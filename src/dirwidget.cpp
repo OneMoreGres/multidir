@@ -261,6 +261,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   connect (pathWidget_, &PathWidget::pathChanged,
            this, &DirWidget::setPath);
+  connect (pathWidget_, &PathWidget::editionFinished,
+           this, &DirWidget::activate);
 
   controlsLayout_->addWidget (newFolder);
   controlsLayout_->addWidget (pathWidget_);

@@ -157,11 +157,13 @@ void PathWidget::applyEdition ()
   {
     emit pathChanged (QFileInfo (newPath));
   }
+  emit editionFinished ();
 }
 
 void PathWidget::rejectEdition ()
 {
   toggleEdition (false);
+  emit editionFinished ();
 }
 
 void PathWidget::adjust ()
