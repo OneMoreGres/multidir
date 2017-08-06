@@ -5,6 +5,10 @@ sudo: required
 
 git:
   depth: 1
+  
+env:
+  global:
+    - secure: "gBf5mNj674kkrZctQKrSEX9YUP6GFakCRUWRfXzW4lgJRFlC8Z60RHdvtn+jMYDguK/yczcsxhyxRHRk7kS+cQgdBX6fWfT0IBNR6MBijxQPbq/Onzo8g95xWn8f7925azO0LukqFd4/kcobXC0CeQrCbZr5QkK5WfXIa4KNSGA42wwkoqUgqNvQyE+hgqEWcs+yKSdmeI0wBzddN/vvNSIWpB143HQ2GQhZkSTajB7OcvRvl7UuuVtYeE54tsgnpqLaam+cZL+jxlSXcAyWWWEDE2vF2xa/MWxaqJcenpIFLvNk3N1ha9+40xoDbC9ib1KUxyXGGlUWrFEnjkOapi/205gVUVJ6bRE4NxS31pcgeDAqwfVvd6+YHLtF29fgpt2xdsR3NdO7rTOQmhsnqy1aA4kRzsGz/U0HXKg2mehb8aSJlS4uPbSf0yoMuWsqoa0PCEcZTrD310nv3OspmsNLMOpsckXUmvhHkmuNfJ5Wo+H0rFmZ0uDIBD1OJDs+447R7jimABSnC/JBnpQ1Bi/YUdJU5VVFuwZrudaWGcCScd+wAXkUIbBTnWXVfjLgH4hrqrh1r+SqdGaWy6fQlaXouFhrhiK8cTNvJ5iXBytaYu0EZoC5MgsngNmjoWriY+RPx/LAcG3qtj2K0K7XjbOhgnmoCXq7VQEOR9+EPW0="
 
 matrix:
   include:
@@ -40,6 +44,9 @@ deploy:
     on:
       tags: true
       condition: $TRAVIS_OS_NAME = osx
+
+after_deploy:
+  - if [[ "$TRAVIS_OS_NAME" == "linux"]]; then chmod +x ./utils/update_github_release.sh & ./utils/update_github_release.sh "$TRAVIS_TAG"; fi
 
 notifications:
   email:
