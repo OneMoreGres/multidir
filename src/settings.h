@@ -8,6 +8,7 @@ class QCheckBox;
 class QSpinBox;
 class QTabWidget;
 class QTableWidget;
+class QComboBox;
 
 class Settings : public QDialog
 {
@@ -40,6 +41,7 @@ public:
 private:
   void loadShortcuts ();
   void saveShortcuts ();
+  void saveLanguage ();
 
   QTabWidget *tabs_;
   QLineEdit *console_;
@@ -47,6 +49,7 @@ private:
   QCheckBox *checkUpdates_;
   QCheckBox *startInBackground_;
   QSpinBox *imageCache_;
+  QComboBox *languages_;
   QTableWidget *shortcuts_;
   QLineEdit *groupShortcuts_;
   QLineEdit *tabShortcuts_;
