@@ -10,12 +10,12 @@ class QTabWidget;
 class QTableWidget;
 class QComboBox;
 
-class Settings : public QDialog
+class SettingsEditor : public QDialog
 {
 Q_OBJECT
 public:
-  explicit Settings (QWidget *parent = nullptr);
-  ~Settings ();
+  explicit SettingsEditor (QWidget *parent = nullptr);
+  ~SettingsEditor ();
 
   QString console () const;
   void setConsole (const QString &console);

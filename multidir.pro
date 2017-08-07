@@ -52,7 +52,6 @@ SOURCES += \
     src/globalaction.cpp \
     src/proxymodel.cpp \
     src/filesystemmodel.cpp \
-    src/settings.cpp \
     src/copypaste.cpp \
     src/dirview.cpp \
     src/trash.cpp \
@@ -78,14 +77,14 @@ SOURCES += \
     src/filepermissiondelegate.cpp \
     src/filesystemcompleter.cpp \
     src/pathwidget.cpp \
-    src/viewer.cpp
+    src/viewer.cpp \
+    src/settingseditor.cpp
 
 HEADERS  += \
     src/dirwidget.h \
     src/globalaction.h \
     src/proxymodel.h \
     src/filesystemmodel.h \
-    src/settings.h \
     src/copypaste.h \
     src/dirview.h \
     src/constants.h \
@@ -113,7 +112,8 @@ HEADERS  += \
     src/filepermissiondelegate.h \
     src/filesystemcompleter.h \
     src/pathwidget.h \
-    src/viewer.h
+    src/viewer.h \
+    src/settingseditor.h
 
 RESOURCES += \
     resources.qrc

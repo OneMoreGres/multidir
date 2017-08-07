@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "groupholder.h"
 #include "groupcontrol.h"
-#include "settings.h"
+#include "settingseditor.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
 #include "fileoperation.h"
@@ -264,7 +264,7 @@ void MainWindow::toggleVisible ()
 
 void MainWindow::editSettings ()
 {
-  Settings settings;
+  SettingsEditor settings;
   settings.setConsole (consoleCommand_);
   settings.setCheckUpdates (checkUpdates_);
   settings.setStartInBackground (startInBackground_);
