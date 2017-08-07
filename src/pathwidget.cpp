@@ -162,6 +162,11 @@ void PathWidget::applyEdition ()
 
 void PathWidget::rejectEdition ()
 {
+  if (!pathEdit_->isVisible ())
+  {
+    return;
+  }
+
   toggleEdition (false);
   emit editionFinished ();
 }
