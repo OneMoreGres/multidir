@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "shortcutmanager.h"
+#include "translationloader.h"
 
 #include <QGridLayout>
 #include <QKeySequenceEdit>
@@ -12,6 +13,7 @@
 #include <QTableWidget>
 #include <QStyledItemDelegate>
 #include <QSettings>
+#include <QComboBox>
 
 namespace
 {
@@ -61,6 +63,7 @@ Settings::Settings (QWidget *parent) :
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
   startInBackground_ (new QCheckBox (tr ("Start in background"), this)),
   imageCache_ (new QSpinBox (this)),
+  languages_ (new QComboBox (this)),
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
   tabShortcuts_ (new QLineEdit (this))
@@ -91,6 +94,13 @@ Settings::Settings (QWidget *parent) :
     ++row;
     layout->addWidget (checkUpdates_, row, 0);
     layout->addWidget (startInBackground_, row, 1);
+
+    ++row;
+    layout->addWidget (new QLabel (tr ("Language")), row, 0);
+    layout->addWidget (languages_, row, 1);
+    languages_->setToolTip (tr ("Restart required"));
+    languages_->addItems (TranslationLoader::availableLanguages ());
+    languages_->setCurrentText (TranslationLoader::language ());
 
     ++row;
     layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
@@ -135,6 +145,8 @@ Settings::Settings (QWidget *parent) :
            this, &QDialog::accept);
   connect (buttons, &QDialogButtonBox::accepted,
            this, &Settings::saveShortcuts);
+  connect (buttons, &QDialogButtonBox::accepted,
+           this, &Settings::saveLanguage);
   connect (buttons, &QDialogButtonBox::rejected,
            this, &QDialog::reject);
   layout->addWidget (buttons);
@@ -258,6 +270,11 @@ void Settings::saveShortcuts ()
     const auto type = SM::Shortcut (idItem->type () - Item::UserType);
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
+}
+
+void Settings::saveLanguage ()
+{
+  TranslationLoader::setLanguage (languages_->currentText ());
 }
 
 #include "moc_settings.cpp"
