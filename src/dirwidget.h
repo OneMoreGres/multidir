@@ -75,6 +75,7 @@ private:
   void copyPath ();
   void openInBackground (const QModelIndex &index);
   void showProperties ();
+  void viewCurrent ();
 
   bool isMinSizeFixed () const;
   void fixMinSize (bool isOn);
@@ -116,6 +117,7 @@ private:
   QMenu *viewMenu_;
   QAction *openAction_;
   QMenu *openWith_;
+  QAction *viewAction_;
   QAction *openInEditorAction_;
   QAction *openInTabAction_;
   QAction *renameAction_;

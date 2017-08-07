@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "propertieswidget.h"
 #include "pathwidget.h"
+#include "viewer.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -61,6 +62,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   openWith_ (nullptr),
+  viewAction_ (nullptr),
   openInEditorAction_ (nullptr),
   openInTabAction_ (nullptr),
   renameAction_ (nullptr),
@@ -80,9 +82,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 {
   proxy_->setDynamicSortFilter (true);
 
-  connect (model, &QAbstractItemModel::rowsRemoved,
+  connect (model_, &QAbstractItemModel::rowsRemoved,
            this, &DirWidget::checkDirExistence);
-  connect (model, &QFileSystemModel::fileRenamed,
+  connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleDirRename);
 
 
@@ -135,6 +137,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   // view menu
   connect (viewMenu_, &QMenu::aboutToShow,
            this, &DirWidget::updateSiblingActions);
+
   openAction_ = makeShortcut (ShortcutManager::OpenItem, viewMenu_);
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
@@ -158,6 +161,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
                emit editorRequested (current ().absoluteFilePath ());
              }
            });
+
+
+  viewAction_ = makeShortcut (ShortcutManager::View, viewMenu_);
+  connect (viewAction_, &QAction::triggered,
+           this, &DirWidget::viewCurrent);
 
   viewMenu_->addSeparator ();
 
@@ -296,6 +304,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            upAction_, &QAction::trigger);
   connect (view_, &DirView::backgroundActivated,
            this, &DirWidget::openInBackground);
+  connect (view_, &DirView::currentChanged,
+           this, &DirWidget::updateActions);
 
   installEventFilter (this);
 }
@@ -550,7 +560,7 @@ void DirWidget::newFolder ()
   view_->renameCurrent ();
 }
 
-QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu,bool isCheckable)
+QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu, bool isCheckable)
 {
   auto action = new QAction (this);
   ShortcutManager::add (ShortcutManager::Shortcut (shortcutType), action);
@@ -773,6 +783,19 @@ void DirWidget::showProperties ()
   w->move (global.x () - w->width () / 2, global.y () - w->height () / 2);
 }
 
+void DirWidget::viewCurrent ()
+{
+  if (!current ().isDir ())
+  {
+    auto view = new Viewer;
+    view->showFile (current ().absoluteFilePath ());
+  }
+  else
+  {
+    setPath (current ());
+  }
+}
+
 bool DirWidget::isMinSizeFixed () const
 {
   return isMinSizeFixed_->isChecked ();
@@ -792,7 +815,6 @@ void DirWidget::fixMinSize (bool isOn)
 
 void DirWidget::showViewContextMenu ()
 {
-  updateActions ();
   viewMenu_->exec (QCursor::pos ());
 }
 
@@ -827,6 +849,7 @@ void DirWidget::updateActions ()
 
   openAction_->setEnabled (isValid);
   openWith_->setEnabled (isValid && !isDir);
+  viewAction_->setEnabled (isValid);
   if (openWith_->isEnabled ())
   {
     OpenWith::popupateMenu (*openWith_, current ());
