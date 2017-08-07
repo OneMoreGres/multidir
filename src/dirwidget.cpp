@@ -82,9 +82,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 {
   proxy_->setDynamicSortFilter (true);
 
-  connect (model, &QAbstractItemModel::rowsRemoved,
+  connect (model_, &QAbstractItemModel::rowsRemoved,
            this, &DirWidget::checkDirExistence);
-  connect (model, &QFileSystemModel::fileRenamed,
+  connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleDirRename);
 
 
@@ -137,6 +137,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   // view menu
   connect (viewMenu_, &QMenu::aboutToShow,
            this, &DirWidget::updateSiblingActions);
+
   openAction_ = makeShortcut (ShortcutManager::OpenItem, viewMenu_);
   connect (openAction_, &QAction::triggered,
            this, [this]() {openPath (view_->currentIndex ());});
@@ -559,7 +560,7 @@ void DirWidget::newFolder ()
   view_->renameCurrent ();
 }
 
-QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu,bool isCheckable)
+QAction * DirWidget::makeShortcut (int shortcutType, QMenu *menu, bool isCheckable)
 {
   auto action = new QAction (this);
   ShortcutManager::add (ShortcutManager::Shortcut (shortcutType), action);
