@@ -303,6 +303,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            upAction_, &QAction::trigger);
   connect (view_, &DirView::backgroundActivated,
            this, &DirWidget::openInBackground);
+  connect (view_, &DirView::currentChanged,
+           this, &DirWidget::updateActions);
 
   installEventFilter (this);
 }
@@ -812,7 +814,6 @@ void DirWidget::fixMinSize (bool isOn)
 
 void DirWidget::showViewContextMenu ()
 {
-  updateActions ();
   viewMenu_->exec (QCursor::pos ());
 }
 

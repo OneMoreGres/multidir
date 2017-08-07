@@ -47,6 +47,7 @@ public:
   bool eventFilter (QObject *watched, QEvent *event) override;
 
 signals:
+  void currentChanged (const QModelIndex &index);
   void movedBackward ();
   void activated (const QModelIndex &index);
   void backgroundActivated (const QModelIndex &index);
