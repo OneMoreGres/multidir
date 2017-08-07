@@ -77,7 +77,8 @@ SOURCES += \
     src/filepermissions.cpp \
     src/filepermissiondelegate.cpp \
     src/filesystemcompleter.cpp \
-    src/pathwidget.cpp
+    src/pathwidget.cpp \
+    src/viewer.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -111,7 +112,8 @@ HEADERS  += \
     src/filepermissions.h \
     src/filepermissiondelegate.h \
     src/filesystemcompleter.h \
-    src/pathwidget.h
+    src/pathwidget.h \
+    src/viewer.h
 
 RESOURCES += \
     resources.qrc

@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "propertieswidget.h"
 #include "pathwidget.h"
+#include "viewer.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -61,6 +62,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   viewMenu_ (new QMenu (this)),
   openAction_ (nullptr),
   openWith_ (nullptr),
+  viewAction_ (nullptr),
   openInEditorAction_ (nullptr),
   openInTabAction_ (nullptr),
   renameAction_ (nullptr),
@@ -158,6 +160,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
                emit editorRequested (current ().absoluteFilePath ());
              }
            });
+
+
+  viewAction_ = makeShortcut (ShortcutManager::View, viewMenu_);
+  connect (viewAction_, &QAction::triggered,
+           this, &DirWidget::viewCurrent);
 
   viewMenu_->addSeparator ();
 
@@ -773,6 +780,19 @@ void DirWidget::showProperties ()
   w->move (global.x () - w->width () / 2, global.y () - w->height () / 2);
 }
 
+void DirWidget::viewCurrent ()
+{
+  if (!current ().isDir ())
+  {
+    auto view = new Viewer;
+    view->showFile (current ().absoluteFilePath ());
+  }
+  else
+  {
+    setPath (current ());
+  }
+}
+
 bool DirWidget::isMinSizeFixed () const
 {
   return isMinSizeFixed_->isChecked ();
@@ -827,6 +847,7 @@ void DirWidget::updateActions ()
 
   openAction_->setEnabled (isValid);
   openWith_->setEnabled (isValid && !isDir);
+  viewAction_->setEnabled (isValid);
   if (openWith_->isEnabled ())
   {
     OpenWith::popupateMenu (*openWith_, current ());

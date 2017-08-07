@@ -143,6 +143,8 @@ void ShortcutManager::setDefaults ()
                                    QIcon (":/properties.png"), c};
   shortcuts[SM::ChangePermissions] = {{QS ("Ctrl+M")}, QObject::tr ("Change permissions"),
                                       QIcon (":/permissions.png"), c};
+  shortcuts[SM::View] = {{QS ("F3")}, QObject::tr ("View"),
+                         QIcon (":/read.png"), c};
 }
 
 void ShortcutManager::save (QSettings &settings)
