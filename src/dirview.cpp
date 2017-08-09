@@ -194,6 +194,8 @@ void DirView::initTable ()
 
   connect (table_->selectionModel (), &QItemSelectionModel::currentChanged,
            this, &DirView::currentChanged);
+  connect (table_->selectionModel (), &QItemSelectionModel::selectionChanged,
+           this, &DirView::selectionChanged);
 
   table_->horizontalHeader ()->setSectionsMovable (true);
   table_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
@@ -231,6 +233,8 @@ void DirView::initList ()
 
   connect (list_->selectionModel (), &QItemSelectionModel::currentChanged,
            this, &DirView::currentChanged);
+  connect (list_->selectionModel (), &QItemSelectionModel::selectionChanged,
+           this, &DirView::selectionChanged);
 
   list_->installEventFilter (this);
   list_->viewport ()->installEventFilter (this);

@@ -16,25 +16,25 @@ const auto tb = 1024 * gb;
 namespace utils
 {
 
-QString sizeString (qint64 bytes)
+QString sizeString (qint64 bytes, int precision)
 {
   if (bytes >= tb)
   {
-    return QString::number (bytes / tb, 'f', 3) + QObject::tr ("Tb");
+    return QString::number (bytes / tb, 'f', precision) + ' ' + QObject::tr ("Tb");
   }
   if (bytes >= gb)
   {
-    return QString::number (bytes / gb, 'f', 3) + QObject::tr ("Gb");
+    return QString::number (bytes / gb, 'f', precision) + ' ' + QObject::tr ("Gb");
   }
   if (bytes >= mb)
   {
-    return QString::number (bytes / mb, 'f', 3) + QObject::tr ("Mb");
+    return QString::number (bytes / mb, 'f', precision) + ' ' + QObject::tr ("Mb");
   }
   if (bytes >= kb)
   {
-    return QString::number (bytes / kb, 'f', 3) + QObject::tr ("Kb");
+    return QString::number (bytes / kb, 'f', precision) + ' ' + QObject::tr ("Kb");
   }
-  return QString::number (bytes) + QObject::tr ("bytes");
+  return QString::number (bytes) + ' ' + QObject::tr ("bytes");
 }
 
 qint64 totalSize (const QFileInfo &info)

@@ -13,6 +13,7 @@
 #include "propertieswidget.h"
 #include "pathwidget.h"
 #include "viewer.h"
+#include "dirstatuswidget.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -50,6 +51,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   index_ (),
   path_ (),
   pathWidget_ (new PathWidget (model, this)),
+  status_ (new DirStatusWidget (this)),
   commandPrompt_ (new QLineEdit (this)),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
@@ -294,6 +296,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   layout->addLayout (controlsLayout_);
   layout->addWidget (view_);
   layout->addWidget (commandPrompt_);
+  layout->addWidget (status_);
 
 
   connect (view_, &DirView::contextMenuRequested,
@@ -306,6 +309,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::openInBackground);
   connect (view_, &DirView::currentChanged,
            this, &DirWidget::updateActions);
+  connect (view_, &DirView::selectionChanged,
+           this, &DirWidget::updateStatusSelection);
 
   installEventFilter (this);
 }
@@ -503,6 +508,7 @@ void DirWidget::openPath (const QModelIndex &index)
     view_->setRootIndex ({});
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
+    status_->setPath (path_);
     return;
   }
 
@@ -542,6 +548,7 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
+    status_->setPath (path_);
   }
 }
 
@@ -833,6 +840,11 @@ void DirWidget::setShowDirs (bool on)
 {
   proxy_->setShowDirs (on);
   updateActions ();
+}
+
+void DirWidget::updateStatusSelection ()
+{
+  status_->setSelection (selected ());
 }
 
 void DirWidget::updateActions ()
