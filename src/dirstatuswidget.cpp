@@ -32,6 +32,8 @@ DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
   layout->addWidget (selection_);
 
   layout->setMargin (0);
+
+  startTimer (5000);
 }
 
 void DirStatusWidget::updateSelection (const QList<QFileInfo> &selection)
@@ -90,6 +92,11 @@ void DirStatusWidget::updateEntries ()
     }
   }
   entries_->setText (tr ("#%1 (%2)").arg (count).arg (utils::sizeString (size)));
+}
+
+void DirStatusWidget::timerEvent (QTimerEvent */*event*/)
+{
+  updateStorage ();
 }
 
 #include "moc_dirstatuswidget.cpp"

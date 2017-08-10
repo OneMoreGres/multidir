@@ -15,10 +15,11 @@ void update ()
   if (!lastCheck.isValid () || lastCheck.secsTo (now) > minDelaySec)
   {
     storages.clear ();
-    for (const auto &i : QStorageInfo::mountedVolumes ())
+    for (auto &i : QStorageInfo::mountedVolumes ())
     {
       if (i.isValid () && i.isReady ())
       {
+        i.refresh ();
         storages << i;
       }
     }
