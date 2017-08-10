@@ -10,7 +10,7 @@
 #include <QThread>
 
 
-ProxyModel::ProxyModel (QFileSystemModel *model, QObject *parent) :
+ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   QSortFilterProxyModel (parent),
   model_ (model),
   showDirs_ (true),

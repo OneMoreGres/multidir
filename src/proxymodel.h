@@ -2,13 +2,13 @@
 
 #include <QSortFilterProxyModel>
 
-class QFileSystemModel;
+class FileSystemModel;
 
 class ProxyModel : public QSortFilterProxyModel
 {
 Q_OBJECT
 public:
-  ProxyModel (QFileSystemModel *model, QObject *parent = nullptr);
+  ProxyModel (FileSystemModel *model, QObject *parent = nullptr);
   ~ProxyModel ();
 
   bool showDirs () const;
@@ -44,7 +44,7 @@ protected:
 private:
   void updateIcon (const QString &fileName, const QPixmap &pixmap);
 
-  QFileSystemModel *model_;
+  FileSystemModel *model_;
   bool showDirs_;
   bool showFiles_;
   bool showDotDot_;
