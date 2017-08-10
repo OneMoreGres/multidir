@@ -125,12 +125,12 @@ void ProxyModel::setShowThumbnails (bool isOn)
 
 bool ProxyModel::isDir (int row) const
 {
-  return model_->isDir (model_->index (row, 0, current_));
+  return model_->isDir (mapToSource (index (row, 0, current ())));
 }
 
 qint64 ProxyModel::fileSize (int row)
 {
-  return model_->size (model_->index (row, 0, current_));
+  return model_->size (mapToSource (index (row, 0, current ())));
 }
 
 int ProxyModel::count () const
