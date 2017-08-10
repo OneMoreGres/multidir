@@ -24,6 +24,11 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
 {
   setSourceModel (model);
 
+  connect (model, &FileSystemModel::rowsInserted,
+           this, &ProxyModel::detectContentsChange);
+  connect (model, &FileSystemModel::rowsRemoved,
+           this, &ProxyModel::detectContentsChange);
+
   auto *reader = new BackgroundReader;
   connect (this, &ProxyModel::iconRequested,
            reader, &BackgroundReader::readIcon);
@@ -49,8 +54,13 @@ bool ProxyModel::showDirs () const
 
 void ProxyModel::setShowDirs (bool showDirs)
 {
+  if (showDirs_ == showDirs)
+  {
+    return;
+  }
   showDirs_ = showDirs;
   invalidateFilter ();
+  emit contentsChanged ();
 }
 
 bool ProxyModel::showFiles () const
@@ -60,8 +70,13 @@ bool ProxyModel::showFiles () const
 
 void ProxyModel::setShowFiles (bool showFiles)
 {
+  if (showFiles_ == showFiles)
+  {
+    return;
+  }
   showFiles_ = showFiles;
   invalidateFilter ();
+  emit contentsChanged ();
 }
 
 bool ProxyModel::showDotDot () const
@@ -71,8 +86,13 @@ bool ProxyModel::showDotDot () const
 
 void ProxyModel::setShowDotDot (bool showDotDot)
 {
+  if (showDotDot_ == showDotDot)
+  {
+    return;
+  }
   showDotDot_ = showDotDot;
   invalidateFilter ();
+  emit contentsChanged ();
 }
 
 bool ProxyModel::showHidden () const
@@ -82,8 +102,13 @@ bool ProxyModel::showHidden () const
 
 void ProxyModel::setShowHidden (bool showHidden)
 {
+  if (showHidden_ == showHidden)
+  {
+    return;
+  }
   showHidden_ = showHidden;
   invalidateFilter ();
+  emit contentsChanged ();
 }
 
 bool ProxyModel::showThumbnails () const
@@ -98,16 +123,53 @@ void ProxyModel::setShowThumbnails (bool isOn)
                     {Qt::DecorationRole});
 }
 
+bool ProxyModel::isDir (int row) const
+{
+  return model_->isDir (model_->index (row, 0, current_));
+}
+
+qint64 ProxyModel::fileSize (int row)
+{
+  return model_->size (model_->index (row, 0, current_));
+}
+
+int ProxyModel::count () const
+{
+  return rowCount (current ());
+}
+
+QFileInfo ProxyModel::currentPath () const
+{
+  return model_->fileInfo (current_);
+}
+
 void ProxyModel::setNameFilter (const QString &name)
 {
+  if (nameFilter_ == name)
+  {
+    return;
+  }
   nameFilter_ = name;
   invalidateFilter ();
+  emit contentsChanged ();
 }
 
 void ProxyModel::setCurrent (const QModelIndex &current)
 {
+  const auto mapped = mapToSource (current);
+  if (current_ == mapped)
+  {
+    return;
+  }
   current_ = mapToSource (current);
   invalidateFilter ();
+  emit currentChanged (current_);
+  emit contentsChanged ();
+}
+
+QModelIndex ProxyModel::current () const
+{
+  return mapFromSource (current_);
 }
 
 bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const
@@ -259,6 +321,14 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
       return model_->lastModified (left) < model_->lastModified (right);
   }
   return QSortFilterProxyModel::lessThan (left, right);
+}
+
+void ProxyModel::detectContentsChange (const QModelIndex &parent)
+{
+  if (parent == current_)
+  {
+    emit contentsChanged ();
+  }
 }
 
 #include "moc_proxymodel.cpp"

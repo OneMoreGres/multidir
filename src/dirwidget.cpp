@@ -51,7 +51,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   index_ (),
   path_ (),
   pathWidget_ (new PathWidget (model, this)),
-  status_ (new DirStatusWidget (this)),
+  status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
@@ -506,9 +506,9 @@ void DirWidget::openPath (const QModelIndex &index)
   {
     // do not change proxy current path to disable possible dir filtering
     view_->setRootIndex ({});
+    proxy_->setCurrent ({});
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
-    status_->setPath (path_);
     return;
   }
 
@@ -548,7 +548,6 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
-    status_->setPath (path_);
   }
 }
 

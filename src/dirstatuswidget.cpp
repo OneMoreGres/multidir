@@ -1,17 +1,27 @@
 #include "dirstatuswidget.h"
 #include "storagemanager.h"
 #include "utils.h"
+#include "proxymodel.h"
+#include "filesystemmodel.h"
+#include "debug.h"
 
 #include <QFileInfo>
 #include <QLabel>
 #include <QBoxLayout>
 
-DirStatusWidget::DirStatusWidget (QWidget *parent) :
+DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
   QWidget (parent),
+  path_ (),
+  model_ (model),
   storage_ (new QLabel (this)),
   entries_ (new QLabel (this)),
   selection_ (new QLabel (this))
 {
+  connect (model_, &ProxyModel::currentChanged,
+           this, &DirStatusWidget::updatePath);
+  connect (model_, &ProxyModel::contentsChanged,
+           this, &DirStatusWidget::updateEntries);
+
   storage_->setToolTip (tr ("Available/total space"));
   entries_->setToolTip (tr ("Total files"));
   selection_->setToolTip (tr ("Selected files"));
@@ -24,24 +34,16 @@ DirStatusWidget::DirStatusWidget (QWidget *parent) :
   layout->setMargin (0);
 }
 
-void DirStatusWidget::setPath (const QFileInfo &path)
-{
-  updateStorage (path);
-  updateEntries (path);
-  selection_->clear ();
-}
-
 void DirStatusWidget::setSelection (const QList<QFileInfo> &selection)
 {
   if (!selection.isEmpty ())
   {
-    using namespace utils;
     const auto size = std::accumulate (selection.cbegin (), selection.cend (), qint64 (0),
                                        [](qint64 sum, const QFileInfo &i) {
                                          return i.isFile () ? sum + i.size () : sum;
                                        });
     selection_->setText (tr ("*%1 (%2)").arg (selection.size ())
-                         .arg (sizeString (size)));
+                         .arg (utils::sizeString (size)));
   }
   else
   {
@@ -49,9 +51,17 @@ void DirStatusWidget::setSelection (const QList<QFileInfo> &selection)
   }
 }
 
-void DirStatusWidget::updateStorage (const QFileInfo &path)
+void DirStatusWidget::updatePath ()
 {
-  const auto storage = StorageManager::storage (path);
+  path_ = model_->currentPath ();
+  updateStorage ();
+  updateEntries ();
+  selection_->clear ();
+}
+
+void DirStatusWidget::updateStorage ()
+{
+  const auto storage = StorageManager::storage (path_);
   if (storage)
   {
     using namespace utils;
@@ -67,15 +77,19 @@ void DirStatusWidget::updateStorage (const QFileInfo &path)
   }
 }
 
-void DirStatusWidget::updateEntries (const QFileInfo &path)
+void DirStatusWidget::updateEntries ()
 {
-  const auto files = QDir (path.absoluteFilePath ()).entryInfoList (QDir::Files);
-  const auto size = std::accumulate (files.cbegin (), files.cend (), qint64 (0),
-                                     [](qint64 sum, const QFileInfo &i) {
-                                       return sum + i.size ();
-                                     });
-  using namespace utils;
-  entries_->setText (tr ("#%1 (%2)").arg (files.size ()).arg (sizeString (size)));
+  qint64 size = 0;
+  int count = 0;
+  for (auto i = 0, end = model_->count (); i < end; ++i)
+  {
+    if (!model_->isDir (i))
+    {
+      ++count;
+      size += model_->fileSize (i);
+    }
+  }
+  entries_->setText (tr ("#%1 (%2)").arg (count).arg (utils::sizeString (size)));
 }
 
 #include "moc_dirstatuswidget.cpp"
