@@ -16,7 +16,7 @@ public:
   DirStatusWidget (const DirStatusWidget &) = delete;
   DirStatusWidget &operator= (const DirStatusWidget &) = delete;
 
-  void setSelection (const QList<QFileInfo> &selection);
+  void updateSelection (const QList<QFileInfo> &selection);
 
 private:
   void updatePath ();

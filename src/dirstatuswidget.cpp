@@ -34,7 +34,7 @@ DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
   layout->setMargin (0);
 }
 
-void DirStatusWidget::setSelection (const QList<QFileInfo> &selection)
+void DirStatusWidget::updateSelection (const QList<QFileInfo> &selection)
 {
   if (!selection.isEmpty ())
   {

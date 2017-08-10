@@ -843,7 +843,7 @@ void DirWidget::setShowDirs (bool on)
 
 void DirWidget::updateStatusSelection ()
 {
-  status_->setSelection (selected ());
+  status_->updateSelection (selected ());
 }
 
 void DirWidget::updateActions ()
