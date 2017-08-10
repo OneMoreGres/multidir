@@ -8,6 +8,7 @@ class FileSystemModel;
 class DirView;
 class FileOperation;
 class PathWidget;
+class DirStatusWidget;
 
 class QLabel;
 class QMenu;
@@ -92,6 +93,7 @@ private:
 
   void setShowDirs (bool on);
 
+  void updateStatusSelection ();
   void updateActions ();
   void checkDirExistence ();
   void handleDirRename (const QString &path, const QString &old, const QString &now);
@@ -103,6 +105,7 @@ private:
   QString index_;
   QFileInfo path_;
   PathWidget *pathWidget_;
+  DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
 
   QMenu *menu_;

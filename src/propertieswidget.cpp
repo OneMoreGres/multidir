@@ -39,7 +39,7 @@ PropertiesWidget::PropertiesWidget (const QFileInfo &info, QWidget *parent) :
 
   layout->addRow (tr ("Name: "), new QLabel (info.fileName ()));
   layout->addRow (tr ("Path: "), new QLabel (info.absolutePath ()));
-  layout->addRow (tr ("Size: "), new QLabel (utils::sizeString (getSize (info))));
+  layout->addRow (tr ("Size: "), new QLabel (utils::sizeString (getSize (info), 3)));
   layout->addRow (tr ("Created: "), new QLabel (info.created ().toString ()));
   layout->addRow (tr ("Last modified: "), new QLabel (info.lastModified ().toString ()));
   layout->addRow (tr ("Owner: "), new QLabel (info.owner ()));

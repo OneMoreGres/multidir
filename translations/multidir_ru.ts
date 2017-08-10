@@ -2,65 +2,98 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
+    <name>DirStatusWidget</name>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="15"/>
+        <source>Available/total space</source>
+        <translation>Доступное/общее место</translation>
+    </message>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="16"/>
+        <source>Total files</source>
+        <translation>Всего файлов</translation>
+    </message>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="17"/>
+        <source>Selected files</source>
+        <translation>Выбрано файлов</translation>
+    </message>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="41"/>
+        <source>*%1 (%2)</source>
+        <translation>*%1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="59"/>
+        <source>%1/%2 (%3%)</source>
+        <translation>%1/%2 (%3%)</translation>
+    </message>
+    <message>
+        <location filename="../src/dirstatuswidget.cpp" line="76"/>
+        <source>#%1 (%2)</source>
+        <translation>#%1 (%2)</translation>
+    </message>
+</context>
+<context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirwidget.cpp" line="145"/>
+        <location filename="../src/dirwidget.cpp" line="147"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="188"/>
+        <location filename="../src/dirwidget.cpp" line="190"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="191"/>
+        <location filename="../src/dirwidget.cpp" line="193"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="194"/>
+        <location filename="../src/dirwidget.cpp" line="196"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="226"/>
+        <location filename="../src/dirwidget.cpp" line="228"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="283"/>
+        <location filename="../src/dirwidget.cpp" line="285"/>
         <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
         <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="420"/>
+        <location filename="../src/dirwidget.cpp" line="425"/>
         <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
         <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="516"/>
+        <location filename="../src/dirwidget.cpp" line="522"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="551"/>
-        <location filename="../src/dirwidget.cpp" line="555"/>
+        <location filename="../src/dirwidget.cpp" line="558"/>
+        <location filename="../src/dirwidget.cpp" line="562"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="629"/>
+        <location filename="../src/dirwidget.cpp" line="636"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="644"/>
+        <location filename="../src/dirwidget.cpp" line="651"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="664"/>
+        <location filename="../src/dirwidget.cpp" line="671"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
     </message>

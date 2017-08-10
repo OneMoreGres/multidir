@@ -78,7 +78,9 @@ SOURCES += \
     src/filesystemcompleter.cpp \
     src/pathwidget.cpp \
     src/viewer.cpp \
-    src/settingseditor.cpp
+    src/settingseditor.cpp \
+    src/dirstatuswidget.cpp \
+    src/storagemanager.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -113,7 +115,9 @@ HEADERS  += \
     src/filesystemcompleter.h \
     src/pathwidget.h \
     src/viewer.h \
-    src/settingseditor.h
+    src/settingseditor.h \
+    src/dirstatuswidget.h \
+    src/storagemanager.h
 
 RESOURCES += \
     resources.qrc
