@@ -71,32 +71,6 @@ void TranslationLoader::setLanguage (const QString &language)
   setTranslation (toTranslation (language));
 }
 
-QStringList TranslationLoader::availableTranslations ()
-{
-  QStringList result {QLocale (builtin).name ()};
-  QTranslator checker;
-
-  for (const auto &dir: searchPaths ())
-  {
-    for (const auto &file: QDir (dir).entryInfoList (
-           {appTranslation + '*'}, QDir::Files))
-    {
-      if (checker.load (file.absoluteFilePath ()))
-      {
-        const auto name = file.baseName ();
-        const auto suffixIndex = name.indexOf (QLatin1Char ('_'));
-        if (suffixIndex < 0)
-        {
-          continue;
-        }
-        const auto suffix = name.mid (suffixIndex + 1);
-        result.append (QLocale (suffix).name ());
-      }
-    }
-  }
-  return result;
-}
-
 QString TranslationLoader::translation ()
 {
   QSettings settings;

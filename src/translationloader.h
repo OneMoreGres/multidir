@@ -12,7 +12,6 @@ public:
   static void setLanguage (const QString &language);
 
 private:
-  static QStringList availableTranslations ();
   static QString translation ();
   static void setTranslation (const QString &translation);
   static QStringList searchPaths ();
