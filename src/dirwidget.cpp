@@ -257,7 +257,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (isMinSizeFixed_, &QAction::toggled,
            this, &DirWidget::fixMinSize);
 
-  upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr, true);
+  upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr);
   connect (upAction_, &QAction::triggered,
            this, [this] {openPath (view_->rootIndex ().parent ());});
   auto up = new QToolButton (this);
