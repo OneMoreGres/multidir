@@ -26,8 +26,6 @@ public:
   QVariant get (Type type) const;
   void set (Type type, const QVariant &value);
 
-  QSettings &qsettings ();
-
 private:
   QSettings settings_;
 };

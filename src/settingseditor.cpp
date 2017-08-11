@@ -14,7 +14,6 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QStyledItemDelegate>
-#include <QSettings>
 #include <QComboBox>
 #include <QPixmapCache>
 
@@ -175,14 +174,14 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
 
   load ();
 
-  SettingsManager settings;
-  restoreState (settings.qsettings ());
+  QSettings settings;
+  restoreState (settings);
 }
 
 SettingsEditor::~SettingsEditor ()
 {
-  SettingsManager settings;
-  saveState (settings.qsettings ());
+  QSettings settings;
+  saveState (settings);
 }
 
 void SettingsEditor::init ()
@@ -220,10 +219,11 @@ void SettingsEditor::initOrphanSettings ()
 {
   TranslationLoader::load ();
 
-  SettingsManager settings;
+  QSettings qsettings;
   ShortcutManager::setDefaults ();
-  ShortcutManager::restore (settings.qsettings ());
+  ShortcutManager::restore (qsettings);
 
+  SettingsManager settings;
   QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
 }
 
@@ -269,8 +269,8 @@ void SettingsEditor::saveShortcuts ()
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
 
-  SettingsManager settings;
-  ShortcutManager::save (settings.qsettings ());
+  QSettings settings;
+  ShortcutManager::save (settings);
 }
 
 void SettingsEditor::loadLanguage ()

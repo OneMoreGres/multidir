@@ -156,9 +156,10 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   {
-    SettingsManager settings;
-    restore (settings.qsettings ());
+    QSettings settings;
+    restore (settings);
   }
+
   SettingsManager::subscribeForUpdates (this);
   updateSettings ();
 
@@ -175,8 +176,8 @@ MainWindow::~MainWindow ()
   Notifier::setMain (nullptr);
 
 #ifndef DEVELOPMENT
-  SettingsManager settings;
-  save (settings.qsettings ());
+  QSettings settings;
+  save (settings);
 #endif
 }
 

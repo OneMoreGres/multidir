@@ -1,7 +1,6 @@
 #include "viewer.h"
 #include "debug.h"
 #include "notifier.h"
-#include "settingsmanager.h"
 
 #include <QTextEdit>
 #include <QBoxLayout>
@@ -11,6 +10,7 @@
 #include <QtConcurrentRun>
 #include <QFileInfo>
 #include <QTextCodec>
+#include <QSettings>
 
 namespace
 {
@@ -39,14 +39,14 @@ Viewer::Viewer (QWidget *parent) :
   layout->addWidget (edit_);
 
 
-  SettingsManager settings;
-  restoreGeometry (settings.qsettings ().value (qs_grometry, saveGeometry ()).toByteArray ());
+  QSettings settings;
+  restoreGeometry (settings.value (qs_grometry, saveGeometry ()).toByteArray ());
 }
 
 Viewer::~Viewer ()
 {
-  SettingsManager settings;
-  settings.qsettings ().setValue (qs_grometry, saveGeometry ());
+  QSettings settings;
+  settings.setValue (qs_grometry, saveGeometry ());
 }
 
 bool Viewer::setFile (const QString &name)

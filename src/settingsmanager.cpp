@@ -73,7 +73,6 @@ QVariant SettingsManager::get (Type type) const
 {
   ASSERT (0 <= type && type < TypeCount);
   const auto &entry = entries[type];
-  ASSERT (settings_.group ().isEmpty ());
   return settings_.value (entry.path, entry.defaultValue);
 }
 
@@ -82,13 +81,7 @@ void SettingsManager::set (Type type, const QVariant &value)
 {
   ASSERT (0 <= type && type < TypeCount);
   const auto &entry = entries[type];
-  ASSERT (settings_.group ().isEmpty ());
   settings_.setValue (entry.path, value);
-}
-
-QSettings &SettingsManager::qsettings ()
-{
-  return settings_;
 }
 
 void SettingsManager::triggerUpdate ()
