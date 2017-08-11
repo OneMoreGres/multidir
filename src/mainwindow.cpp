@@ -133,7 +133,7 @@ MainWindow::MainWindow (QWidget *parent) :
   trayMenu->addAction (quit);
 
   tray_->setContextMenu (trayMenu);
-  tray_->setToolTip (tr ("Multidir"));
+  tray_->setToolTip (constants::appName);
   tray_->setIcon (QIcon (":/app.png"));
   tray_->show ();
   connect (tray_, &QSystemTrayIcon::activated,
@@ -330,7 +330,7 @@ void MainWindow::activateFindMode ()
 void MainWindow::showAbout ()
 {
   QStringList lines {
-    tr ("<b>%1</b> version %2").arg (tr ("Multidir"), constants::version),
+    tr ("<b>%1</b> version %2").arg (constants::appName, constants::version),
     tr ("Author: Gres (<a href='mailto:%1'>%1</a>)").arg ("multidir@gres.biz"),
     tr ("Homepage: <a href='https://%1'>%1</a>").arg ("gres.biz/multidir"),
     tr ("Issues: <a href='https://%1'>%1</a>").arg ("github.com/onemoregres/multidir/issues"),
@@ -361,7 +361,7 @@ void MainWindow::showFileOperation (QSharedPointer<FileOperation> operation)
 
 void MainWindow::updateWindowTitle (const QString &groupName)
 {
-  setWindowTitle (tr ("Multidir - ") + groupName);
+  setWindowTitle (constants::appName + QString (" - ") + groupName);
 }
 
 #include "moc_mainwindow.cpp"

@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QPixmapCache>
 #include <QPointer>
+#include <QApplication>
 
 namespace
 {
@@ -30,7 +31,7 @@ QVector<Entry> entries = [] {
   QVector<Entry> result (SettingsManager::TypeCount);
   using QS = QLatin1String;
 
-#define SET(XXX) entries[SettingsManager::XXX]
+#define SET(XXX) result[SettingsManager::XXX]
 
   SET (ConsoleCommand) = {QS ("console"), defaultConsole};
   SET (EditorCommand) = {QS ("editor"), defaultEditor};
@@ -63,23 +64,6 @@ QVector<Subscriber> subscribers;
 }
 
 
-void SettingsManager::triggerUpdate ()
-{
-  subscribers.erase (std::remove_if (subscribers.begin (), subscribers.end (),
-                                     [](const Subscriber &i) {return !i.object;}), subscribers.end ());
-
-  for (const auto &i:subscribers)
-  {
-    QMetaObject::invokeMethod (i.object.data (), qPrintable (i.method));
-  }
-}
-
-void SettingsManager::subscribeForUpdates (QObject *object, const QString &method)
-{
-  ASSERT (!method.isEmpty ());
-  subscribers.append ({object, method});
-}
-
 SettingsManager::SettingsManager () :
   settings_ ()
 {
@@ -105,4 +89,27 @@ void SettingsManager::set (Type type, const QVariant &value)
 QSettings &SettingsManager::qsettings ()
 {
   return settings_;
+}
+
+void SettingsManager::triggerUpdate ()
+{
+  subscribers.erase (std::remove_if (subscribers.begin (), subscribers.end (),
+                                     [](const Subscriber &i) {return !i.object;}), subscribers.end ());
+
+  for (const auto &i:subscribers)
+  {
+    QMetaObject::invokeMethod (i.object.data (), qPrintable (i.method));
+  }
+}
+
+void SettingsManager::subscribeForUpdates (QObject *object, const QString &method)
+{
+  ASSERT (!method.isEmpty ());
+  subscribers.append ({object, method});
+}
+
+void SettingsManager::setPortable (bool isPortable)
+{
+  QSettings::setDefaultFormat (isPortable ? QSettings::IniFormat : QSettings::NativeFormat);
+  QSettings::setPath (QSettings::IniFormat, QSettings::UserScope, QApplication::applicationDirPath ());
 }

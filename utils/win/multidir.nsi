@@ -15,6 +15,7 @@
 !define ICON "${CONTENT_DIR}\icon.ico"
 !define UNINSTALLER "uninstall.exe"
 !define BRANDING "${APP_BRAND_NAME} ver. ${VERSION}"
+!define RUNNER "${APP_BRAND_NAME}-run.lnk"
 !define OUT_README "readme.txt"
 !define REG_ROOT "HKCU"
 !define REG_APP "Software\${COMPANY}\${APP_WORK_NAME}"
@@ -76,7 +77,8 @@ Var START_DIR
 
 !insertmacro MUI_PAGE_INSTFILES
 
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${BINARY}"
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_FUNCTION "RunApp"
 !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\${OUT_README}"
 !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
@@ -93,6 +95,8 @@ Var START_DIR
 
 ; sections
 
+Var APP_SIZE
+Var IS_PORTABLE
 Section !$(SECT_APP) SECT_APP_ID
     SectionIn RO
     SetOutPath "$INSTDIR"
@@ -111,11 +115,17 @@ Section !$(SECT_APP) SECT_APP_ID
     File "${CONTENT_DIR}\app\translations\*.qm"
     SetOutPath "$INSTDIR\iconengines"
     File "${CONTENT_DIR}\app\iconengines\*.dll"
+    
+    SetOutPath "$INSTDIR"
+    IntCmp $IS_PORTABLE ${SF_SELECTED} portable_app
+        CreateShortcut "$INSTDIR\${RUNNER}" "$INSTDIR\${BINARY}"
+        Goto done_app
+    portable_app:
+        CreateShortcut "$INSTDIR\${RUNNER}" "$INSTDIR\${BINARY}" "--portable"
+    done_app:
 SectionEnd
 
 
-Var APP_SIZE
-Var IS_PORTABLE
 Section -Registry
     IntCmp $IS_PORTABLE ${SF_SELECTED} done_registry
         SetOutPath "$INSTDIR"
@@ -137,8 +147,10 @@ SectionEnd
 Section -StartMenu
     !insertmacro MUI_STARTMENU_WRITE_BEGIN 0
         CreateDirectory "$SMPROGRAMS\$START_DIR"
-        CreateShortcut "$SMPROGRAMS\$START_DIR\${APP_BRAND_NAME}.lnk" "$INSTDIR\${BINARY}"
-        CreateShortcut "$SMPROGRAMS\$START_DIR\$(UNINSTALL_LINK).lnk" "$INSTDIR\${UNINSTALLER}"
+        CreateShortcut "$SMPROGRAMS\$START_DIR\${APP_BRAND_NAME}.lnk" "$INSTDIR\${RUNNER}"
+        IntCmp $IS_PORTABLE ${SF_SELECTED} done_menu
+            CreateShortcut "$SMPROGRAMS\$START_DIR\$(UNINSTALL_LINK).lnk" "$INSTDIR\${UNINSTALLER}"
+        done_menu:
     !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
@@ -153,13 +165,14 @@ SectionEnd
 
 
 Section $(SECT_DESKTOP) SECT_DESKTOP_ID
-    CreateShortcut "$DESKTOP\${APP_BRAND_NAME}.lnk" "$INSTDIR\${BINARY}" ""
+    CreateShortcut "$DESKTOP\${APP_BRAND_NAME}.lnk" "$INSTDIR\${RUNNER}"
 SectionEnd
 
 
 Section $(SECT_AUTOSTART) SECT_AUTOSTART_ID
-    WriteRegStr ${REG_ROOT} "${REG_AUTOSTART}" "${APP_BRAND_NAME}" "$INSTDIR\${BINARY}"
+    WriteRegStr ${REG_ROOT} "${REG_AUTOSTART}" "${APP_BRAND_NAME}" "$INSTDIR\${RUNNER}"
 SectionEnd
+
 
 Section /o $(SECT_PORTABLE) SECT_PORTABLE_ID
 SectionEnd
@@ -181,6 +194,10 @@ Section "Uninstall"
 SectionEnd
 
 ; functions
+
+Function RunApp
+    ExecShell "" "$INSTDIR\${RUNNER}"
+FunctionEnd
 
 Function .onSelChange
     SectionGetFlags ${SECT_PORTABLE_ID} $IS_PORTABLE

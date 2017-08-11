@@ -19,6 +19,8 @@ public:
   static void subscribeForUpdates (QObject *object, const QString &method =
                                      QLatin1String("updateSettings"));
 
+  static void setPortable (bool isPortable);
+
   SettingsManager ();
 
   QVariant get (Type type) const;
