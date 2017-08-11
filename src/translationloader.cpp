@@ -9,7 +9,6 @@
 
 namespace
 {
-const QString qs_language = QLatin1String ("language");
 const QString appTranslation = QLatin1String ("multidir");
 const auto builtin = QLocale::English;
 }
