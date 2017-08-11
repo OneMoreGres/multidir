@@ -128,9 +128,14 @@ bool ProxyModel::isDir (int row) const
   return model_->isDir (mapToSource (index (row, 0, current ())));
 }
 
-qint64 ProxyModel::fileSize (int row)
+qint64 ProxyModel::fileSize (int row) const
 {
   return model_->size (mapToSource (index (row, 0, current ())));
+}
+
+QString ProxyModel::fileName (int row) const
+{
+  return model_->fileName (mapToSource (index (row, 0, current ())));
 }
 
 int ProxyModel::count () const

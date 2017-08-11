@@ -38,7 +38,8 @@ public:
 
 
   bool isDir (int row) const;
-  qint64 fileSize (int row);
+  qint64 fileSize (int row) const;
+  QString fileName (int row) const;
   int count () const;
 
   QFileInfo currentPath () const;
