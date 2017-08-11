@@ -128,8 +128,6 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::nextTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
-  connect (w, &DirWidget::fileOperation,
-           this, &GroupWidget::fileOperation);
 
   w->setPath (QDir::homePath ());
   view_->add (*w);

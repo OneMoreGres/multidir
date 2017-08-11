@@ -102,8 +102,6 @@ GroupWidget &GroupHolder::add ()
   auto group = new GroupWidget (model_, this);
   connect (this, &GroupHolder::setNameFilter,
            group, &GroupWidget::setNameFilter);
-  connect (group, &GroupWidget::fileOperation,
-           this, &GroupHolder::fileOperation);
 
   const auto index = groups_->addWidget (group);
   groups_->setCurrentIndex (index);

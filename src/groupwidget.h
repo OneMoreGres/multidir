@@ -32,9 +32,6 @@ public:
 public slots:
   void updateSettings ();
 
-signals:
-  void fileOperation (QSharedPointer<FileOperation> operation);
-
 private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);

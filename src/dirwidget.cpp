@@ -91,6 +91,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::checkDirExistence);
   connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleDirRename);
+  connect (this, &DirWidget::fileOperation,
+           model_, &FileSystemModel::fileOperation);
 
 
   auto nextTab = makeShortcut (ShortcutManager::NextTab, nullptr);

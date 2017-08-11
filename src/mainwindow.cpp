@@ -57,8 +57,6 @@ MainWindow::MainWindow (QWidget *parent) :
 
   connect (findEdit_, &QLineEdit::textChanged,
            groups_, &GroupHolder::setNameFilter);
-  connect (groups_, &GroupHolder::fileOperation,
-           this, &MainWindow::showFileOperation);
   connect (groups_, &GroupHolder::currentChanged,
            this, &MainWindow::updateWindowTitle);
 

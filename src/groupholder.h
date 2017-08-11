@@ -40,7 +40,6 @@ signals:
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);
   void setNameFilter (const QString &filter);
-  void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:
   FileSystemModel &model_;
