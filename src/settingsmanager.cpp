@@ -64,23 +64,6 @@ QVector<Subscriber> subscribers;
 }
 
 
-void SettingsManager::triggerUpdate ()
-{
-  subscribers.erase (std::remove_if (subscribers.begin (), subscribers.end (),
-                                     [](const Subscriber &i) {return !i.object;}), subscribers.end ());
-
-  for (const auto &i:subscribers)
-  {
-    QMetaObject::invokeMethod (i.object.data (), qPrintable (i.method));
-  }
-}
-
-void SettingsManager::subscribeForUpdates (QObject *object, const QString &method)
-{
-  ASSERT (!method.isEmpty ());
-  subscribers.append ({object, method});
-}
-
 SettingsManager::SettingsManager () :
   settings_ ()
 {
@@ -106,6 +89,23 @@ void SettingsManager::set (Type type, const QVariant &value)
 QSettings &SettingsManager::qsettings ()
 {
   return settings_;
+}
+
+void SettingsManager::triggerUpdate ()
+{
+  subscribers.erase (std::remove_if (subscribers.begin (), subscribers.end (),
+                                     [](const Subscriber &i) {return !i.object;}), subscribers.end ());
+
+  for (const auto &i:subscribers)
+  {
+    QMetaObject::invokeMethod (i.object.data (), qPrintable (i.method));
+  }
+}
+
+void SettingsManager::subscribeForUpdates (QObject *object, const QString &method)
+{
+  ASSERT (!method.isEmpty ());
+  subscribers.append ({object, method});
 }
 
 void SettingsManager::setPortable (bool isPortable)
