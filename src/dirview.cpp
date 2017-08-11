@@ -323,6 +323,13 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   else if (event->type () == QEvent::KeyPress)
   {
     auto casted = static_cast<QKeyEvent *>(event);
+    if ((casted->key () == Qt::Key_Down || casted->key () == Qt::Key_Up) &&
+        casted->modifiers () & Qt::ControlModifier)
+    {
+      casted->setModifiers (casted->modifiers () ^ Qt::ControlModifier);
+      return false;
+    }
+
     if (casted->key () == Qt::Key_Backspace ||
         (watched == table_ && casted->key () == Qt::Key_Left))
     {
