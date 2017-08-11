@@ -42,6 +42,8 @@ QVector<Entry> entries = [] {
   SET (TabIds) = {QS ("tabIds"),
                   QS ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")};
 
+  SET (Translation) = {QS ("language"), {}};
+
   SET (ShowFreeSpace) = {QS ("statusShowFree"), true};
   SET (ShowFilesInfo) = {QS ("statusShowFiles"), true};
   SET (ShowSelectionInfo) = {QS ("statusShowSelection"), true};

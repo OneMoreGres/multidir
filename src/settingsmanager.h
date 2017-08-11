@@ -10,7 +10,7 @@ public:
   enum Type
   {
     ConsoleCommand, EditorCommand, CheckUpdates, StartInBackground, ImageCacheSize,
-    GroupIds, TabIds,
+    GroupIds, TabIds, Translation,
     ShowFreeSpace, ShowFilesInfo, ShowSelectionInfo,
     TypeCount
   };
