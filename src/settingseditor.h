@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QDialog>
-#include <QKeySequence>
 
 class QLineEdit;
 class QCheckBox;
@@ -18,11 +17,15 @@ public:
   explicit SettingsEditor (QWidget *parent = nullptr);
   ~SettingsEditor ();
 
+  static void initOrphanSettings ();
+
 private:
   void init ();
 
   void saveState (QSettings &settings) const;
   void restoreState (QSettings &settings);
+
+  void updateOrphanSettings ();
 
   void loadShortcuts ();
   void saveShortcuts ();

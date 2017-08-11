@@ -23,18 +23,11 @@
 #include <QMenuBar>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QPixmapCache>
 #include <QStatusBar>
 
 namespace
 {
-const QString qs_shortcuts = "shortcuts";
 const QString qs_geometry = "geometry";
-const QString qs_console = "console";
-const QString qs_editor = "editor";
-const QString qs_updates = "checkUpdates";
-const QString qs_background = "startBackground";
-const QString qs_imageCacheSize = "imageCacheSize";
 }
 
 MainWindow::MainWindow (QWidget *parent) :
@@ -187,10 +180,6 @@ MainWindow::~MainWindow ()
 
 void MainWindow::save (QSettings &settings) const
 {
-  settings.beginGroup (qs_shortcuts);
-  ShortcutManager::save (settings);
-  settings.endGroup ();
-
   settings.setValue (qs_geometry, saveGeometry ());
 
   groupControl_->save (settings);
@@ -198,10 +187,6 @@ void MainWindow::save (QSettings &settings) const
 
 void MainWindow::restore (QSettings &settings)
 {
-  settings.beginGroup (qs_shortcuts);
-  ShortcutManager::restore (settings);
-  settings.endGroup ();
-
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
   groupControl_->restore (settings);
@@ -215,7 +200,6 @@ void MainWindow::updateSettings ()
   editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
   setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
   startInBackground_ = settings.get (Type::StartInBackground).toBool ();
-  QPixmapCache::setCacheLimit (std::max (1, settings.get (Type::ImageCacheSize).toInt ()));
 }
 
 void MainWindow::updateTrayMenu ()

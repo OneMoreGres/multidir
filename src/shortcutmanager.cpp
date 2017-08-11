@@ -9,6 +9,7 @@
 
 namespace
 {
+const auto qs_group = QString ("shortcuts");
 using SM = ShortcutManager;
 
 struct Shortcut
@@ -149,14 +150,17 @@ void ShortcutManager::setDefaults ()
 
 void ShortcutManager::save (QSettings &settings)
 {
+  settings.beginGroup (qs_group);
   for (auto i = 0; i < ShortcutCount; ++i)
   {
     settings.setValue (QString::number (i), get (Shortcut (i)));
   }
+  settings.endGroup ();
 }
 
 void ShortcutManager::restore (QSettings &settings)
 {
+  settings.beginGroup (qs_group);
   for (auto i = 0; i < ShortcutCount; ++i)
   {
     if (settings.contains (QString::number (i)))
@@ -164,6 +168,7 @@ void ShortcutManager::restore (QSettings &settings)
       set (Shortcut (i), settings.value (QString::number (i)).toString ());
     }
   }
+  settings.endGroup ();
 }
 
 void ShortcutManager::add (Shortcut type, QAction *action)

@@ -2,6 +2,7 @@
 #include "shortcutmanager.h"
 #include "translationloader.h"
 #include "settingsmanager.h"
+#include "debug.h"
 
 #include <QGridLayout>
 #include <QKeySequenceEdit>
@@ -15,7 +16,7 @@
 #include <QStyledItemDelegate>
 #include <QSettings>
 #include <QComboBox>
-#include <QSettings>
+#include <QPixmapCache>
 
 namespace
 {
@@ -95,7 +96,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     ++row;
     layout->addWidget (new QLabel (tr ("Image cache size")), row, 0);
     layout->addWidget (imageCache_, row, 1);
-    imageCache_->setRange (1, 100);
+    imageCache_->setRange (1, 500);
     imageCache_->setSuffix (tr (" Mb"));
 
     ++row;
@@ -215,6 +216,25 @@ void SettingsEditor::restoreState (QSettings &settings)
   }
 }
 
+void SettingsEditor::initOrphanSettings ()
+{
+  TranslationLoader::load ();
+
+  QSettings qsettings;
+  ShortcutManager::setDefaults ();
+  ShortcutManager::restore (qsettings);
+
+  SettingsManager settings;
+  QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
+}
+
+void SettingsEditor::updateOrphanSettings ()
+{
+  SettingsManager settings;
+  QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
+
+}
+
 void SettingsEditor::loadShortcuts ()
 {
   using SM = ShortcutManager;
@@ -249,6 +269,9 @@ void SettingsEditor::saveShortcuts ()
     const auto type = SM::Shortcut (idItem->type () - Item::UserType);
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
+
+  QSettings qsettings;
+  ShortcutManager::save (qsettings);
 }
 
 void SettingsEditor::loadLanguage ()
@@ -308,6 +331,9 @@ void SettingsEditor::save ()
       settings.set (Type (i.value ()), casted->value ());
     }
   }
+
+  updateOrphanSettings ();
+
   settings.triggerUpdate ();
 }
 
