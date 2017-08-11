@@ -40,8 +40,6 @@ MainWindow::MainWindow (QWidget *parent) :
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
-  consoleCommand_ (),
-  editorCommand_ (),
   checkUpdates_ (false),
   startInBackground_ (false)
 {
@@ -57,10 +55,6 @@ MainWindow::MainWindow (QWidget *parent) :
            this, &MainWindow::showFileOperation);
 
 
-  connect (groups_, &GroupHolder::consoleRequested,
-           this, &MainWindow::openConsole);
-  connect (groups_, &GroupHolder::editorRequested,
-           this, &MainWindow::openInEditor);
   connect (findEdit_, &QLineEdit::textChanged,
            groups_, &GroupHolder::setNameFilter);
   connect (groups_, &GroupHolder::fileOperation,
@@ -199,8 +193,6 @@ void MainWindow::updateSettings ()
 {
   SettingsManager settings;
   using Type = SettingsManager::Type;
-  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
-  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
   setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
   startInBackground_ = settings.get (Type::StartInBackground).toBool ();
 }
@@ -239,41 +231,6 @@ void MainWindow::editSettings ()
 {
   SettingsEditor settings;
   settings.exec ();
-}
-
-void MainWindow::openConsole (const QString &path)
-{
-  if (!consoleCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = consoleCommand_;
-    command.replace ("%d", path);
-    const auto parts = utils::parseShellCommand (command);
-    if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
-    {
-      Notifier::error (tr ("Failed to open console '%1' in '%2'")
-                       .arg (consoleCommand_, path));
-    }
-  }
-}
-
-void MainWindow::openInEditor (const QString &path)
-{
-  if (!editorCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = editorCommand_;
-    if (command.contains ("%p"))
-    {
-      command.replace ("%p", path);
-    }
-    else
-    {
-      command += ' ' + path;
-    }
-    if (!QProcess::startDetached (command))
-    {
-      Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
-    }
-  }
 }
 
 void MainWindow::setCheckUpdates (bool isOn)

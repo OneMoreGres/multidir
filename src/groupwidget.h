@@ -33,8 +33,6 @@ public slots:
   void updateSettings ();
 
 signals:
-  void consoleRequested (const QString &path);
-  void editorRequested (const QString &path);
   void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:

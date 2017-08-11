@@ -34,8 +34,6 @@ private:
   void trayClicked (QSystemTrayIcon::ActivationReason reason);
   void toggleVisible ();
   void editSettings ();
-  void openConsole (const QString &path);
-  void openInEditor (const QString &path);
   void setCheckUpdates (bool isOn);
   void addWidget ();
   void activateFindMode ();
@@ -51,8 +49,6 @@ private:
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
-  QString consoleCommand_;
-  QString editorCommand_;
   bool checkUpdates_;
   bool startInBackground_;
 };

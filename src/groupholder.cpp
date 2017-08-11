@@ -100,10 +100,6 @@ GroupWidget &GroupHolder::at (int index) const
 GroupWidget &GroupHolder::add ()
 {
   auto group = new GroupWidget (model_, this);
-  connect (group, &GroupWidget::consoleRequested,
-           this, &GroupHolder::consoleRequested);
-  connect (group, &GroupWidget::editorRequested,
-           this, &GroupHolder::editorRequested);
   connect (this, &GroupHolder::setNameFilter,
            group, &GroupWidget::setNameFilter);
   connect (group, &GroupWidget::fileOperation,

@@ -128,10 +128,6 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::nextTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
-  connect (w, &DirWidget::consoleRequested,
-           this, &GroupWidget::consoleRequested);
-  connect (w, &DirWidget::editorRequested,
-           this, &GroupWidget::editorRequested);
   connect (w, &DirWidget::fileOperation,
            this, &GroupWidget::fileOperation);
 
