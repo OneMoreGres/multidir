@@ -31,7 +31,7 @@ QVector<Entry> entries = [] {
   QVector<Entry> result (SettingsManager::TypeCount);
   using QS = QLatin1String;
 
-#define SET(XXX) entries[SettingsManager::XXX]
+#define SET(XXX) result[SettingsManager::XXX]
 
   SET (ConsoleCommand) = {QS ("console"), defaultConsole};
   SET (EditorCommand) = {QS ("editor"), defaultEditor};
