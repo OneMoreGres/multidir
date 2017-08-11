@@ -170,7 +170,7 @@ void GroupWidget::updateWidgetShortcuts ()
   for (auto &i: widgets_)
   {
     const auto index = order.indexOf (i.widget);
-    const auto key = (index < count) ? ids_.at (index) : QChar ();
+    const auto key = (index < count) ? QString (ids_.at (index)) : QString ();
     i.widget->setIndex (key);
     if (!key.isNull () && !commonPart.isEmpty ())
     {
