@@ -137,7 +137,7 @@ void cleanup (T * &w)
 {
   if (w)
   {
-    w->deleteLater ();
+    delete w;
     w = nullptr;
   }
 }
@@ -170,7 +170,7 @@ void DirView::setIsList (bool isList)
   connect (selection, &QItemSelectionModel::selectionChanged,
            this, &DirView::selectionChanged);
 
-  const auto view = this->view ();
+  auto *view = this->view ();
   view->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (view, &QWidget::customContextMenuRequested,
            this, &DirView::contextMenuRequested);
@@ -188,6 +188,8 @@ void DirView::setIsList (bool isList)
   setRootIndex (root);
   setLocked (isLocked ());
   setExtensive (isExtensive ());
+
+  activate ();
 }
 
 void DirView::initTable ()
@@ -294,7 +296,7 @@ void DirView::showHeaderContextMenu ()
 
 QAbstractItemView * DirView::view () const
 {
-  return (table_
+  return (!isList_
           ? static_cast<QAbstractItemView *>(table_)
           : static_cast<QAbstractItemView *>(list_) );
 }
