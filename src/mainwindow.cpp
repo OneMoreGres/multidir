@@ -212,7 +212,7 @@ void MainWindow::updateSettings ()
   SettingsManager settings;
   using Type = SettingsManager::Type;
   consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
-  consoleCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
+  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
   setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
   startInBackground_ = settings.get (Type::StartInBackground).toBool ();
   QPixmapCache::setCacheLimit (std::max (1, settings.get (Type::ImageCacheSize).toInt ()));
