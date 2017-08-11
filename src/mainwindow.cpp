@@ -12,11 +12,11 @@
 #include "notifier.h"
 #include "shortcutmanager.h"
 #include "utils.h"
+#include "settingsmanager.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
 #include <QApplication>
-#include <QSettings>
 #include <QProcess>
 #include <QTimer>
 #include <QLineEdit>
@@ -164,6 +164,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
   QSettings qsettings;
   restore (qsettings);
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 
   if (!startInBackground_)
   {
@@ -191,12 +193,6 @@ void MainWindow::save (QSettings &settings) const
 
   settings.setValue (qs_geometry, saveGeometry ());
 
-  settings.setValue (qs_console, consoleCommand_);
-  settings.setValue (qs_editor, editorCommand_);
-  settings.setValue (qs_updates, checkUpdates_);
-  settings.setValue (qs_background, startInBackground_);
-  settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
-
   groupControl_->save (settings);
 }
 
@@ -208,28 +204,18 @@ void MainWindow::restore (QSettings &settings)
 
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-#ifdef Q_OS_LINUX
-  const auto console = QString ("xterm");
-  const auto editor = QString ("gedit");
-#endif
-#ifdef Q_OS_WIN
-  const auto console = QString ("cmd");
-  const auto editor = QString ("notepad.exe");
-#endif
-#ifdef Q_OS_MAC
-  const auto console = QString ("open -a Terminal");
-  const auto editor = QString ("open -a TextEdit");
-#endif
-  consoleCommand_ = settings.value (qs_console, console).toString ().trimmed ();
-  editorCommand_ = settings.value (qs_editor, editor).toString ().trimmed ();
-
-  setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
-  startInBackground_ = settings.value (qs_background, false).toBool ();
-
-  auto cacheSize = settings.value (qs_imageCacheSize, QPixmapCache::cacheLimit ()).toInt ();
-  QPixmapCache::setCacheLimit (std::max (1, cacheSize));
-
   groupControl_->restore (settings);
+}
+
+void MainWindow::updateSettings ()
+{
+  SettingsManager settings;
+  using Type = SettingsManager::Type;
+  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
+  consoleCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
+  setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
+  startInBackground_ = settings.get (Type::StartInBackground).toBool ();
+  QPixmapCache::setCacheLimit (std::max (1, settings.get (Type::ImageCacheSize).toInt ()));
 }
 
 void MainWindow::updateTrayMenu ()
@@ -265,24 +251,7 @@ void MainWindow::toggleVisible ()
 void MainWindow::editSettings ()
 {
   SettingsEditor settings;
-  settings.setConsole (consoleCommand_);
-  settings.setCheckUpdates (checkUpdates_);
-  settings.setStartInBackground (startInBackground_);
-  settings.setEditor (editorCommand_);
-  settings.setImageCacheSize (QPixmapCache::cacheLimit ());
-  settings.setGroupShortcuts (groupControl_->ids ());
-  settings.setTabShortcuts (groups_->widgetIds ());
-
-  if (settings.exec () == QDialog::Accepted)
-  {
-    consoleCommand_ = settings.console ().trimmed ();
-    editorCommand_ = settings.editor ().trimmed ();
-    setCheckUpdates (settings.checkUpdates ());
-    startInBackground_ = settings.startInBackground ();
-    QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
-    groupControl_->setIds (settings.groupShortcuts ());
-    groups_->setWidgetIds (settings.tabShortcuts ());
-  }
+  settings.exec ();
 }
 
 void MainWindow::openConsole (const QString &path)

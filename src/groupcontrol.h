@@ -24,6 +24,9 @@ public:
   const QString &ids () const;
   void setIds (const QString &ids);
 
+public slots:
+  void updateSettings ();
+
 private:
   void add ();
   void renameCurrent ();

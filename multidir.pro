@@ -80,7 +80,8 @@ SOURCES += \
     src/viewer.cpp \
     src/settingseditor.cpp \
     src/dirstatuswidget.cpp \
-    src/storagemanager.cpp
+    src/storagemanager.cpp \
+    src/settingsmanager.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -117,7 +118,8 @@ HEADERS  += \
     src/viewer.h \
     src/settingseditor.h \
     src/dirstatuswidget.h \
-    src/storagemanager.h
+    src/storagemanager.h \
+    src/settingsmanager.h
 
 RESOURCES += \
     resources.qrc

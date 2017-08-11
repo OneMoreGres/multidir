@@ -34,9 +34,6 @@ public:
   void renameCurrent (const QString &newName);
   void removeCurrent ();
 
-  const QString &widgetIds () const;
-  void setWidgetIds (const QString &ids);
-
 signals:
   void currentChanged (const QString &name);
 

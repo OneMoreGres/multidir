@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "shortcutmanager.h"
 #include "utils.h"
+#include "settingsmanager.h"
 
 #include <QMenu>
 #include <QSettings>
@@ -42,6 +43,9 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   connect (closeAction_, &QAction::triggered, this, &GroupControl::removeCurrent);
 
   menu_->addSeparator ();
+
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 }
 
 GroupControl::~GroupControl ()
@@ -69,6 +73,12 @@ void GroupControl::restore (QSettings &settings)
 
   const auto current = view_.currentIndex ();
   trigger (actionAt (current));
+}
+
+void GroupControl::updateSettings ()
+{
+  SettingsManager settings;
+  setIds (settings.get (SettingsManager::GroupIds).toString ());
 }
 
 void GroupControl::populateMenuActions ()
