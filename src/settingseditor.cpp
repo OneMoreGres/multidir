@@ -175,14 +175,14 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
 
   load ();
 
-  QSettings qsettings;
-  restoreState (qsettings);
+  SettingsManager settings;
+  restoreState (settings.qsettings ());
 }
 
 SettingsEditor::~SettingsEditor ()
 {
-  QSettings qsettings;
-  saveState (qsettings);
+  SettingsManager settings;
+  saveState (settings.qsettings ());
 }
 
 void SettingsEditor::init ()
@@ -220,11 +220,10 @@ void SettingsEditor::initOrphanSettings ()
 {
   TranslationLoader::load ();
 
-  QSettings qsettings;
-  ShortcutManager::setDefaults ();
-  ShortcutManager::restore (qsettings);
-
   SettingsManager settings;
+  ShortcutManager::setDefaults ();
+  ShortcutManager::restore (settings.qsettings ());
+
   QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
 }
 
@@ -270,8 +269,8 @@ void SettingsEditor::saveShortcuts ()
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
 
-  QSettings qsettings;
-  ShortcutManager::save (qsettings);
+  SettingsManager settings;
+  ShortcutManager::save (settings.qsettings ());
 }
 
 void SettingsEditor::loadLanguage ()
