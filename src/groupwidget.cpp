@@ -172,9 +172,9 @@ void GroupWidget::updateWidgetShortcuts ()
     const auto index = order.indexOf (i.widget);
     const auto key = (index < count) ? QString (ids_.at (index)) : QString ();
     i.widget->setIndex (key);
+    siblings[index] = i.widget;
     if (!key.isNull () && !commonPart.isEmpty ())
     {
-      siblings[index] = i.widget;
       i.action->setShortcut (QString ("%1,%2").arg (commonPart).arg (ids_.at (index)));
     }
     else

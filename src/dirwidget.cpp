@@ -367,13 +367,15 @@ void DirWidget::setSiblings (const QList<DirWidget *> siblings)
                   menu->clear ();
 
                   const auto common = SM::get (s).toString ();
+                  auto number = 0;
                   for (auto *i: siblings)
                   {
-                    auto action = menu->addAction (i->index ());
+                    const auto index = i->index ();
+                    auto action = menu->addAction (QString::number (++number) + index);
                     action->setData (QVariant::fromValue (i));
-                    if (!common.isEmpty ())
+                    if (!common.isEmpty () && !index.isEmpty ())
                     {
-                      action->setShortcut ({common + ',' + i->index ()});
+                      action->setShortcut ({common + ',' + index});
                       action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
                       addAction (action);
                     }
