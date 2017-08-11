@@ -323,44 +323,53 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   else if (event->type () == QEvent::KeyPress)
   {
     auto casted = static_cast<QKeyEvent *>(event);
-    if ((casted->key () == Qt::Key_Down || casted->key () == Qt::Key_Up) &&
-        casted->modifiers () & Qt::ControlModifier)
+    const auto key = casted->key ();
+    const auto modifiers = casted->modifiers ();
+
+    if ((key == Qt::Key_Down || key == Qt::Key_Up || key == Qt::Key_Space) &&
+        modifiers & Qt::ControlModifier)
     {
-      casted->setModifiers (casted->modifiers () ^ Qt::ControlModifier);
+      casted->setModifiers (modifiers ^ Qt::ControlModifier);
       return false;
     }
 
-    if (casted->key () == Qt::Key_Backspace ||
-        (watched == table_ && casted->key () == Qt::Key_Left))
+    if (modifiers == Qt::NoModifier)
     {
-      emit movedBackward ();
-    }
-    else if (casted->key () == Qt::Key_Space ||
-             (watched == table_ && casted->key () == Qt::Key_Right))
-    {
-      const auto index = currentIndex ();
-      if (index.isValid ())
+      if (key == Qt::Key_Backspace || (watched == table_ && key == Qt::Key_Left))
       {
-        emit activated (index);
+        emit movedBackward ();
+        return true;
       }
-    }
-    else if (casted->key () == Qt::Key_Home)
-    {
-      const auto rows = model_->rowCount (rootIndex ());
-      if (rows > 0)
+
+      if (key == Qt::Key_Space || (watched == table_ && key == Qt::Key_Right))
       {
-        setCurrentIndex (model_->index (0, 0, rootIndex ()));
+        const auto index = currentIndex ();
+        if (index.isValid ())
+        {
+          emit activated (index);
+        }
+        return true;
       }
-      return true;
-    }
-    else if (casted->key () == Qt::Key_End)
-    {
-      const auto rows = model_->rowCount (rootIndex ());
-      if (rows > 0)
+
+      if (key == Qt::Key_Home)
       {
-        setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+        const auto rows = model_->rowCount (rootIndex ());
+        if (rows > 0)
+        {
+          setCurrentIndex (model_->index (0, 0, rootIndex ()));
+        }
+        return true;
       }
-      return true;
+
+      if (key == Qt::Key_End)
+      {
+        const auto rows = model_->rowCount (rootIndex ());
+        if (rows > 0)
+        {
+          setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+        }
+        return true;
+      }
     }
   }
   else if (event->type () == QEvent::FocusIn)
