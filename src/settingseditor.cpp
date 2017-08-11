@@ -1,6 +1,8 @@
 #include "settingseditor.h"
 #include "shortcutmanager.h"
 #include "translationloader.h"
+#include "settingsmanager.h"
+#include "debug.h"
 
 #include <QGridLayout>
 #include <QKeySequenceEdit>
@@ -14,6 +16,7 @@
 #include <QStyledItemDelegate>
 #include <QSettings>
 #include <QComboBox>
+#include <QPixmapCache>
 
 namespace
 {
@@ -22,8 +25,7 @@ enum ShortcutColumn
   Id, Name, Context, Key, IsGlobal, Count
 };
 
-const QString qs_ground = "settings";
-const QString qs_size = "size";
+const QString qs_size = "settings/size";
 
 
 class ShortcutDelegate : public QStyledItemDelegate
@@ -66,9 +68,15 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   languages_ (new QComboBox (this)),
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
-  tabShortcuts_ (new QLineEdit (this))
+  tabShortcuts_ (new QLineEdit (this)),
+  showFreeSpace_ (new QCheckBox (tr ("Show free space"), this)),
+  showFilesInfo_ (new QCheckBox (tr ("Show files info"), this)),
+  showSelectionInfo_ (new QCheckBox (tr ("Show selection info"), this)),
+  editorToSettings_ ()
 {
   setWindowTitle (tr ("Settings"));
+
+  init ();
 
   {
     auto tab = new QWidget (tabs_);
@@ -88,7 +96,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     ++row;
     layout->addWidget (new QLabel (tr ("Image cache size")), row, 0);
     layout->addWidget (imageCache_, row, 1);
-    imageCache_->setRange (1, 100);
+    imageCache_->setRange (1, 500);
     imageCache_->setSuffix (tr (" Mb"));
 
     ++row;
@@ -99,8 +107,6 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     layout->addWidget (new QLabel (tr ("Language")), row, 0);
     layout->addWidget (languages_, row, 1);
     languages_->setToolTip (tr ("Restart required"));
-    languages_->addItems (TranslationLoader::availableLanguages ());
-    languages_->setCurrentText (TranslationLoader::language ());
 
     ++row;
     layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
@@ -117,8 +123,6 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     shortcuts_->setHorizontalHeaderLabels ({tr ("Id"), tr ("Name"), tr ("Context"),
                                             tr ("Shortcut"), tr ("Global")});
     shortcuts_->hideColumn (ShortcutColumn::Id);
-    loadShortcuts ();
-    shortcuts_->resizeColumnsToContents ();
     shortcuts_->setSortingEnabled (true);
     shortcuts_->setSelectionMode (QTableWidget::SingleSelection);
     shortcuts_->setSelectionBehavior (QTableWidget::SelectRows);
@@ -138,21 +142,73 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
                                    " switch shortcut"));
   }
 
+  {
+    auto tab = new QWidget (tabs_);
+    tabs_->addTab (tab, tr ("View"));
+    auto layout = new QGridLayout (tab);
+
+    auto row = 0;
+    layout->addWidget (showFreeSpace_, row, 0);
+
+    ++row;
+    layout->addWidget (showFilesInfo_, row, 0);
+
+    ++row;
+    layout->addWidget (showSelectionInfo_, row, 0);
+
+    ++row;
+    layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
+  }
+
+
   auto layout = new QVBoxLayout (this);
   layout->addWidget (tabs_);
   auto buttons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   connect (buttons, &QDialogButtonBox::accepted,
            this, &QDialog::accept);
-  connect (buttons, &QDialogButtonBox::accepted,
-           this, &SettingsEditor::saveShortcuts);
-  connect (buttons, &QDialogButtonBox::accepted,
-           this, &SettingsEditor::saveLanguage);
   connect (buttons, &QDialogButtonBox::rejected,
            this, &QDialog::reject);
   layout->addWidget (buttons);
 
-  QSettings settings;
-  settings.beginGroup (qs_ground);
+  connect (this, &QDialog::accepted,
+           this, &SettingsEditor::save);
+
+  load ();
+
+  SettingsManager settings;
+  restoreState (settings.qsettings ());
+}
+
+SettingsEditor::~SettingsEditor ()
+{
+  SettingsManager settings;
+  saveState (settings.qsettings ());
+}
+
+void SettingsEditor::init ()
+{
+  using S = SettingsManager;
+  editorToSettings_[console_] = S::ConsoleCommand;
+  editorToSettings_[editor_] = S::EditorCommand;
+  editorToSettings_[checkUpdates_] = S::CheckUpdates;
+  editorToSettings_[startInBackground_] = S::StartInBackground;
+  editorToSettings_[imageCache_] = S::ImageCacheSize;
+
+  editorToSettings_[groupShortcuts_] = S::GroupIds;
+  editorToSettings_[tabShortcuts_] = S::TabIds;
+
+  editorToSettings_[showFreeSpace_] = S::ShowFreeSpace;
+  editorToSettings_[showFilesInfo_] = S::ShowFilesInfo;
+  editorToSettings_[showSelectionInfo_] = S::ShowSelectionInfo;
+}
+
+void SettingsEditor::saveState (QSettings &settings) const
+{
+  settings.setValue (qs_size, size ());
+}
+
+void SettingsEditor::restoreState (QSettings &settings)
+{
   const auto size = settings.value (qs_size).toSize ();
   if (!size.isEmpty ())
   {
@@ -160,81 +216,22 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   }
 }
 
-SettingsEditor::~SettingsEditor ()
+void SettingsEditor::initOrphanSettings ()
 {
-  QSettings settings;
-  settings.beginGroup (qs_ground);
-  settings.setValue (qs_size, size ());
+  TranslationLoader::load ();
+
+  SettingsManager settings;
+  ShortcutManager::setDefaults ();
+  ShortcutManager::restore (settings.qsettings ());
+
+  QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
 }
 
-QString SettingsEditor::console () const
+void SettingsEditor::updateOrphanSettings ()
 {
-  return console_->text ();
-}
+  SettingsManager settings;
+  QPixmapCache::setCacheLimit (std::max (1, settings.get (SettingsManager::ImageCacheSize).toInt ()));
 
-void SettingsEditor::setConsole (const QString &console)
-{
-  console_->setText (console);
-}
-
-bool SettingsEditor::checkUpdates () const
-{
-  return checkUpdates_->isChecked ();
-}
-
-void SettingsEditor::setCheckUpdates (bool isOn)
-{
-  checkUpdates_->setChecked (isOn);
-}
-
-bool SettingsEditor::startInBackground () const
-{
-  return startInBackground_->isChecked ();
-}
-
-void SettingsEditor::setStartInBackground (bool isOn)
-{
-  startInBackground_->setChecked (isOn);
-}
-
-int SettingsEditor::imageCacheSizeKb () const
-{
-  return imageCache_->value () * 1024;;
-}
-
-void SettingsEditor::setImageCacheSize (int sizeKb)
-{
-  imageCache_->setValue (sizeKb / 1024);
-}
-
-QString SettingsEditor::editor () const
-{
-  return editor_->text ();
-}
-
-void SettingsEditor::setEditor (const QString &editor)
-{
-  editor_->setText (editor);
-}
-
-QString SettingsEditor::groupShortcuts () const
-{
-  return groupShortcuts_->text ();
-}
-
-void SettingsEditor::setGroupShortcuts (const QString &value)
-{
-  groupShortcuts_->setText (value);
-}
-
-QString SettingsEditor::tabShortcuts () const
-{
-  return tabShortcuts_->text ();
-}
-
-void SettingsEditor::setTabShortcuts (const QString &value)
-{
-  tabShortcuts_->setText (value);
 }
 
 void SettingsEditor::loadShortcuts ()
@@ -258,6 +255,7 @@ void SettingsEditor::loadShortcuts ()
     shortcuts_->setItem (i, ShortcutColumn::IsGlobal,
                          nonEditable (SM::isGlobal (type) ? tr ("Yes") : QLatin1String ("")));
   }
+  shortcuts_->resizeColumnsToContents ();
 }
 
 void SettingsEditor::saveShortcuts ()
@@ -270,11 +268,76 @@ void SettingsEditor::saveShortcuts ()
     const auto type = SM::Shortcut (idItem->type () - Item::UserType);
     SM::set (type, shortcuts_->item (i, ShortcutColumn::Key)->text ());
   }
+
+  SettingsManager settings;
+  ShortcutManager::save (settings.qsettings ());
+}
+
+void SettingsEditor::loadLanguage ()
+{
+  languages_->addItems (TranslationLoader::availableLanguages ());
+  languages_->setCurrentText (TranslationLoader::language ());
 }
 
 void SettingsEditor::saveLanguage ()
 {
   TranslationLoader::setLanguage (languages_->currentText ());
+}
+
+void SettingsEditor::load ()
+{
+  loadShortcuts ();
+  loadLanguage ();
+
+  SettingsManager settings;
+  using Type = SettingsManager::Type;
+  for (auto i = editorToSettings_.begin (), end = editorToSettings_.end (); i != end; ++i)
+  {
+    if (auto casted = qobject_cast<QCheckBox *>(i.key ()))
+    {
+      casted->setChecked (settings.get (Type (i.value ())).toBool ());
+    }
+    else if (auto casted = qobject_cast<QLineEdit *>(i.key ()))
+    {
+      casted->setText (settings.get (Type (i.value ())).toString ());
+    }
+    else if (auto casted = qobject_cast<QSpinBox *>(i.key ()))
+    {
+      casted->setValue (settings.get (Type (i.value ())).toInt ());
+    }
+  }
+
+  imageCache_->setValue (settings.get (Type::ImageCacheSize).toInt () / 1024);
+}
+
+void SettingsEditor::save ()
+{
+  saveShortcuts ();
+  saveLanguage ();
+
+  SettingsManager settings;
+  using Type = SettingsManager::Type;
+  for (auto i = editorToSettings_.cbegin (), end = editorToSettings_.cend (); i != end; ++i)
+  {
+    if (auto casted = qobject_cast<const QCheckBox *>(i.key ()))
+    {
+      settings.set (Type (i.value ()), casted->isChecked ());
+    }
+    else if (auto casted = qobject_cast<QLineEdit *>(i.key ()))
+    {
+      settings.set (Type (i.value ()), casted->text ());
+    }
+    else if (auto casted = qobject_cast<QSpinBox *>(i.key ()))
+    {
+      settings.set (Type (i.value ()), casted->value ());
+    }
+  }
+
+  settings.set (Type::ImageCacheSize, imageCache_->value () * 1024);
+
+  updateOrphanSettings ();
+
+  settings.triggerUpdate ();
 }
 
 #include "moc_settingseditor.cpp"

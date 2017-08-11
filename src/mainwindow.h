@@ -23,6 +23,9 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+public slots:
+  void updateSettings ();
+
 protected:
   void keyPressEvent (QKeyEvent *event) override;
 

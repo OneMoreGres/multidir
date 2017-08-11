@@ -29,6 +29,9 @@ public:
   const QString &ids () const;
   void setIds (const QString &ids);
 
+public slots:
+  void updateSettings ();
+
 signals:
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);

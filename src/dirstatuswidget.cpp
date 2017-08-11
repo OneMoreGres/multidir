@@ -4,6 +4,7 @@
 #include "proxymodel.h"
 #include "filesystemmodel.h"
 #include "debug.h"
+#include "settingsmanager.h"
 
 #include <QFileInfo>
 #include <QLabel>
@@ -33,11 +34,40 @@ DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
 
   layout->setMargin (0);
 
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
+
   startTimer (5000);
+}
+
+void DirStatusWidget::updateSettings ()
+{
+  SettingsManager settings;
+  storage_->setEnabled (settings.get (SettingsManager::ShowFreeSpace).toBool ());
+  entries_->setEnabled (settings.get (SettingsManager::ShowFilesInfo).toBool ());
+  selection_->setEnabled (settings.get (SettingsManager::ShowSelectionInfo).toBool ());
+
+  storage_->setVisible (storage_->isEnabled ());
+  entries_->setVisible (entries_->isEnabled ());
+  selection_->setVisible (selection_->isEnabled ());
+
+  if (storage_->isEnabled () || entries_->isEnabled () || selection_->isEnabled ())
+  {
+    show ();
+  }
+  else
+  {
+    hide ();
+  }
 }
 
 void DirStatusWidget::updateSelection (const QList<QFileInfo> &selection)
 {
+  if (!selection_->isEnabled ())
+  {
+    return;
+  }
+
   if (!selection.isEmpty ())
   {
     const auto size = std::accumulate (selection.cbegin (), selection.cend (), qint64 (0),
@@ -63,6 +93,11 @@ void DirStatusWidget::updatePath ()
 
 void DirStatusWidget::updateStorage ()
 {
+  if (!storage_->isEnabled ())
+  {
+    return;
+  }
+
   const auto storage = StorageManager::storage (path_);
   if (storage)
   {
@@ -81,6 +116,11 @@ void DirStatusWidget::updateStorage ()
 
 void DirStatusWidget::updateEntries ()
 {
+  if (!entries_->isEnabled ())
+  {
+    return;
+  }
+
   qint64 size = 0;
   int count = 0;
   for (auto i = 0, end = model_->count (); i < end; ++i)

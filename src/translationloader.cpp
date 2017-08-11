@@ -1,15 +1,14 @@
 #include "translationloader.h"
 #include "debug.h"
+#include "settingsmanager.h"
 
 #include <QApplication>
 #include <QTranslator>
 #include <QLibraryInfo>
-#include <QSettings>
 #include <QDir>
 
 namespace
 {
-const QString qs_language = QLatin1String ("language");
 const QString appTranslation = QLatin1String ("multidir");
 const auto builtin = QLocale::English;
 }
@@ -73,8 +72,8 @@ void TranslationLoader::setLanguage (const QString &language)
 
 QString TranslationLoader::translation ()
 {
-  QSettings settings;
-  auto name = settings.value (qs_language).toString ();
+  SettingsManager settings;
+  auto name = settings.get (SettingsManager::Translation).toString ();
   if (name.isEmpty ())
   {
     const QLocale locale;
@@ -92,8 +91,8 @@ QString TranslationLoader::translation ()
 
 void TranslationLoader::setTranslation (const QString &translation)
 {
-  QSettings settings;
-  settings.setValue (qs_language, translation);
+  SettingsManager settings;
+  settings.set (SettingsManager::Translation, translation);
 }
 
 QStringList TranslationLoader::searchPaths ()

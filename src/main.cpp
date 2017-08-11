@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 #include "openwith.h"
-#include "shortcutmanager.h"
 #include "debug.h"
-#include "translationloader.h"
+#include "settingseditor.h"
 
 #include <QApplication>
 #include <QDir>
@@ -18,10 +17,6 @@ int main (int argc, char *argv[])
   a.setQuitOnLastWindowClosed (false);
 #endif
 
-  TranslationLoader::load ();
-
-  ShortcutManager::setDefaults ();
-
   QLockFile f (QDir::home ().absoluteFilePath (QLatin1String (".multidir.lock")));
   if (!f.tryLock ())
   {
@@ -30,6 +25,7 @@ int main (int argc, char *argv[])
   }
 
   OpenWith::init ();
+  SettingsEditor::initOrphanSettings ();
 
   MainWindow window;
   return a.exec ();

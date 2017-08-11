@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "shortcutmanager.h"
 #include "utils.h"
+#include "settingsmanager.h"
 
 #include <QBoxLayout>
 #include <QSettings>
@@ -36,6 +37,9 @@ GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
 
   connect (view_, &TiledView::tileSwapped,
            this, &GroupWidget::updateWidgetShortcuts);
+
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 }
 
 GroupWidget::~GroupWidget ()
@@ -94,6 +98,12 @@ void GroupWidget::restore (QSettings &settings)
   view_->restore (settings);
 
   updateWidgetShortcuts ();
+}
+
+void GroupWidget::updateSettings ()
+{
+  SettingsManager settings;
+  setIds (settings.get (SettingsManager::TabIds).toString ());
 }
 
 void GroupWidget::setNameFilter (const QString &filter)
@@ -160,7 +170,7 @@ void GroupWidget::updateWidgetShortcuts ()
   for (auto &i: widgets_)
   {
     const auto index = order.indexOf (i.widget);
-    const auto key = (index < count) ? ids_.at (index) : QChar ();
+    const auto key = (index < count) ? QString (ids_.at (index)) : QString ();
     i.widget->setIndex (key);
     if (!key.isNull () && !commonPart.isEmpty ())
     {

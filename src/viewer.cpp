@@ -1,21 +1,20 @@
 #include "viewer.h"
 #include "debug.h"
 #include "notifier.h"
+#include "settingsmanager.h"
 
 #include <QTextEdit>
 #include <QBoxLayout>
 #include <QMessageBox>
 #include <QAction>
 #include <QFile>
-#include <QSettings>
 #include <QtConcurrentRun>
 #include <QFileInfo>
 #include <QTextCodec>
 
 namespace
 {
-const QString qs_geometry = "geometry";
-const QString qs_group = "viewer";
+const QString qs_grometry = "viewer/geometry";
 }
 
 Viewer::Viewer (QWidget *parent) :
@@ -40,18 +39,14 @@ Viewer::Viewer (QWidget *parent) :
   layout->addWidget (edit_);
 
 
-  QSettings settings;
-  settings.beginGroup (qs_group);
-  restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
-  settings.endGroup ();
+  SettingsManager settings;
+  restoreGeometry (settings.qsettings ().value (qs_grometry, saveGeometry ()).toByteArray ());
 }
 
 Viewer::~Viewer ()
 {
-  QSettings settings;
-  settings.beginGroup (qs_group);
-  settings.setValue (qs_geometry, saveGeometry ());
-  settings.endGroup ();
+  SettingsManager settings;
+  settings.qsettings ().setValue (qs_grometry, saveGeometry ());
 }
 
 bool Viewer::setFile (const QString &name)

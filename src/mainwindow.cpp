@@ -12,29 +12,22 @@
 #include "notifier.h"
 #include "shortcutmanager.h"
 #include "utils.h"
+#include "settingsmanager.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
 #include <QApplication>
-#include <QSettings>
 #include <QProcess>
 #include <QTimer>
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QPixmapCache>
 #include <QStatusBar>
 
 namespace
 {
-const QString qs_shortcuts = "shortcuts";
 const QString qs_geometry = "geometry";
-const QString qs_console = "console";
-const QString qs_editor = "editor";
-const QString qs_updates = "checkUpdates";
-const QString qs_background = "startBackground";
-const QString qs_imageCacheSize = "imageCacheSize";
 }
 
 MainWindow::MainWindow (QWidget *parent) :
@@ -162,8 +155,12 @@ MainWindow::MainWindow (QWidget *parent) :
   layout->addWidget (status);
 
 
-  QSettings qsettings;
-  restore (qsettings);
+  {
+    SettingsManager settings;
+    restore (settings.qsettings ());
+  }
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 
   if (!startInBackground_)
   {
@@ -178,58 +175,33 @@ MainWindow::~MainWindow ()
   Notifier::setMain (nullptr);
 
 #ifndef DEVELOPMENT
-  QSettings settings;
-  save (settings);
+  SettingsManager settings;
+  save (settings.qsettings ());
 #endif
 }
 
 void MainWindow::save (QSettings &settings) const
 {
-  settings.beginGroup (qs_shortcuts);
-  ShortcutManager::save (settings);
-  settings.endGroup ();
-
   settings.setValue (qs_geometry, saveGeometry ());
-
-  settings.setValue (qs_console, consoleCommand_);
-  settings.setValue (qs_editor, editorCommand_);
-  settings.setValue (qs_updates, checkUpdates_);
-  settings.setValue (qs_background, startInBackground_);
-  settings.setValue (qs_imageCacheSize, QPixmapCache::cacheLimit ());
 
   groupControl_->save (settings);
 }
 
 void MainWindow::restore (QSettings &settings)
 {
-  settings.beginGroup (qs_shortcuts);
-  ShortcutManager::restore (settings);
-  settings.endGroup ();
-
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-#ifdef Q_OS_LINUX
-  const auto console = QString ("xterm");
-  const auto editor = QString ("gedit");
-#endif
-#ifdef Q_OS_WIN
-  const auto console = QString ("cmd");
-  const auto editor = QString ("notepad.exe");
-#endif
-#ifdef Q_OS_MAC
-  const auto console = QString ("open -a Terminal");
-  const auto editor = QString ("open -a TextEdit");
-#endif
-  consoleCommand_ = settings.value (qs_console, console).toString ().trimmed ();
-  editorCommand_ = settings.value (qs_editor, editor).toString ().trimmed ();
-
-  setCheckUpdates (settings.value (qs_updates, checkUpdates_).toBool ());
-  startInBackground_ = settings.value (qs_background, false).toBool ();
-
-  auto cacheSize = settings.value (qs_imageCacheSize, QPixmapCache::cacheLimit ()).toInt ();
-  QPixmapCache::setCacheLimit (std::max (1, cacheSize));
-
   groupControl_->restore (settings);
+}
+
+void MainWindow::updateSettings ()
+{
+  SettingsManager settings;
+  using Type = SettingsManager::Type;
+  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
+  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
+  setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
+  startInBackground_ = settings.get (Type::StartInBackground).toBool ();
 }
 
 void MainWindow::updateTrayMenu ()
@@ -265,24 +237,7 @@ void MainWindow::toggleVisible ()
 void MainWindow::editSettings ()
 {
   SettingsEditor settings;
-  settings.setConsole (consoleCommand_);
-  settings.setCheckUpdates (checkUpdates_);
-  settings.setStartInBackground (startInBackground_);
-  settings.setEditor (editorCommand_);
-  settings.setImageCacheSize (QPixmapCache::cacheLimit ());
-  settings.setGroupShortcuts (groupControl_->ids ());
-  settings.setTabShortcuts (groups_->widgetIds ());
-
-  if (settings.exec () == QDialog::Accepted)
-  {
-    consoleCommand_ = settings.console ().trimmed ();
-    editorCommand_ = settings.editor ().trimmed ();
-    setCheckUpdates (settings.checkUpdates ());
-    startInBackground_ = settings.startInBackground ();
-    QPixmapCache::setCacheLimit (settings.imageCacheSizeKb ());
-    groupControl_->setIds (settings.groupShortcuts ());
-    groups_->setWidgetIds (settings.tabShortcuts ());
-  }
+  settings.exec ();
 }
 
 void MainWindow::openConsole (const QString &path)
