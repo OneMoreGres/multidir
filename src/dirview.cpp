@@ -168,8 +168,8 @@ void DirView::setIsList (bool isList)
     if (!delegate_)
     {
       delegate_ = new FileDelegate (this);
-      list_->setItemDelegate (delegate_);
     }
+    list_->setItemDelegate (delegate_);
   }
 
   setRootIndex (root);
