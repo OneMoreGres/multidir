@@ -23,6 +23,12 @@ DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
   connect (model_, &ProxyModel::contentsChanged,
            this, &DirStatusWidget::updateEntries);
 
+  {
+    auto font = this->font ();
+    font.setPointSize (font.pointSize () - 2);
+    setFont (font);
+  }
+
   storage_->setToolTip (tr ("Available/total space"));
   entries_->setToolTip (tr ("Total files"));
   selection_->setToolTip (tr ("Selected files"));
