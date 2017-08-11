@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QPixmapCache>
 #include <QPointer>
+#include <QApplication>
 
 namespace
 {
@@ -105,4 +106,10 @@ void SettingsManager::set (Type type, const QVariant &value)
 QSettings &SettingsManager::qsettings ()
 {
   return settings_;
+}
+
+void SettingsManager::setPortable (bool isPortable)
+{
+  QSettings::setDefaultFormat (isPortable ? QSettings::IniFormat : QSettings::NativeFormat);
+  QSettings::setPath (QSettings::IniFormat, QSettings::UserScope, QApplication::applicationDirPath ());
 }
