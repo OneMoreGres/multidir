@@ -306,6 +306,8 @@ void SettingsEditor::load ()
       casted->setValue (settings.get (Type (i.value ())).toInt ());
     }
   }
+
+  imageCache_->setValue (settings.get (Type::ImageCacheSize).toInt () / 1024);
 }
 
 void SettingsEditor::save ()
@@ -330,6 +332,8 @@ void SettingsEditor::save ()
       settings.set (Type (i.value ()), casted->value ());
     }
   }
+
+  settings.set (Type::ImageCacheSize, imageCache_->value () * 1024);
 
   updateOrphanSettings ();
 
