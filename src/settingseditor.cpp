@@ -68,6 +68,9 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
   tabShortcuts_ (new QLineEdit (this)),
+  showFreeSpace_ (new QCheckBox (tr ("Show free space"), this)),
+  showFilesInfo_ (new QCheckBox (tr ("Show files info"), this)),
+  showSelectionInfo_ (new QCheckBox (tr ("Show selection info"), this)),
   editorToSettings_ ()
 {
   setWindowTitle (tr ("Settings"));
@@ -138,6 +141,25 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
                                    " switch shortcut"));
   }
 
+  {
+    auto tab = new QWidget (tabs_);
+    tabs_->addTab (tab, tr ("View"));
+    auto layout = new QGridLayout (tab);
+
+    auto row = 0;
+    layout->addWidget (showFreeSpace_, row, 0);
+
+    ++row;
+    layout->addWidget (showFilesInfo_, row, 0);
+
+    ++row;
+    layout->addWidget (showSelectionInfo_, row, 0);
+
+    ++row;
+    layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
+  }
+
+
   auto layout = new QVBoxLayout (this);
   layout->addWidget (tabs_);
   auto buttons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
@@ -173,6 +195,10 @@ void SettingsEditor::init ()
 
   editorToSettings_[groupShortcuts_] = S::GroupIds;
   editorToSettings_[tabShortcuts_] = S::TabIds;
+
+  editorToSettings_[showFreeSpace_] = S::ShowFreeSpace;
+  editorToSettings_[showFilesInfo_] = S::ShowFilesInfo;
+  editorToSettings_[showSelectionInfo_] = S::ShowSelectionInfo;
 }
 
 void SettingsEditor::saveState (QSettings &settings) const

@@ -18,6 +18,9 @@ public:
 
   void updateSelection (const QList<QFileInfo> &selection);
 
+public slots:
+  void updateSettings ();
+
 protected:
   void timerEvent (QTimerEvent *event) override;
 

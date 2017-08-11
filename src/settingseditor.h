@@ -45,5 +45,9 @@ private:
   QLineEdit *groupShortcuts_;
   QLineEdit *tabShortcuts_;
 
+  QCheckBox *showFreeSpace_;
+  QCheckBox *showFilesInfo_;
+  QCheckBox *showSelectionInfo_;
+
   QHash<QWidget *, int> editorToSettings_;
 };
