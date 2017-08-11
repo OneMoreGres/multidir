@@ -2,6 +2,7 @@
 #include "openwith.h"
 #include "debug.h"
 #include "settingseditor.h"
+#include "constants.h"
 
 #include <QApplication>
 #include <QDir>
@@ -12,7 +13,7 @@ int main (int argc, char *argv[])
 {
   QApplication a (argc, argv);
   a.setOrganizationName (QLatin1String ("Gres"));
-  a.setApplicationName (QLatin1String ("MultiDir"));
+  a.setApplicationName (constants::appName);
 #ifndef DEVELOPMENT
   a.setQuitOnLastWindowClosed (false);
 #endif
