@@ -4,11 +4,6 @@
 
 class GroupsView;
 
-class QAction;
-class QMenu;
-class QActionGroup;
-class QSettings;
-
 class GroupsMenu : public QMenu
 {
 Q_OBJECT
@@ -31,7 +26,6 @@ private:
   void setCurrent (QAction *action);
   void updateShortcuts ();
   QAction * actionAt (int index) const;
-  int index (QAction *action) const;
   void setIds (const QString &ids);
 
   GroupsView *view_;

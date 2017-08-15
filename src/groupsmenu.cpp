@@ -6,16 +6,9 @@
 #include "utils.h"
 #include "settingsmanager.h"
 
-#include <QMenu>
-#include <QSettings>
 #include <QInputDialog>
 #include <QMessageBox>
 
-namespace
-{
-const QString qs_groups = "groups";
-const QString qs_currentGroup = "currentGroup";
-}
 
 GroupsMenu::GroupsMenu (GroupsView *view, QWidget *parent) :
   QMenu (tr ("Groups"), parent),
@@ -177,11 +170,6 @@ QAction * GroupsMenu::actionAt (int index) const
   ASSERT (menuIndex >= 0);
   ASSERT (menuIndex < actions.size ());
   return actions[menuIndex];
-}
-
-int GroupsMenu::index (QAction *action) const
-{
-  return actions_->actions ().indexOf (action);
 }
 
 void GroupsMenu::setIds (const QString &ids)
