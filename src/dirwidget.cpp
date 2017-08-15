@@ -147,7 +147,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   openAction_ = makeShortcut (ShortcutManager::OpenItem, viewMenu_);
   connect (openAction_, &QAction::triggered,
-           this, [this]() {openPath (view_->currentIndex ());});
+           this, &DirWidget::openSelected);
 
   openWith_ = viewMenu_->addMenu (tr ("Open with"));
 
@@ -302,7 +302,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (view_, &DirView::contextMenuRequested,
            this, &DirWidget::showViewContextMenu);
   connect (view_, &DirView::activated,
-           this, &DirWidget::openPath);
+           this, &DirWidget::openSelected);
   connect (view_, &DirView::movedBackward,
            upAction_, &QAction::trigger);
   connect (view_, &DirView::backgroundActivated,
@@ -507,6 +507,11 @@ void DirWidget::setNameFilter (const QString &filter)
 
 void DirWidget::openPath (const QModelIndex &index)
 {
+  if (isLocked ())
+  {
+    return;
+  }
+
   if (!index.isValid ()) // drives
   {
     // do not change proxy current path to disable possible dir filtering
@@ -514,32 +519,8 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent ({});
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
-    return;
   }
-
-  const auto info = fileInfo (index);
-  if (!info.isDir ())
-  {
-    if (info.permission (QFile::ExeUser))
-    {
-      if (!QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ()))
-      {
-        Notifier::error (tr ("Failed to open '%1'").arg (info.absoluteFilePath ()));
-      }
-    }
-    else
-    {
-      QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
-    }
-    return;
-  }
-
-  if (isLocked () || !info.permission (QFile::ExeUser))
-  {
-    return;
-  }
-
-  if (info.fileName () == constants::dotdot)
+  else if (proxy_->isDotDot (index))
   {
     openPath (index.parent ().parent ());
   }
@@ -553,6 +534,25 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
+  }
+}
+
+void DirWidget::openFile (const QFileInfo &info)
+{
+  if (info.isDir ())
+  {
+    return;
+  }
+
+  if (!info.permission (QFile::ExeUser))
+  {
+    QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
+    return;
+  }
+
+  if (!QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ()))
+  {
+    Notifier::error (tr ("Failed to open '%1'").arg (info.absoluteFilePath ()));
   }
 }
 
@@ -743,6 +743,29 @@ QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
   return names;
 }
 
+void DirWidget::openSelected ()
+{
+  const auto indexes = view_->selectedRows ();
+  if (indexes.size () < 2)
+  {
+    const auto current = fileInfo (view_->currentIndex ());
+    if (current.isDir ())
+    {
+      openPath (view_->currentIndex ());
+      return;
+    }
+    if (indexes.isEmpty ())
+    {
+      return;
+    }
+  }
+
+  for (const auto &i: indexes)
+  {
+    openFile (fileInfo (i));
+  }
+}
+
 void DirWidget::cut ()
 {
   CopyPaste::cut (selected ());
@@ -920,7 +943,7 @@ void DirWidget::updateActions ()
   newFolderAction_->setEnabled (dirs && !locked);
   upAction_->setEnabled (!locked);
 
-  openAction_->setEnabled (isValid && isSingleSelected);
+  openAction_->setEnabled (true);
   openWith_->setEnabled (isValid && !isDir && isSingleSelected);
   if (openWith_->isEnabled ())
   {
