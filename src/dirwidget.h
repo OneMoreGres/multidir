@@ -78,6 +78,7 @@ private:
   void openInBackground (const QModelIndex &index);
   void showProperties ();
   void viewCurrent ();
+  void moveUp ();
 
   void openConsole ();
   void openInEditor ();

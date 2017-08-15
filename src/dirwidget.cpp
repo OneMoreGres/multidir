@@ -260,7 +260,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr);
   connect (upAction_, &QAction::triggered,
-           this, [this] {openPath (view_->rootIndex ().parent ());});
+           this, &DirWidget::moveUp);
   auto up = new QToolButton (this);
   up->setDefaultAction (upAction_);
 
@@ -814,6 +814,11 @@ void DirWidget::viewCurrent ()
   {
     setPath (current ());
   }
+}
+
+void DirWidget::moveUp ()
+{
+  openPath (view_->rootIndex ().parent ());
 }
 
 void DirWidget::openConsole ()
