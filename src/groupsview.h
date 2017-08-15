@@ -4,21 +4,15 @@
 
 class GroupWidget;
 class FileSystemModel;
-class FileOperation;
-class FileOperationWidget;
 
 class QSettings;
-class QAction;
-class QMenu;
-class QLineEdit;
 class QStackedWidget;
-class QActionGroup;
 
-class GroupHolder : public QWidget
+class GroupsView : public QWidget
 {
 Q_OBJECT
 public:
-  explicit GroupHolder (FileSystemModel &model, QWidget *parent = nullptr);
+  explicit GroupsView (FileSystemModel *model, QWidget *parent = nullptr);
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
@@ -36,13 +30,11 @@ public:
 
 signals:
   void currentChanged (const QString &name);
+  void restored ();
 
-  void consoleRequested (const QString &path);
-  void editorRequested (const QString &path);
   void setNameFilter (const QString &filter);
-  void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:
-  FileSystemModel &model_;
+  FileSystemModel *model_;
   QStackedWidget *groups_;
 };

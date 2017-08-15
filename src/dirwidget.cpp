@@ -12,8 +12,9 @@
 #include "debug.h"
 #include "propertieswidget.h"
 #include "pathwidget.h"
-#include "viewer.h"
+#include "fileviewer.h"
 #include "dirstatuswidget.h"
+#include "settingsmanager.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -53,6 +54,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathWidget_ (new PathWidget (model, this)),
   status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
+  consoleCommand_ (),
+  editorCommand_ (),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
   showDirs_ (nullptr),
@@ -88,6 +91,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::checkDirExistence);
   connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleDirRename);
+  connect (this, &DirWidget::fileOperation,
+           model_, &FileSystemModel::fileOperation);
 
 
   auto nextTab = makeShortcut (ShortcutManager::NextTab, nullptr);
@@ -106,7 +111,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   auto openConsole = makeShortcut (ShortcutManager::OpenConsole, menu_);
   connect (openConsole, &QAction::triggered,
-           this, [this] {emit consoleRequested (path_.absoluteFilePath ());});
+           this, &DirWidget::openConsole);
 
   auto editPath = makeShortcut (ShortcutManager::ChangePath, menu_);
   connect (editPath, &QAction::triggered,
@@ -157,12 +162,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   openInEditorAction_ = makeShortcut (ShortcutManager::OpenInEditor, viewMenu_);
   connect (openInEditorAction_, &QAction::triggered,
-           this, [this]() {
-             if (current ().isFile ())
-             {
-               emit editorRequested (current ().absoluteFilePath ());
-             }
-           });
+           this, &DirWidget::openInEditor);
 
 
   viewAction_ = makeShortcut (ShortcutManager::View, viewMenu_);
@@ -255,7 +255,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   isMinSizeFixed_ = makeShortcut (ShortcutManager::FixMinSize, representMenu, true);
   connect (isMinSizeFixed_, &QAction::toggled,
-           this, &DirWidget::fixMinSize);
+           this, &DirWidget::fixateSizeAsMinimal);
 
   upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr);
   connect (upAction_, &QAction::triggered,
@@ -313,6 +313,9 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::updateStatusSelection);
 
   installEventFilter (this);
+
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 }
 
 DirWidget::~DirWidget ()
@@ -632,6 +635,14 @@ void DirWidget::adjustItems ()
   view_->adjustItems ();
 }
 
+void DirWidget::updateSettings ()
+{
+  SettingsManager settings;
+  using Type = SettingsManager::Type;
+  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
+  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
+}
+
 void DirWidget::promptClose ()
 {
   auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?")
@@ -795,7 +806,7 @@ void DirWidget::viewCurrent ()
 {
   if (!current ().isDir ())
   {
-    auto view = new Viewer;
+    auto view = new FileViewer;
     view->showFile (current ().absoluteFilePath ());
   }
   else
@@ -804,12 +815,55 @@ void DirWidget::viewCurrent ()
   }
 }
 
+void DirWidget::openConsole ()
+{
+  const auto path = path_.absoluteFilePath ();
+  if (!consoleCommand_.isEmpty () && !path.isEmpty ())
+  {
+    auto command = consoleCommand_;
+    command.replace ("%d", path);
+    const auto parts = utils::parseShellCommand (command);
+    if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
+    {
+      Notifier::error (tr ("Failed to open console '%1' in '%2'")
+                       .arg (consoleCommand_, path));
+    }
+  }
+}
+
+void DirWidget::openInEditor ()
+{
+  const auto current = this->current ();
+  if (!current.isFile ())
+  {
+    return;
+  }
+
+  const auto path = current.absoluteFilePath ();
+  if (!editorCommand_.isEmpty () && !path.isEmpty ())
+  {
+    auto command = editorCommand_;
+    if (command.contains ("%p"))
+    {
+      command.replace ("%p", path);
+    }
+    else
+    {
+      command += ' ' + path;
+    }
+    if (!QProcess::startDetached (command))
+    {
+      Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
+    }
+  }
+}
+
 bool DirWidget::isMinSizeFixed () const
 {
   return isMinSizeFixed_->isChecked ();
 }
 
-void DirWidget::fixMinSize (bool isOn)
+void DirWidget::fixateSizeAsMinimal (bool isOn)
 {
   if (isOn)
   {

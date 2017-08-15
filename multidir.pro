@@ -66,10 +66,8 @@ SOURCES += \
     src/groupwidget.cpp \
     src/filedelegate.cpp \
     src/notifier.cpp \
-    src/groupcontrol.cpp \
     src/fileconflictresolver.cpp \
     src/utils.cpp \
-    src/groupholder.cpp \
     src/shortcutmanager.cpp \
     src/propertieswidget.cpp \
     src/translationloader.cpp \
@@ -77,11 +75,13 @@ SOURCES += \
     src/filepermissiondelegate.cpp \
     src/filesystemcompleter.cpp \
     src/pathwidget.cpp \
-    src/viewer.cpp \
     src/settingseditor.cpp \
     src/dirstatuswidget.cpp \
     src/storagemanager.cpp \
-    src/settingsmanager.cpp
+    src/settingsmanager.cpp \
+    src/groupsview.cpp \
+    src/groupsmenu.cpp \
+    src/fileviewer.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -104,10 +104,8 @@ HEADERS  += \
     src/groupwidget.h \
     src/filedelegate.h \
     src/notifier.h \
-    src/groupcontrol.h \
     src/fileconflictresolver.h \
     src/utils.h \
-    src/groupholder.h \
     src/shortcutmanager.h \
     src/propertieswidget.h \
     src/translationloader.h \
@@ -115,11 +113,13 @@ HEADERS  += \
     src/filepermissiondelegate.h \
     src/filesystemcompleter.h \
     src/pathwidget.h \
-    src/viewer.h \
     src/settingseditor.h \
     src/dirstatuswidget.h \
     src/storagemanager.h \
-    src/settingsmanager.h
+    src/settingsmanager.h \
+    src/groupsview.h \
+    src/groupsmenu.h \
+    src/fileviewer.h
 
 RESOURCES += \
     resources.qrc

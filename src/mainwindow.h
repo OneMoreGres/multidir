@@ -3,8 +3,7 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class GroupHolder;
-class GroupControl;
+class GroupsView;
 class FileSystemModel;
 class FileOperation;
 class FileConflictResolver;
@@ -30,29 +29,24 @@ protected:
   void keyPressEvent (QKeyEvent *event) override;
 
 private:
-  void updateTrayMenu ();
-  void trayClicked (QSystemTrayIcon::ActivationReason reason);
   void toggleVisible ();
   void editSettings ();
-  void openConsole (const QString &path);
-  void openInEditor (const QString &path);
-  void setCheckUpdates (bool isOn);
-  void addWidget ();
-  void activateFindMode ();
   void showAbout ();
+  void activateFindMode ();
+
+  void updateTrayMenu ();
+  void handleTrayClick (QSystemTrayIcon::ActivationReason reason);
+  void setCheckUpdates (bool isOn);
   void showFileOperation (QSharedPointer<FileOperation> operation);
   void updateWindowTitle (const QString &groupName);
 
   FileSystemModel *model_;
-  GroupHolder *groups_;
-  GroupControl *groupControl_;
+  GroupsView *groups_;
   FileConflictResolver *conflictResolver_;
   QLineEdit *findEdit_;
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
-  QString consoleCommand_;
-  QString editorCommand_;
   bool checkUpdates_;
   bool startInBackground_;
 };

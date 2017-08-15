@@ -2,7 +2,6 @@
 #include "dirwidget.h"
 #include "tiledview.h"
 #include "backport.h"
-#include "fileoperation.h"
 #include "debug.h"
 #include "shortcutmanager.h"
 #include "utils.h"
@@ -23,13 +22,13 @@ const QString qs_name = "name";
 }
 
 
-GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
+GroupWidget::GroupWidget (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
   name_ (),
-  model_ (&model),
+  model_ (model),
   widgets_ (),
   view_ (new TiledView (this)),
-  ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))
+  ids_ ()
 {
   auto layout = new QVBoxLayout (this);
   layout->setMargin (0);
@@ -128,12 +127,6 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::nextTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
-  connect (w, &DirWidget::consoleRequested,
-           this, &GroupWidget::consoleRequested);
-  connect (w, &DirWidget::editorRequested,
-           this, &GroupWidget::editorRequested);
-  connect (w, &DirWidget::fileOperation,
-           this, &GroupWidget::fileOperation);
 
   w->setPath (QDir::homePath ());
   view_->add (*w);
@@ -186,11 +179,6 @@ void GroupWidget::updateWidgetShortcuts ()
   {
     i.widget->setSiblings (siblings.values ());
   }
-}
-
-const QString &GroupWidget::ids () const
-{
-  return ids_;
 }
 
 void GroupWidget::setIds (const QString &ids)

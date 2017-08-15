@@ -5,7 +5,6 @@
 class DirWidget;
 class TiledView;
 class FileSystemModel;
-class FileOperation;
 
 class QSettings;
 class QFileInfo;
@@ -14,7 +13,7 @@ class GroupWidget : public QWidget
 {
 Q_OBJECT
 public:
-  GroupWidget (FileSystemModel &model, QWidget *parent = nullptr);
+  GroupWidget (FileSystemModel *model, QWidget *parent = nullptr);
   ~GroupWidget ();
 
   void save (QSettings &settings) const;
@@ -26,16 +25,8 @@ public:
   QString name () const;
   void setName (const QString &name);
 
-  const QString &ids () const;
-  void setIds (const QString &ids);
-
 public slots:
   void updateSettings ();
-
-signals:
-  void consoleRequested (const QString &path);
-  void editorRequested (const QString &path);
-  void fileOperation (QSharedPointer<FileOperation> operation);
 
 private:
   void close (DirWidget *widget);
@@ -44,6 +35,7 @@ private:
   void add (const QFileInfo &path);
   void updateWidgetNames ();
   void updateWidgetShortcuts ();
+  void setIds (const QString &ids);
 
   struct Widget
   {

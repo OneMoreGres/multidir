@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include "groupholder.h"
-#include "groupcontrol.h"
+#include "groupsview.h"
+#include "groupsmenu.h"
 #include "settingseditor.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
@@ -11,13 +11,11 @@
 #include "debug.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
-#include "utils.h"
 #include "settingsmanager.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
 #include <QApplication>
-#include <QProcess>
 #include <QTimer>
 #include <QLineEdit>
 #include <QMenuBar>
@@ -33,15 +31,12 @@ const QString qs_geometry = "geometry";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groups_ (new GroupHolder (*model_, this)),
-  groupControl_ (new GroupControl (*groups_, this)),
+  groups_ (new GroupsView (model_, this)),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
-  consoleCommand_ (),
-  editorCommand_ (),
   checkUpdates_ (false),
   startInBackground_ (false)
 {
@@ -57,15 +52,9 @@ MainWindow::MainWindow (QWidget *parent) :
            this, &MainWindow::showFileOperation);
 
 
-  connect (groups_, &GroupHolder::consoleRequested,
-           this, &MainWindow::openConsole);
-  connect (groups_, &GroupHolder::editorRequested,
-           this, &MainWindow::openInEditor);
   connect (findEdit_, &QLineEdit::textChanged,
-           groups_, &GroupHolder::setNameFilter);
-  connect (groups_, &GroupHolder::fileOperation,
-           this, &MainWindow::showFileOperation);
-  connect (groups_, &GroupHolder::currentChanged,
+           groups_, &GroupsView::setNameFilter);
+  connect (groups_, &GroupsView::currentChanged,
            this, &MainWindow::updateWindowTitle);
 
 
@@ -77,7 +66,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto add = new QAction (this);
   fileMenu->addAction (add);
   ShortcutManager::add (ShortcutManager::AddTab, add);
-  connect (add, &QAction::triggered, this, &MainWindow::addWidget);
+  connect (add, &QAction::triggered, groups_, &GroupsView::addWidgetToCurrent);
 
   auto find = new QAction (this);
   fileMenu->addAction (find);
@@ -97,7 +86,8 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menuBar->addMenu (groupControl_->menu ());
+  auto groupsMenu = new GroupsMenu (groups_, this);
+  menuBar->addMenu (groupsMenu);
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
@@ -106,7 +96,7 @@ MainWindow::MainWindow (QWidget *parent) :
   debug->setCheckable (true);
   helpMenu->addAction (debug);
   ShortcutManager::add (ShortcutManager::Debug, debug);
-  connect (debug, &QAction::toggled, this, [](bool isOn) {debug::setDebugMode (isOn);});
+  connect (debug, &QAction::toggled, this, &debug::setDebugMode);
 
   auto about = new QAction (this);
   helpMenu->addAction (about);
@@ -137,11 +127,12 @@ MainWindow::MainWindow (QWidget *parent) :
   tray_->setIcon (QIcon (":/app.png"));
   tray_->show ();
   connect (tray_, &QSystemTrayIcon::activated,
-           this, &MainWindow::trayClicked);
+           this, &MainWindow::handleTrayClick);
 
   updateTrayMenu ();
 
 
+  // layout
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
   menuBarLayout->addLayout (fileOperationsLayout_);
@@ -185,22 +176,20 @@ void MainWindow::save (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
 
-  groupControl_->save (settings);
+  groups_->save (settings);
 }
 
 void MainWindow::restore (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-  groupControl_->restore (settings);
+  groups_->restore (settings);
 }
 
 void MainWindow::updateSettings ()
 {
   SettingsManager settings;
   using Type = SettingsManager::Type;
-  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
-  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
   setCheckUpdates (settings.get (Type::CheckUpdates).toBool ());
   startInBackground_ = settings.get (Type::StartInBackground).toBool ();
 }
@@ -209,11 +198,12 @@ void MainWindow::updateTrayMenu ()
 {
   disconnect (toggleAction_, &QAction::toggled,
               this, &MainWindow::toggleVisible);
-  toggleAction_->setChecked (groups_->isVisible ());
+  toggleAction_->setChecked (isVisible ());
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
-void MainWindow::trayClicked (QSystemTrayIcon::ActivationReason reason)
+
+void MainWindow::handleTrayClick (QSystemTrayIcon::ActivationReason reason)
 {
   if (reason == QSystemTrayIcon::ActivationReason::Trigger)
   {
@@ -229,6 +219,7 @@ void MainWindow::toggleVisible ()
   }
   else
   {
+    hide ();
     show ();
     raise ();
     activateWindow ();
@@ -239,41 +230,6 @@ void MainWindow::editSettings ()
 {
   SettingsEditor settings;
   settings.exec ();
-}
-
-void MainWindow::openConsole (const QString &path)
-{
-  if (!consoleCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = consoleCommand_;
-    command.replace ("%d", path);
-    const auto parts = utils::parseShellCommand (command);
-    if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
-    {
-      Notifier::error (tr ("Failed to open console '%1' in '%2'")
-                       .arg (consoleCommand_, path));
-    }
-  }
-}
-
-void MainWindow::openInEditor (const QString &path)
-{
-  if (!editorCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = editorCommand_;
-    if (command.contains ("%p"))
-    {
-      command.replace ("%p", path);
-    }
-    else
-    {
-      command += ' ' + path;
-    }
-    if (!QProcess::startDetached (command))
-    {
-      Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
-    }
-  }
 }
 
 void MainWindow::setCheckUpdates (bool isOn)
@@ -298,11 +254,6 @@ void MainWindow::setCheckUpdates (bool isOn)
              updater, &QObject::deleteLater);
     QTimer::singleShot (3000, updater, &UpdateChecker::check);
   }
-}
-
-void MainWindow::addWidget ()
-{
-  groups_->addWidgetToCurrent ();
 }
 
 void MainWindow::keyPressEvent (QKeyEvent *event)

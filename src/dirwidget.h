@@ -44,13 +44,14 @@ public:
   void activate ();
   void adjustItems ();
 
+public slots:
+  void updateSettings ();
+
 signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
   void nextTabRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
-  void consoleRequested (const QString &path);
-  void editorRequested (const QString &path);
   void fileOperation (QSharedPointer<FileOperation> operation);
 
 protected:
@@ -78,8 +79,11 @@ private:
   void showProperties ();
   void viewCurrent ();
 
+  void openConsole ();
+  void openInEditor ();
+
   bool isMinSizeFixed () const;
-  void fixMinSize (bool isOn);
+  void fixateSizeAsMinimal (bool isOn);
 
   void showViewContextMenu ();
   void updateSiblingActions ();
@@ -107,6 +111,8 @@ private:
   PathWidget *pathWidget_;
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
+  QString consoleCommand_;
+  QString editorCommand_;
 
   QMenu *menu_;
   QAction *isLocked_;

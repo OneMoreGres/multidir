@@ -137,7 +137,7 @@ void cleanup (T * &w)
 {
   if (w)
   {
-    w->deleteLater ();
+    delete w;
     w = nullptr;
   }
 }
@@ -145,57 +145,65 @@ void cleanup (T * &w)
 
 void DirView::setIsList (bool isList)
 {
-  auto root = view () ? rootIndex () : QModelIndex ();
+  if (isList_ == isList && (table_ || list_))
+  {
+    return;
+  }
+
+  const auto root = view () ? rootIndex () : QModelIndex ();
 
   isList_ = isList;
   if (!isList_)
   {
     cleanup (list_);
-
-    if (!table_)
-    {
-      initTable ();
-    }
+    initTable ();
   }
   else
   {
     cleanup (table_);
-
-    if (!list_)
-    {
-      initList ();
-    }
-    if (!delegate_)
-    {
-      delegate_ = new FileDelegate (this);
-      list_->setItemDelegate (delegate_);
-    }
+    initList ();
   }
+
+  auto selection = view ()->selectionModel ();
+  connect (selection, &QItemSelectionModel::currentChanged,
+           this, &DirView::currentChanged);
+  connect (selection, &QItemSelectionModel::selectionChanged,
+           this, &DirView::selectionChanged);
+
+  auto *view = this->view ();
+  view->setContextMenuPolicy (Qt::CustomContextMenu);
+  connect (view, &QWidget::customContextMenuRequested,
+           this, &DirView::contextMenuRequested);
+  connect (view, &QAbstractItemView::activated,
+           this, &DirView::activated);
+
+  view->setDragDropOverwriteMode (false);
+  view->setDefaultDropAction (Qt::MoveAction);
+
+  view->installEventFilter (this);
+  view->viewport ()->installEventFilter (this);
+
+  layout ()->addWidget (view);
 
   setRootIndex (root);
   setLocked (isLocked ());
   setExtensive (isExtensive ());
+
+  activate ();
 }
 
 void DirView::initTable ()
 {
+  if (table_)
+  {
+    return;
+  }
+
   table_ = new QTableView (this);
   table_->setModel (model_);
 
   table_->setSortingEnabled (true);
   table_->setSelectionBehavior (QAbstractItemView::SelectRows);
-  table_->setDragDropOverwriteMode (false);
-  table_->setDefaultDropAction (Qt::MoveAction);
-  table_->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (table_, &QTableView::activated,
-           this, &DirView::activated);
-  connect (table_, &QWidget::customContextMenuRequested,
-           this, &DirView::contextMenuRequested);
-
-  connect (table_->selectionModel (), &QItemSelectionModel::currentChanged,
-           this, &DirView::currentChanged);
-  connect (table_->selectionModel (), &QItemSelectionModel::selectionChanged,
-           this, &DirView::selectionChanged);
 
   table_->horizontalHeader ()->setSectionsMovable (true);
   table_->horizontalHeader ()->setContextMenuPolicy (Qt::CustomContextMenu);
@@ -204,15 +212,15 @@ void DirView::initTable ()
 
   table_->setItemDelegateForColumn (FileSystemModel::Permissions,
                                     new FilePermissionDelegate (table_));
-
-  table_->installEventFilter (this);
-  table_->viewport ()->installEventFilter (this);
-
-  layout ()->addWidget (table_);
 }
 
 void DirView::initList ()
 {
+  if (list_)
+  {
+    return;
+  }
+
   list_ = new QListView (this);
   list_->setModel (model_);
 
@@ -223,23 +231,12 @@ void DirView::initList ()
   list_->setUniformItemSizes (true);
   list_->setSelectionMode (QListView::ExtendedSelection);
 
-  list_->setDragDropOverwriteMode (false);
-  list_->setDefaultDropAction (Qt::MoveAction);
-  list_->setContextMenuPolicy (Qt::CustomContextMenu);
-  connect (list_, &QListView::activated,
-           this, &DirView::activated);
-  connect (list_, &QWidget::customContextMenuRequested,
-           this, &DirView::contextMenuRequested);
+  if (!delegate_)
+  {
+    delegate_ = new FileDelegate (this);
+  }
 
-  connect (list_->selectionModel (), &QItemSelectionModel::currentChanged,
-           this, &DirView::currentChanged);
-  connect (list_->selectionModel (), &QItemSelectionModel::selectionChanged,
-           this, &DirView::selectionChanged);
-
-  list_->installEventFilter (this);
-  list_->viewport ()->installEventFilter (this);
-
-  layout ()->addWidget (list_);
+  list_->setItemDelegate (delegate_);
 }
 
 bool DirView::isLocked () const
@@ -299,7 +296,7 @@ void DirView::showHeaderContextMenu ()
 
 QAbstractItemView * DirView::view () const
 {
-  return (table_
+  return (!isList_
           ? static_cast<QAbstractItemView *>(table_)
           : static_cast<QAbstractItemView *>(list_) );
 }
@@ -326,37 +323,53 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   else if (event->type () == QEvent::KeyPress)
   {
     auto casted = static_cast<QKeyEvent *>(event);
-    if (casted->key () == Qt::Key_Backspace ||
-        (watched == table_ && casted->key () == Qt::Key_Left))
+    const auto key = casted->key ();
+    const auto modifiers = casted->modifiers ();
+
+    if ((key == Qt::Key_Down || key == Qt::Key_Up || key == Qt::Key_Space) &&
+        modifiers & Qt::ControlModifier)
     {
-      emit movedBackward ();
+      casted->setModifiers (modifiers ^ Qt::ControlModifier);
+      return false;
     }
-    else if (casted->key () == Qt::Key_Space ||
-             (watched == table_ && casted->key () == Qt::Key_Right))
+
+    if (modifiers == Qt::NoModifier)
     {
-      const auto index = currentIndex ();
-      if (index.isValid ())
+      if (key == Qt::Key_Backspace || (watched == table_ && key == Qt::Key_Left))
       {
-        emit activated (index);
+        emit movedBackward ();
+        return true;
       }
-    }
-    else if (casted->key () == Qt::Key_Home)
-    {
-      const auto rows = model_->rowCount (rootIndex ());
-      if (rows > 0)
+
+      if (key == Qt::Key_Space || (watched == table_ && key == Qt::Key_Right))
       {
-        setCurrentIndex (model_->index (0, 0, rootIndex ()));
+        const auto index = currentIndex ();
+        if (index.isValid ())
+        {
+          emit activated (index);
+        }
+        return true;
       }
-      return true;
-    }
-    else if (casted->key () == Qt::Key_End)
-    {
-      const auto rows = model_->rowCount (rootIndex ());
-      if (rows > 0)
+
+      if (key == Qt::Key_Home)
       {
-        setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+        const auto rows = model_->rowCount (rootIndex ());
+        if (rows > 0)
+        {
+          setCurrentIndex (model_->index (0, 0, rootIndex ()));
+        }
+        return true;
       }
-      return true;
+
+      if (key == Qt::Key_End)
+      {
+        const auto rows = model_->rowCount (rootIndex ());
+        if (rows > 0)
+        {
+          setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+        }
+        return true;
+      }
     }
   }
   else if (event->type () == QEvent::FocusIn)
