@@ -74,6 +74,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   permissionsAction_ (nullptr),
   trashAction_ (nullptr),
   removeAction_ (nullptr),
+  showPropertiesAction_ (nullptr),
   cutAction_ (nullptr),
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
@@ -216,8 +217,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   viewMenu_->addSeparator ();
 
-  auto showProperties = makeShortcut (ShortcutManager::ShowProperties, viewMenu_);
-  connect (showProperties, &QAction::triggered,
+  showPropertiesAction_ = makeShortcut (ShortcutManager::ShowProperties, viewMenu_);
+  connect (showPropertiesAction_, &QAction::triggered,
            this, &DirWidget::showProperties);
 
 
@@ -307,7 +308,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            upAction_, &QAction::trigger);
   connect (view_, &DirView::backgroundActivated,
            this, &DirWidget::openInBackground);
-  connect (view_, &DirView::currentChanged,
+  connect (view_, &DirView::selectionChanged,
            this, &DirWidget::updateActions);
   connect (view_, &DirView::selectionChanged,
            this, &DirWidget::updateStatusSelection);
@@ -909,34 +910,38 @@ void DirWidget::updateActions ()
   const auto index = view_->currentIndex ();
   const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
   const auto isDir = current ().isDir ();
-  const auto isValid = view_->currentIndex ().isValid ();
+  const auto isValid = index.isValid ();
+  const auto isSingleSelected = (view_->selectedRows ().size () <= 1);
 
   newFolderAction_->setEnabled (dirs && !locked);
   upAction_->setEnabled (!locked);
 
-  openAction_->setEnabled (isValid);
-  openWith_->setEnabled (isValid && !isDir);
-  viewAction_->setEnabled (isValid);
+  openAction_->setEnabled (isValid && isSingleSelected);
+  openWith_->setEnabled (isValid && !isDir && isSingleSelected);
   if (openWith_->isEnabled ())
   {
     OpenWith::popupateMenu (*openWith_, current ());
   }
-  openInTabAction_->setEnabled (isValid && isDir);
-  openInEditorAction_->setEnabled (isValid && !isDir);
+  viewAction_->setEnabled (isValid && !isDir && isSingleSelected);
+  openInTabAction_->setEnabled (isValid && isDir && isSingleSelected);
+  openInEditorAction_->setEnabled (isValid && !isDir && isSingleSelected);
 
-  copyPathAction_->setEnabled (isValid);
+  copyPathAction_->setEnabled (isValid && isSingleSelected);
 
   cutAction_->setEnabled (!locked && isValid);
   copyAction_->setEnabled (isValid);
   pasteAction_->setEnabled (!locked);
 
-  copyToMenu_->setEnabled (isValid);
-  moveToMenu_->setEnabled (!locked && isValid);
-  linkToMenu_->setEnabled (isValid);
+  copyToMenu_->setEnabled (isValid && !isDotDot && isSingleSelected);
+  moveToMenu_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
+  linkToMenu_->setEnabled (isValid && !isDotDot && isSingleSelected);
 
-  renameAction_->setEnabled (!locked && isValid && !isDotDot);
+  permissionsAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
+  renameAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
   removeAction_->setEnabled (!locked && isValid && !isDotDot);
   trashAction_->setEnabled (!locked && isValid && !isDotDot);
+
+  showPropertiesAction_->setEnabled (isValid && isSingleSelected);
 }
 
 void DirWidget::checkDirExistence ()

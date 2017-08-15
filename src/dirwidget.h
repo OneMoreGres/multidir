@@ -133,6 +133,7 @@ private:
   QAction *permissionsAction_;
   QAction *trashAction_;
   QAction *removeAction_;
+  QAction *showPropertiesAction_;
   QAction *cutAction_;
   QAction *copyAction_;
   QAction *pasteAction_;
