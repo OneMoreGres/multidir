@@ -4,15 +4,9 @@
 
 class GroupWidget;
 class FileSystemModel;
-class FileOperation;
-class FileOperationWidget;
 
 class QSettings;
-class QAction;
-class QMenu;
-class QLineEdit;
 class QStackedWidget;
-class QActionGroup;
 
 class GroupsView : public QWidget
 {
@@ -38,8 +32,6 @@ signals:
   void currentChanged (const QString &name);
   void restored ();
 
-  void consoleRequested (const QString &path);
-  void editorRequested (const QString &path);
   void setNameFilter (const QString &filter);
 
 private:

@@ -1,9 +1,7 @@
 #include "groupsview.h"
 #include "groupwidget.h"
-#include "fileoperation.h"
 #include "debug.h"
 
-#include <QMenu>
 #include <QStackedWidget>
 #include <QSettings>
 #include <QBoxLayout>
