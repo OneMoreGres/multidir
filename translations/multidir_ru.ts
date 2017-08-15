@@ -37,75 +37,60 @@
 <context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirwidget.cpp" line="152"/>
+        <location filename="../src/dirwidget.cpp" line="154"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="190"/>
+        <location filename="../src/dirwidget.cpp" line="192"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="193"/>
+        <location filename="../src/dirwidget.cpp" line="195"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="196"/>
+        <location filename="../src/dirwidget.cpp" line="198"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="228"/>
+        <location filename="../src/dirwidget.cpp" line="230"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="285"/>
+        <location filename="../src/dirwidget.cpp" line="287"/>
         <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
         <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="430"/>
-        <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
-        <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
-    </message>
-    <message>
-        <location filename="../src/dirwidget.cpp" line="527"/>
+        <location filename="../src/dirwidget.cpp" line="517"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="562"/>
-        <location filename="../src/dirwidget.cpp" line="566"/>
+        <location filename="../src/dirwidget.cpp" line="524"/>
+        <location filename="../src/dirwidget.cpp" line="528"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="648"/>
+        <location filename="../src/dirwidget.cpp" line="610"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="663"/>
+        <location filename="../src/dirwidget.cpp" line="625"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="683"/>
+        <location filename="../src/dirwidget.cpp" line="645"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
-    </message>
-    <message>
-        <location filename="../src/dirwidget.cpp" line="828"/>
-        <source>Failed to open console &apos;%1&apos; in &apos;%2&apos;</source>
-        <translation>Ошибка открытия консоли &apos;%1&apos; в &apos;%2&apos;</translation>
-    </message>
-    <message>
-        <location filename="../src/dirwidget.cpp" line="856"/>
-        <source>Failed to open editor &apos;%1&apos;</source>
-        <translation>Ошибка открытия редактора &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -699,6 +684,16 @@ Modified: %3</source>
         <location filename="../src/openwith.cpp" line="591"/>
         <source>Failed to start external app &apos;%1&apos; with command &apos;%2&apos;</source>
         <translation>Ошибка запуска программы &apos;%1&apos; командой &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommand.cpp" line="26"/>
+        <source>Empty command</source>
+        <translation>Пустая команда</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommand.cpp" line="30"/>
+        <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
+        <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
 </context>
 <context>

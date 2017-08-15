@@ -14,6 +14,7 @@
 #include "fileviewer.h"
 #include "dirstatuswidget.h"
 #include "settingsmanager.h"
+#include "shellcommand.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -55,6 +56,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   commandPrompt_ (new QLineEdit (this)),
   consoleCommand_ (),
   editorCommand_ (),
+  siblings_ (),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
   showDirs_ (nullptr),
@@ -359,8 +361,15 @@ QFileInfo DirWidget::path () const
   return path_;
 }
 
+const QList<DirWidget *> &DirWidget::siblings () const
+{
+  return siblings_;
+}
+
 void DirWidget::setSiblings (const QList<DirWidget *> siblings)
 {
+  siblings_ = siblings;
+
   using SM = ShortcutManager;
   auto handle = [this, siblings](SM::Shortcut s, QMenu *menu, Qt::DropAction drop) {
                   for (auto *i: menu->actions ())
@@ -421,62 +430,15 @@ void DirWidget::showCommandPrompt ()
 
 void DirWidget::execCommandPrompt ()
 {
-  const auto parts = utils::parseShellCommand (preprocessedCommand ());
-  if (!parts.isEmpty ())
+  ShellCommand command (commandPrompt_->text ());
+  command.preprocessSelections (*this);
+  command.setWorkDir (path_);
+  if (!command.run ())
   {
-    const auto workDir = path ().absoluteFilePath ();
-    if (!QProcess::startDetached (parts[0], parts.mid (1), workDir))
-    {
-      Notifier::error (tr ("Failed to run command '%1' in '%2'")
-                       .arg (parts.join (' '), workDir));
-      commandPrompt_->selectAll ();
-      return;
-    }
+    commandPrompt_->selectAll ();
+    return;
   }
   commandPrompt_->hide ();
-}
-
-QString DirWidget::preprocessedCommand () const
-{
-  auto handle = [](QString &command, const DirWidget &w, const QString &index) {
-                  const QString pathPlaceholder ("%%1%");
-                  command.replace (pathPlaceholder.arg (index), w.path ().absoluteFilePath ());
-
-                  const QString itemPlaceholder ("%-%1%");
-                  command.replace (itemPlaceholder.arg (index), w.current ().absoluteFilePath ());
-
-                  const QString selectedPlaceholder (R"(%(.)?\*%1%)");
-                  const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
-                  if (command.contains (selectedRegex))
-                  {
-                    QStringList items;
-                    for (const auto &i: w.selected ())
-                    {
-                      items << i.absoluteFilePath ();
-                    }
-
-                    auto match = selectedRegex.match (command);
-                    while (match.hasMatch ())
-                    {
-                      const auto separator = (!match.captured (1).isEmpty ()
-                                              ? match.captured (1) : " ");
-                      command.replace (match.capturedStart (0), match.capturedLength (0),
-                                       items.join (separator));
-                      match = selectedRegex.match (command);
-                    }
-                  }
-                };
-
-
-  auto command = commandPrompt_->text ().trimmed ();
-  handle (command, *this, "");
-  for (const auto *i: copyToMenu_->actions ())
-  {
-    auto *sibling = i->data ().value<DirWidget *>();
-    ASSERT (sibling);
-    handle (command, *sibling, sibling->index ());
-  }
-  return command.trimmed ();
 }
 
 QString DirWidget::index () const
@@ -845,45 +807,18 @@ void DirWidget::moveUp ()
 
 void DirWidget::openConsole ()
 {
-  const auto path = path_.absoluteFilePath ();
-  if (!consoleCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = consoleCommand_;
-    command.replace ("%d", path);
-    const auto parts = utils::parseShellCommand (command);
-    if (parts.isEmpty () || !QProcess::startDetached (parts[0], parts.mid (1), path))
-    {
-      Notifier::error (tr ("Failed to open console '%1' in '%2'")
-                       .arg (consoleCommand_, path));
-    }
-  }
+  ShellCommand command (consoleCommand_);
+  command.preprocessFileArguments (path_);
+  command.setWorkDir (path_);
+  command.run ();
 }
 
 void DirWidget::openInEditor ()
 {
-  const auto current = this->current ();
-  if (!current.isFile ())
-  {
-    return;
-  }
-
-  const auto path = current.absoluteFilePath ();
-  if (!editorCommand_.isEmpty () && !path.isEmpty ())
-  {
-    auto command = editorCommand_;
-    if (command.contains ("%p"))
-    {
-      command.replace ("%p", path);
-    }
-    else
-    {
-      command += ' ' + path;
-    }
-    if (!QProcess::startDetached (command))
-    {
-      Notifier::error (tr ("Failed to open editor '%1'").arg (editorCommand_));
-    }
-  }
+  ShellCommand command (editorCommand_);
+  command.preprocessFileArguments (current (), true);
+  command.setWorkDir (path_);
+  command.run ();
 }
 
 bool DirWidget::isMinSizeFixed () const

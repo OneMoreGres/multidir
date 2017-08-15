@@ -31,11 +31,15 @@ public:
   void setPath (const QFileInfo &path);
   QFileInfo path () const;
 
+  const QList<DirWidget *> &siblings () const;
   void setSiblings (const QList<DirWidget *> siblings);
 
   QString index () const;
   void setIndex (const QString &index);
   QString fullName (int preferredWidth) const;
+
+  QList<QFileInfo> selected () const;
+  QFileInfo current () const;
 
   void setNameFilter (const QString &filter);
 
@@ -61,8 +65,6 @@ private:
   void newFolder ();
   QAction * makeShortcut (int shortcutType, QMenu *menu, bool isCheckable = false);
 
-  QList<QFileInfo> selected () const;
-  QFileInfo current () const;
   QFileInfo fileInfo (const QModelIndex &index) const;
   QStringList names (const QList<QModelIndex> &indexes) const;
 
@@ -93,7 +95,6 @@ private:
 
   void showCommandPrompt ();
   void execCommandPrompt ();
-  QString preprocessedCommand () const;
 
   bool isLocked () const;
   void setLocked (bool isLocked);
@@ -116,6 +117,7 @@ private:
   QLineEdit *commandPrompt_;
   QString consoleCommand_;
   QString editorCommand_;
+  QList<DirWidget *> siblings_;
 
   QMenu *menu_;
   QAction *isLocked_;
