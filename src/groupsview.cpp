@@ -60,6 +60,8 @@ void GroupsView::restore (QSettings &settings)
       setCurrentIndex (current);
     }
   }
+
+  emit restored ();
 }
 
 void GroupsView::addWidgetToCurrent ()

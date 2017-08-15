@@ -16,12 +16,6 @@ public:
   explicit GroupsMenu (GroupsView *view, QWidget *parent = nullptr);
   ~GroupsMenu ();
 
-  void save (QSettings &settings) const;
-  void restore (QSettings &settings);
-
-  const QString &ids () const;
-  void setIds (const QString &ids);
-
 public slots:
   void updateSettings ();
 
@@ -30,6 +24,7 @@ private:
   void renameCurrent ();
   void removeCurrent ();
 
+  void handleViewRestored ();
   void updateMenuState ();
   void populateMenuActions ();
   void trigger (QAction *action);
@@ -37,6 +32,7 @@ private:
   void updateShortcuts ();
   QAction * actionAt (int index) const;
   int index (QAction *action) const;
+  void setIds (const QString &ids);
 
   GroupsView *view_;
   QAction *renameAction_;

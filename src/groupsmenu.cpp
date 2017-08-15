@@ -23,6 +23,9 @@ GroupsMenu::GroupsMenu (GroupsView *view, QWidget *parent) :
   actions_ (new QActionGroup (this)),
   ids_ ()
 {
+  connect (view_, &GroupsView::restored,
+           this, &GroupsMenu::handleViewRestored);
+
   connect (actions_, &QActionGroup::triggered,
            this, &GroupsMenu::setCurrent);
 
@@ -49,24 +52,6 @@ GroupsMenu::GroupsMenu (GroupsView *view, QWidget *parent) :
 
 GroupsMenu::~GroupsMenu ()
 {
-  menu_->deleteLater ();
-}
-
-void GroupsMenu::save (QSettings &settings) const
-{
-  view_->save (settings);
-}
-
-void GroupsMenu::restore (QSettings &settings)
-{
-  view_->restore (settings);
-
-  populateMenuActions ();
-  updateMenuState ();
-  updateShortcuts ();
-
-  const auto current = view_->currentIndex ();
-  trigger (actionAt (current));
 }
 
 void GroupsMenu::updateSettings ()
@@ -135,6 +120,17 @@ void GroupsMenu::removeCurrent ()
 
   updateMenuState ();
   updateShortcuts ();
+}
+
+void GroupsMenu::handleViewRestored ()
+{
+
+  populateMenuActions ();
+  updateMenuState ();
+  updateShortcuts ();
+
+  const auto current = view_->currentIndex ();
+  trigger (actionAt (current));
 }
 
 void GroupsMenu::updateMenuState ()

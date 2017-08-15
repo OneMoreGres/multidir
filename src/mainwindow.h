@@ -3,7 +3,6 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class GroupsMenu;
 class GroupsView;
 class FileSystemModel;
 class FileOperation;
@@ -43,7 +42,6 @@ private:
 
   FileSystemModel *model_;
   GroupsView *groups_;
-  GroupsMenu *groupsMenu_;
   FileConflictResolver *conflictResolver_;
   QLineEdit *findEdit_;
   QLayout *fileOperationsLayout_;

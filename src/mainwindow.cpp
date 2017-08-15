@@ -32,7 +32,6 @@ MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
   groups_ (new GroupsView (*model_, this)),
-  groupsMenu_ (new GroupsMenu (groups_, this)),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
@@ -87,7 +86,8 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menuBar->addMenu (groupsMenu_);
+  auto groupsMenu = new GroupsMenu (groups_, this);
+  menuBar->addMenu (groupsMenu);
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
@@ -176,14 +176,14 @@ void MainWindow::save (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
 
-  groupsMenu_->save (settings);
+  groups_->save (settings);
 }
 
 void MainWindow::restore (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-  groupsMenu_->restore (settings);
+  groups_->restore (settings);
 }
 
 void MainWindow::updateSettings ()

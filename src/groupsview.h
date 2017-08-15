@@ -36,6 +36,7 @@ public:
 
 signals:
   void currentChanged (const QString &name);
+  void restored ();
 
   void consoleRequested (const QString &path);
   void editorRequested (const QString &path);
