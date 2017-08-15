@@ -5,7 +5,6 @@
 class DirWidget;
 class TiledView;
 class FileSystemModel;
-class FileOperation;
 
 class QSettings;
 class QFileInfo;
@@ -26,9 +25,6 @@ public:
   QString name () const;
   void setName (const QString &name);
 
-  const QString &ids () const;
-  void setIds (const QString &ids);
-
 public slots:
   void updateSettings ();
 
@@ -39,6 +35,7 @@ private:
   void add (const QFileInfo &path);
   void updateWidgetNames ();
   void updateWidgetShortcuts ();
+  void setIds (const QString &ids);
 
   struct Widget
   {

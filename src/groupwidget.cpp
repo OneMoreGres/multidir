@@ -2,7 +2,6 @@
 #include "dirwidget.h"
 #include "tiledview.h"
 #include "backport.h"
-#include "fileoperation.h"
 #include "debug.h"
 #include "shortcutmanager.h"
 #include "utils.h"
@@ -180,11 +179,6 @@ void GroupWidget::updateWidgetShortcuts ()
   {
     i.widget->setSiblings (siblings.values ());
   }
-}
-
-const QString &GroupWidget::ids () const
-{
-  return ids_;
 }
 
 void GroupWidget::setIds (const QString &ids)
