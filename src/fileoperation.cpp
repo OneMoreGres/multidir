@@ -38,15 +38,40 @@ bool createDir (QDir parent, const QString &name)
   return true;
 }
 
+bool removeFile (const QFileInfo &info)
+{
+  if (!QFile::remove (info.absoluteFilePath ()))
+  {
+    Notifier::error (QObject::tr ("Failed to remove file ") + info.absoluteFilePath ());
+    return false;
+  }
+  return true;
+}
+bool removeInfo (const QFileInfo &info);
+
 bool removeDir (const QFileInfo &info)
 {
+  for (const auto &i: utils::dirEntries (info))
+  {
+    if (!removeInfo (i))
+    {
+      return false;
+    }
+  }
+
   auto parent = info.absoluteDir ();
   if (!parent.rmdir (info.fileName ()))
   {
     Notifier::error (QObject::tr ("Failed to remove directory ") + info.absoluteFilePath ());
     return false;
   }
+
   return true;
+}
+
+bool removeInfo (const QFileInfo &info)
+{
+  return info.isDir () ? removeDir (info) : removeFile (info);
 }
 
 }
@@ -56,7 +81,8 @@ FileOperation::FileOperation () :
   target_ (),
   action_ (),
   resolver_ (nullptr),
-  allResolution_ (FileConflictResolver::Pending),
+  allFileResolution_ (FileConflictResolver::Pending),
+  allDirResolution_ (FileConflictResolver::Pending),
   totalSize_ (1),
   doneSize_ (0),
   progress_ (0),
@@ -181,7 +207,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       }
       name = uniqueFileName (targetFile);
     }
-    else if (targetFile.exists () && !targetFile.isDir ())
+    else if (targetFile.exists ())
     {
       const auto resolution = resolveConflict (source, targetFile);
       if (isAborted_)
@@ -193,7 +219,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       {
         continue;
       }
-      if (resolution & FileConflictResolver::Source && !removeDir (targetFile))
+      if (resolution & FileConflictResolver::Source && !removeInfo (targetFile))
       {
         ok = false;
         continue;
@@ -209,7 +235,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       const auto removeSource = action_ == FileOperation::Action::Move;
       if (createDir (targetDir, name)
           && transfer (utils::dirEntries (source), targetDir.absoluteFilePath (name), depth + 1)
-          && ((removeSource && removeDir (source)) || !removeSource))
+          && ((removeSource && removeInfo (source)) || !removeSource))
       {
         continue;
       }
@@ -315,7 +341,7 @@ int FileOperation::resolveConflict (const QFileInfo &source, const QFileInfo &ta
   static QMutex mutex;
   QMutexLocker locker (&mutex); // only one request for all threads
 
-  auto resolution = allResolution_;
+  auto resolution = target.isDir () ? allDirResolution_ : allFileResolution_;
   if (resolution == FileConflictResolver::Pending)
   {
     auto connection = (QThread::currentThread () == qApp->thread ())
@@ -331,7 +357,14 @@ int FileOperation::resolveConflict (const QFileInfo &source, const QFileInfo &ta
     }
     if (resolution & FileConflictResolver::All)
     {
-      allResolution_ = resolution;
+      if (target.isDir ())
+      {
+        allDirResolution_ = resolution;
+      }
+      else
+      {
+        allFileResolution_ = resolution;
+      }
     }
   }
 

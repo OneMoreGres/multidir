@@ -17,8 +17,9 @@ public:
     Source = 1 << 0,
     Target = 1 << 1,
     Rename = 1 << 2,
-    Abort = 1 << 3,
-    All = 1 << 4
+    Merge = 1 << 3,
+    Abort = 1 << 4,
+    All = 1 << 5
   };
 
   explicit FileConflictResolver (QWidget *parent = nullptr);
@@ -32,6 +33,7 @@ private:
   QPushButton *source_;
   QPushButton *target_;
   QPushButton *rename_;
+  QPushButton *merge_;
   QPushButton *abort_;
   QCheckBox *applyToAll_;
 };

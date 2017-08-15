@@ -17,6 +17,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   source_ (new QPushButton (tr ("Use new"), this)),
   target_ (new QPushButton (tr ("Use existing"), this)),
   rename_ (new QPushButton (tr ("Rename new"), this)),
+  merge_ (new QPushButton (tr ("Merge"), this)),
   abort_ (new QPushButton (tr ("Abort"), this)),
   applyToAll_ (new QCheckBox (tr ("Apply to all"), this))
 {
@@ -36,7 +37,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
 
   ++row;
   {
-    auto label = new QLabel (tr ("New file:"), this);
+    auto label = new QLabel (tr ("New:"), this);
     font.setPointSize (10);
     label->setFont (font);
     sourceLabel_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -46,7 +47,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
 
   ++row;
   {
-    auto label = new QLabel (tr ("Existing file:"), this);
+    auto label = new QLabel (tr ("Existing:"), this);
     font.setPointSize (10);
     label->setFont (font);
     targetLabel_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -60,6 +61,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   buttonsLayout->addWidget (source_);
   buttonsLayout->addWidget (target_);
   buttonsLayout->addWidget (rename_);
+  buttonsLayout->addWidget (merge_);
   buttonsLayout->addStretch (2);
   buttonsLayout->addWidget (applyToAll_);
   buttonsLayout->addStretch (2);
@@ -69,6 +71,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   connect (source_, &QPushButton::pressed, this, [this] {done (Source);});
   connect (target_, &QPushButton::pressed, this, [this] {done (Target);});
   connect (rename_, &QPushButton::pressed, this, [this] {done (Rename);});
+  connect (merge_, &QPushButton::pressed, this, [this] {done (Merge);});
   connect (abort_, &QPushButton::pressed, this, [this] {done (Abort);});
 }
 
@@ -77,10 +80,26 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
 {
   ASSERT (result);
   auto labelText = [](const QFileInfo &i) {
-                     return i.absoluteFilePath ()
-                            + tr ("\nModified: ") + i.lastModified ().toString (Qt::ISODate)
-                            + tr (". Size: ") + utils::sizeString (i.size ());
+                     if (!i.isDir ())
+                     {
+                       return tr ("%1\nModified: %2. Size: %3").arg (
+                         i.absoluteFilePath (), i.lastModified ().toString (Qt::ISODate),
+                         utils::sizeString (i.size ()));
+
+                     }
+                     return tr ("%1 (directory)\nModified: %3").arg (
+                       i.absoluteFilePath (), i.lastModified ().toString (Qt::ISODate));
                    };
+
+  if (target.isDir () && source.isDir ())
+  {
+    merge_->show ();
+  }
+  else
+  {
+    merge_->hide ();
+  }
+  applyToAll_->setChecked (false);
 
   switch (FileOperation::Action (action))
   {

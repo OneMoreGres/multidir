@@ -127,46 +127,53 @@
     </message>
     <message>
         <location filename="../src/fileconflictresolver.cpp" line="20"/>
+        <source>Merge</source>
+        <translation>Объединить</translation>
+    </message>
+    <message>
+        <location filename="../src/fileconflictresolver.cpp" line="21"/>
         <source>Abort</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="21"/>
+        <location filename="../src/fileconflictresolver.cpp" line="22"/>
         <source>Apply to all</source>
         <translation>Для всех</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="30"/>
+        <location filename="../src/fileconflictresolver.cpp" line="31"/>
         <source>File operation conflict</source>
         <translation>Конфликт при работе с файлами</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="39"/>
-        <source>New file:</source>
-        <translation>Новый файл:</translation>
+        <location filename="../src/fileconflictresolver.cpp" line="40"/>
+        <source>New:</source>
+        <translation>Новый:</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="49"/>
-        <source>Existing file:</source>
-        <translation>Существующий файл:</translation>
+        <location filename="../src/fileconflictresolver.cpp" line="50"/>
+        <source>Existing:</source>
+        <translation>Существующий:</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="81"/>
-        <source>
-Modified: </source>
-        <translation>
-Изменен: </translation>
+        <location filename="../src/fileconflictresolver.cpp" line="85"/>
+        <source>%1
+Modified: %2. Size: %3</source>
+        <translation>%1
+Изменен: %2. Размер: %3</translation>
     </message>
     <message>
-        <location filename="../src/fileconflictresolver.cpp" line="82"/>
-        <source>. Size: </source>
-        <translation>. Размер: </translation>
+        <location filename="../src/fileconflictresolver.cpp" line="90"/>
+        <source>%1 (directory)
+Modified: %3</source>
+        <translation>%1 (папка)
+Изменена: %3</translation>
     </message>
 </context>
 <context>
     <name>FileOperation</name>
     <message>
-        <location filename="../src/fileoperation.cpp" line="260"/>
+        <location filename="../src/fileoperation.cpp" line="286"/>
         <source>Target already exists </source>
         <translation>Целевой файл уже существует </translation>
     </message>
@@ -413,7 +420,12 @@ Modified: </source>
         <translation>Ошибка создания папки </translation>
     </message>
     <message>
-        <location filename="../src/fileoperation.cpp" line="46"/>
+        <location filename="../src/fileoperation.cpp" line="45"/>
+        <source>Failed to remove file </source>
+        <translation>Ошибка удаления файла </translation>
+    </message>
+    <message>
+        <location filename="../src/fileoperation.cpp" line="65"/>
         <source>Failed to remove directory </source>
         <translation>Ошибка удаления папки </translation>
     </message>

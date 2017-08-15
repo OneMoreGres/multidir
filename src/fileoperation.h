@@ -49,7 +49,8 @@ private:
   QFileInfo target_;
   Action action_;
   FileConflictResolver *resolver_;
-  int allResolution_;
+  int allFileResolution_;
+  int allDirResolution_;
   qint64 totalSize_;
   qint64 doneSize_;
   int progress_;
