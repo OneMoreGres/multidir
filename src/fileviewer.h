@@ -5,12 +5,12 @@
 
 class QTextEdit;
 
-class Viewer : public QWidget
+class FileViewer : public QWidget
 {
 Q_OBJECT
 public:
-  explicit Viewer (QWidget *parent = nullptr);
-  ~Viewer ();
+  explicit FileViewer (QWidget *parent = nullptr);
+  ~FileViewer ();
 
   bool setFile (const QString &name);
   void showFile (const QString &name);

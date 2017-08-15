@@ -1,4 +1,4 @@
-#include "viewer.h"
+#include "fileviewer.h"
 #include "debug.h"
 #include "notifier.h"
 
@@ -17,7 +17,7 @@ namespace
 const QString qs_grometry = "viewer/geometry";
 }
 
-Viewer::Viewer (QWidget *parent) :
+FileViewer::FileViewer (QWidget *parent) :
   QWidget (parent),
   edit_ (new QTextEdit (this)),
   watcher_ (nullptr)
@@ -43,13 +43,13 @@ Viewer::Viewer (QWidget *parent) :
   restoreGeometry (settings.value (qs_grometry, saveGeometry ()).toByteArray ());
 }
 
-Viewer::~Viewer ()
+FileViewer::~FileViewer ()
 {
   QSettings settings;
   settings.setValue (qs_grometry, saveGeometry ());
 }
 
-bool Viewer::setFile (const QString &name)
+bool FileViewer::setFile (const QString &name)
 {
   const QFileInfo info (name);
   setWindowTitle (info.absoluteFilePath ());
@@ -75,7 +75,7 @@ bool Viewer::setFile (const QString &name)
   return true;
 }
 
-void Viewer::showFile (const QString &name)
+void FileViewer::showFile (const QString &name)
 {
   show ();
   if (!setFile (name))
@@ -84,12 +84,12 @@ void Viewer::showFile (const QString &name)
   }
 }
 
-void Viewer::readInBackground (const QString &name)
+void FileViewer::readInBackground (const QString &name)
 {
   ASSERT (!watcher_);
   watcher_ = new QFutureWatcher<QString>(this);
   connect (watcher_, &QFutureWatcher<QString>::finished,
-           this, &Viewer::setFileContents);
+           this, &FileViewer::setFileContents);
 
   watcher_->setFuture (
     QtConcurrent::run (
@@ -114,10 +114,12 @@ void Viewer::readInBackground (const QString &name)
       }, name));
 }
 
-void Viewer::setFileContents ()
+void FileViewer::setFileContents ()
 {
   ASSERT (watcher_);
   edit_->setText (watcher_->result ());
   watcher_->deleteLater ();
   watcher_ = nullptr;
 }
+
+#include "moc_fileviewer.cpp"

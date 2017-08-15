@@ -75,13 +75,13 @@ SOURCES += \
     src/filepermissiondelegate.cpp \
     src/filesystemcompleter.cpp \
     src/pathwidget.cpp \
-    src/viewer.cpp \
     src/settingseditor.cpp \
     src/dirstatuswidget.cpp \
     src/storagemanager.cpp \
     src/settingsmanager.cpp \
     src/groupsview.cpp \
-    src/groupsmenu.cpp
+    src/groupsmenu.cpp \
+    src/fileviewer.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -113,13 +113,13 @@ HEADERS  += \
     src/filepermissiondelegate.h \
     src/filesystemcompleter.h \
     src/pathwidget.h \
-    src/viewer.h \
     src/settingseditor.h \
     src/dirstatuswidget.h \
     src/storagemanager.h \
     src/settingsmanager.h \
     src/groupsview.h \
-    src/groupsmenu.h
+    src/groupsmenu.h \
+    src/fileviewer.h
 
 RESOURCES += \
     resources.qrc

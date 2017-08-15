@@ -12,7 +12,7 @@
 #include "debug.h"
 #include "propertieswidget.h"
 #include "pathwidget.h"
-#include "viewer.h"
+#include "fileviewer.h"
 #include "dirstatuswidget.h"
 #include "settingsmanager.h"
 
@@ -806,7 +806,7 @@ void DirWidget::viewCurrent ()
 {
   if (!current ().isDir ())
   {
-    auto view = new Viewer;
+    auto view = new FileViewer;
     view->showFile (current ().absoluteFilePath ());
   }
   else
