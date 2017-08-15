@@ -11,13 +11,11 @@
 #include "debug.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
-#include "utils.h"
 #include "settingsmanager.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
 #include <QApplication>
-#include <QProcess>
 #include <QTimer>
 #include <QLineEdit>
 #include <QMenuBar>
@@ -69,7 +67,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto add = new QAction (this);
   fileMenu->addAction (add);
   ShortcutManager::add (ShortcutManager::AddTab, add);
-  connect (add, &QAction::triggered, this, &MainWindow::addWidget);
+  connect (add, &QAction::triggered, groups_, &GroupHolder::addWidgetToCurrent);
 
   auto find = new QAction (this);
   fileMenu->addAction (find);
@@ -98,7 +96,7 @@ MainWindow::MainWindow (QWidget *parent) :
   debug->setCheckable (true);
   helpMenu->addAction (debug);
   ShortcutManager::add (ShortcutManager::Debug, debug);
-  connect (debug, &QAction::toggled, this, [](bool isOn) {debug::setDebugMode (isOn);});
+  connect (debug, &QAction::toggled, this, &debug::setDebugMode);
 
   auto about = new QAction (this);
   helpMenu->addAction (about);
@@ -129,11 +127,12 @@ MainWindow::MainWindow (QWidget *parent) :
   tray_->setIcon (QIcon (":/app.png"));
   tray_->show ();
   connect (tray_, &QSystemTrayIcon::activated,
-           this, &MainWindow::trayClicked);
+           this, &MainWindow::handleTrayClick);
 
   updateTrayMenu ();
 
 
+  // layout
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
   menuBarLayout->addLayout (fileOperationsLayout_);
@@ -203,7 +202,8 @@ void MainWindow::updateTrayMenu ()
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
-void MainWindow::trayClicked (QSystemTrayIcon::ActivationReason reason)
+
+void MainWindow::handleTrayClick (QSystemTrayIcon::ActivationReason reason)
 {
   if (reason == QSystemTrayIcon::ActivationReason::Trigger)
   {
@@ -253,11 +253,6 @@ void MainWindow::setCheckUpdates (bool isOn)
              updater, &QObject::deleteLater);
     QTimer::singleShot (3000, updater, &UpdateChecker::check);
   }
-}
-
-void MainWindow::addWidget ()
-{
-  groups_->addWidgetToCurrent ();
 }
 
 void MainWindow::keyPressEvent (QKeyEvent *event)

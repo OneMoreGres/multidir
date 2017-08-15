@@ -30,14 +30,14 @@ protected:
   void keyPressEvent (QKeyEvent *event) override;
 
 private:
-  void updateTrayMenu ();
-  void trayClicked (QSystemTrayIcon::ActivationReason reason);
   void toggleVisible ();
   void editSettings ();
-  void setCheckUpdates (bool isOn);
-  void addWidget ();
-  void activateFindMode ();
   void showAbout ();
+  void activateFindMode ();
+
+  void updateTrayMenu ();
+  void handleTrayClick (QSystemTrayIcon::ActivationReason reason);
+  void setCheckUpdates (bool isOn);
   void showFileOperation (QSharedPointer<FileOperation> operation);
   void updateWindowTitle (const QString &groupName);
 
