@@ -3,8 +3,8 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class GroupHolder;
-class GroupControl;
+class GroupsMenu;
+class GroupsView;
 class FileSystemModel;
 class FileOperation;
 class FileConflictResolver;
@@ -42,8 +42,8 @@ private:
   void updateWindowTitle (const QString &groupName);
 
   FileSystemModel *model_;
-  GroupHolder *groups_;
-  GroupControl *groupControl_;
+  GroupsView *groups_;
+  GroupsMenu *groupsMenu_;
   FileConflictResolver *conflictResolver_;
   QLineEdit *findEdit_;
   QLayout *fileOperationsLayout_;

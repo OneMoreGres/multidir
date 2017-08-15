@@ -2,21 +2,22 @@
 
 #include <QObject>
 
-class GroupHolder;
+class GroupsView;
 
 class QAction;
 class QMenu;
 class QActionGroup;
 class QSettings;
 
-class GroupControl : public QObject
+class GroupsMenu : public QObject
 {
 Q_OBJECT
 public:
-  explicit GroupControl (GroupHolder &view, QObject *parent = nullptr);
-  ~GroupControl ();
+  explicit GroupsMenu (GroupsView *view, QObject *parent = nullptr);
+  ~GroupsMenu ();
 
   QMenu * menu () const;
+  GroupsView * view () const;
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
@@ -40,7 +41,7 @@ private:
   QAction * actionAt (int index) const;
   int index (QAction *action) const;
 
-  GroupHolder &view_;
+  GroupsView *view_;
   QMenu *menu_;
   QAction *renameAction_;
   QAction *closeAction_;

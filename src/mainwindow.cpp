@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include "groupholder.h"
-#include "groupcontrol.h"
+#include "groupsview.h"
+#include "groupsmenu.h"
 #include "settingseditor.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
@@ -31,8 +31,8 @@ const QString qs_geometry = "geometry";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groups_ (new GroupHolder (*model_, this)),
-  groupControl_ (new GroupControl (*groups_, this)),
+  groups_ (new GroupsView (*model_, this)),
+  groupsMenu_ (new GroupsMenu (groups_, this)),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
@@ -54,8 +54,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   connect (findEdit_, &QLineEdit::textChanged,
-           groups_, &GroupHolder::setNameFilter);
-  connect (groups_, &GroupHolder::currentChanged,
+           groups_, &GroupsView::setNameFilter);
+  connect (groups_, &GroupsView::currentChanged,
            this, &MainWindow::updateWindowTitle);
 
 
@@ -67,7 +67,7 @@ MainWindow::MainWindow (QWidget *parent) :
   auto add = new QAction (this);
   fileMenu->addAction (add);
   ShortcutManager::add (ShortcutManager::AddTab, add);
-  connect (add, &QAction::triggered, groups_, &GroupHolder::addWidgetToCurrent);
+  connect (add, &QAction::triggered, groups_, &GroupsView::addWidgetToCurrent);
 
   auto find = new QAction (this);
   fileMenu->addAction (find);
@@ -87,7 +87,7 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menuBar->addMenu (groupControl_->menu ());
+  menuBar->addMenu (groupsMenu_->menu ());
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
@@ -176,14 +176,14 @@ void MainWindow::save (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
 
-  groupControl_->save (settings);
+  groupsMenu_->save (settings);
 }
 
 void MainWindow::restore (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry, saveGeometry ()).toByteArray ());
 
-  groupControl_->restore (settings);
+  groupsMenu_->restore (settings);
 }
 
 void MainWindow::updateSettings ()

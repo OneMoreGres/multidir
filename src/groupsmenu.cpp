@@ -1,5 +1,5 @@
-#include "groupcontrol.h"
-#include "groupholder.h"
+#include "groupsmenu.h"
+#include "groupsview.h"
 #include "groupwidget.h"
 #include "debug.h"
 #include "shortcutmanager.h"
@@ -17,30 +17,30 @@ const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
 }
 
-GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
+GroupsMenu::GroupsMenu (GroupsView *view, QObject *parent) :
   QObject (parent),
   view_ (view),
   menu_ (new QMenu (tr ("Groups"))),
   actions_ (new QActionGroup (this)),
-  ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))
+  ids_ ()
 {
   connect (actions_, &QActionGroup::triggered,
-           this, &GroupControl::setCurrent);
+           this, &GroupsMenu::setCurrent);
 
   auto addGroup = new QAction (this);
   menu_->addAction (addGroup);
   ShortcutManager::add (ShortcutManager::AddGroup, addGroup);
-  connect (addGroup, &QAction::triggered, this, &GroupControl::add);
+  connect (addGroup, &QAction::triggered, this, &GroupsMenu::add);
 
   renameAction_ = new QAction (this);
   menu_->addAction (renameAction_);
   ShortcutManager::add (ShortcutManager::RenameGroup, renameAction_);
-  connect (renameAction_, &QAction::triggered, this, &GroupControl::renameCurrent);
+  connect (renameAction_, &QAction::triggered, this, &GroupsMenu::renameCurrent);
 
   closeAction_ = new QAction (this);
   menu_->addAction (closeAction_);
   ShortcutManager::add (ShortcutManager::RemoveGroup, closeAction_);
-  connect (closeAction_, &QAction::triggered, this, &GroupControl::removeCurrent);
+  connect (closeAction_, &QAction::triggered, this, &GroupsMenu::removeCurrent);
 
   menu_->addSeparator ();
 
@@ -48,53 +48,58 @@ GroupControl::GroupControl (GroupHolder &view, QObject *parent) :
   updateSettings ();
 }
 
-GroupControl::~GroupControl ()
+GroupsMenu::~GroupsMenu ()
 {
   menu_->deleteLater ();
 }
 
-QMenu * GroupControl::menu () const
+QMenu * GroupsMenu::menu () const
 {
   return menu_;
 }
 
-void GroupControl::save (QSettings &settings) const
+GroupsView * GroupsMenu::view () const
 {
-  view_.save (settings);
+  return view_;
 }
 
-void GroupControl::restore (QSettings &settings)
+void GroupsMenu::save (QSettings &settings) const
 {
-  view_.restore (settings);
+  view_->save (settings);
+}
+
+void GroupsMenu::restore (QSettings &settings)
+{
+  view_->restore (settings);
 
   populateMenuActions ();
   updateMenuState ();
   updateShortcuts ();
 
-  const auto current = view_.currentIndex ();
+  const auto current = view_->currentIndex ();
   trigger (actionAt (current));
 }
 
-void GroupControl::updateSettings ()
+void GroupsMenu::updateSettings ()
 {
   SettingsManager settings;
   setIds (settings.get (SettingsManager::GroupIds).toString ());
 }
 
-void GroupControl::populateMenuActions ()
+void GroupsMenu::populateMenuActions ()
 {
-  for (auto i = 0, end = view_.count (); i < end; ++i)
+  for (auto i = 0, end = view_->count (); i < end; ++i)
   {
-    auto &group = view_.at (i);
+    auto &group = view_->at (i);
     auto action = menu_->addAction (group.name ());
     action->setCheckable (true);
     actions_->addAction (action);
   }
 }
 
-void GroupControl::add ()
+void GroupsMenu::add ()
 {
-  auto &group = view_.add ();
+  auto &group = view_->add ();
 
   auto action = menu_->addAction (group.name ());
   action->setCheckable (true);
@@ -105,10 +110,10 @@ void GroupControl::add ()
   updateShortcuts ();
 }
 
-void GroupControl::renameCurrent ()
+void GroupsMenu::renameCurrent ()
 {
-  auto &group = view_.current ();
-  const auto newName = QInputDialog::getText (&view_, {}, tr ("Group title"),
+  auto &group = view_->current ();
+  const auto newName = QInputDialog::getText (view_, {}, tr ("Group title"),
                                               QLineEdit::Normal, group.name ());
 
   if (newName.isEmpty ())
@@ -116,26 +121,26 @@ void GroupControl::renameCurrent ()
     return;
   }
 
-  view_.renameCurrent (newName);
-  const auto index = view_.currentIndex ();
+  view_->renameCurrent (newName);
+  const auto index = view_->currentIndex ();
   actionAt (index)->setText (group.name ());
 }
 
-void GroupControl::removeCurrent ()
+void GroupsMenu::removeCurrent ()
 {
-  auto &group = view_.current ();
-  const auto res = QMessageBox::question (&view_, {}, tr ("Close group \"%1\"?")
+  auto &group = view_->current ();
+  const auto res = QMessageBox::question (view_, {}, tr ("Close group \"%1\"?")
                                           .arg (group.name ()));
   if (res != QMessageBox::Yes)
   {
     return;
   }
 
-  const auto index = view_.currentIndex ();
+  const auto index = view_->currentIndex ();
   auto action = actionAt (index);
   actions_->removeAction (action);
   menu_->removeAction (action);
-  view_.removeCurrent ();
+  view_->removeCurrent ();
 
   trigger (actionAt (0));
 
@@ -143,26 +148,26 @@ void GroupControl::removeCurrent ()
   updateShortcuts ();
 }
 
-void GroupControl::updateMenuState ()
+void GroupsMenu::updateMenuState ()
 {
-  closeAction_->setEnabled (view_.count () > 1);
+  closeAction_->setEnabled (view_->count () > 1);
 }
 
-void GroupControl::trigger (QAction *action)
+void GroupsMenu::trigger (QAction *action)
 {
   action->setChecked (true);
   action->trigger ();
 }
 
-void GroupControl::setCurrent (QAction *action)
+void GroupsMenu::setCurrent (QAction *action)
 {
   ASSERT (action);
   auto index = actions_->actions ().indexOf (action);
-  ASSERT (index < view_.count ());
-  view_.setCurrentIndex (index);
+  ASSERT (index < view_->count ());
+  view_->setCurrentIndex (index);
 }
 
-void GroupControl::updateShortcuts ()
+void GroupsMenu::updateShortcuts ()
 {
   auto index = -1;
   const auto count = ids_.length ();
@@ -180,29 +185,29 @@ void GroupControl::updateShortcuts ()
   }
 }
 
-QAction * GroupControl::actionAt (int index) const
+QAction * GroupsMenu::actionAt (int index) const
 {
   const auto actions = menu_->actions ();
-  const auto menuIndex = actions.size () - (view_.count () - index);
+  const auto menuIndex = actions.size () - (view_->count () - index);
   ASSERT (menuIndex >= 0);
   ASSERT (menuIndex < actions.size ());
   return actions[menuIndex];
 }
 
-int GroupControl::index (QAction *action) const
+int GroupsMenu::index (QAction *action) const
 {
   return actions_->actions ().indexOf (action);
 }
 
-const QString &GroupControl::ids () const
+const QString &GroupsMenu::ids () const
 {
   return ids_;
 }
 
-void GroupControl::setIds (const QString &ids)
+void GroupsMenu::setIds (const QString &ids)
 {
   ids_ = utils::uniqueChars (ids);
   updateShortcuts ();
 }
 
-#include "moc_groupcontrol.cpp"
+#include "moc_groupsmenu.cpp"

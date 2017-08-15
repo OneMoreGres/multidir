@@ -14,11 +14,11 @@ class QLineEdit;
 class QStackedWidget;
 class QActionGroup;
 
-class GroupHolder : public QWidget
+class GroupsView : public QWidget
 {
 Q_OBJECT
 public:
-  explicit GroupHolder (FileSystemModel &model, QWidget *parent = nullptr);
+  explicit GroupsView (FileSystemModel &model, QWidget *parent = nullptr);
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
