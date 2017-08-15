@@ -6,6 +6,8 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
 
 
 namespace
@@ -65,6 +67,7 @@ void setDebugMode (bool isOn)
   else
   {
     file.close ();
+    QDesktopServices::openUrl (QUrl::fromLocalFile (file.fileName ()));
     original = nullptr;
     qInstallMessageHandler (nullptr);
   }
