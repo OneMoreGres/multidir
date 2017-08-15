@@ -14,8 +14,6 @@ void Notifier::error (const QString &text)
 {
   LERROR () << text;
   const auto timeout = 2000;
-  if (bar_)
-  {
-    bar_->showMessage (text, timeout);
-  }
+  QMetaObject::invokeMethod (bar_, "showMessage",
+                             Q_ARG (QString, text), Q_ARG (int, timeout));
 }
