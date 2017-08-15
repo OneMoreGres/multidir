@@ -17,6 +17,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   source_ (new QPushButton (tr ("Use new"), this)),
   target_ (new QPushButton (tr ("Use existing"), this)),
   rename_ (new QPushButton (tr ("Rename new"), this)),
+  merge_ (new QPushButton (tr ("Merge"), this)),
   abort_ (new QPushButton (tr ("Abort"), this)),
   applyToAll_ (new QCheckBox (tr ("Apply to all"), this))
 {
@@ -60,6 +61,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   buttonsLayout->addWidget (source_);
   buttonsLayout->addWidget (target_);
   buttonsLayout->addWidget (rename_);
+  buttonsLayout->addWidget (merge_);
   buttonsLayout->addStretch (2);
   buttonsLayout->addWidget (applyToAll_);
   buttonsLayout->addStretch (2);
@@ -69,6 +71,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   connect (source_, &QPushButton::pressed, this, [this] {done (Source);});
   connect (target_, &QPushButton::pressed, this, [this] {done (Target);});
   connect (rename_, &QPushButton::pressed, this, [this] {done (Rename);});
+  connect (merge_, &QPushButton::pressed, this, [this] {done (Merge);});
   connect (abort_, &QPushButton::pressed, this, [this] {done (Abort);});
 }
 
@@ -81,6 +84,8 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
                             + tr ("\nModified: ") + i.lastModified ().toString (Qt::ISODate)
                             + tr (". Size: ") + utils::sizeString (i.size ());
                    };
+
+  merge_->setVisible (target.isDir ());
 
   switch (FileOperation::Action (action))
   {
