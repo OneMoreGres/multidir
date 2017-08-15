@@ -37,7 +37,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
 
   ++row;
   {
-    auto label = new QLabel (tr ("New file:"), this);
+    auto label = new QLabel (tr ("New:"), this);
     font.setPointSize (10);
     label->setFont (font);
     sourceLabel_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -47,7 +47,7 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
 
   ++row;
   {
-    auto label = new QLabel (tr ("Existing file:"), this);
+    auto label = new QLabel (tr ("Existing:"), this);
     font.setPointSize (10);
     label->setFont (font);
     targetLabel_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -80,12 +80,19 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
 {
   ASSERT (result);
   auto labelText = [](const QFileInfo &i) {
-                     return i.absoluteFilePath ()
-                            + tr ("\nModified: ") + i.lastModified ().toString (Qt::ISODate)
-                            + tr (". Size: ") + utils::sizeString (i.size ());
+                     if (!i.isDir ())
+                     {
+                       return tr ("%1\nModified: %2. Size: %3").arg (
+                         i.absoluteFilePath (), i.lastModified ().toString (Qt::ISODate),
+                         utils::sizeString (i.size ()));
+
+                     }
+                     return tr ("%1 (directory)\nModified: %3").arg (
+                       i.absoluteFilePath (), i.lastModified ().toString (Qt::ISODate));
                    };
 
-  merge_->setVisible (target.isDir ());
+  merge_->setVisible (target.isDir () && source.isDir ());
+  applyToAll_->setChecked (false);
 
   switch (FileOperation::Action (action))
   {
