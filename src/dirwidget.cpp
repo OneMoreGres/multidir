@@ -4,7 +4,6 @@
 #include "copypaste.h"
 #include "dirview.h"
 #include "fileoperation.h"
-#include "constants.h"
 #include "openwith.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
@@ -913,8 +912,8 @@ void DirWidget::updateActions ()
   const auto dirs = showDirs_->isChecked ();
   const auto locked = isLocked_->isChecked ();
   const auto index = view_->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
-  const auto isDir = current ().isDir ();
+  const auto isDotDot = index.isValid () && proxy_->isDotDot (index);
+  const auto isDir =  proxy_->isDir (index.row ());
   const auto isValid = index.isValid ();
   const auto isSingleSelected = (view_->selectedRows ().size () <= 1);
 

@@ -41,6 +41,7 @@ public:
   qint64 fileSize (int row) const;
   QString fileName (int row) const;
   int count () const;
+  bool isDotDot (const QModelIndex &index) const;
 
   QFileInfo currentPath () const;
 

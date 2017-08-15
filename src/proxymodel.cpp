@@ -143,6 +143,11 @@ int ProxyModel::count () const
   return rowCount (current ());
 }
 
+bool ProxyModel::isDotDot (const QModelIndex &index) const
+{
+  return model_->fileName (mapToSource (index.sibling (index.row (), 0))) == constants::dotdot;
+}
+
 QFileInfo ProxyModel::currentPath () const
 {
   return model_->fileInfo (current_);
