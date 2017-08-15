@@ -37,73 +37,73 @@
 <context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirwidget.cpp" line="150"/>
+        <location filename="../src/dirwidget.cpp" line="152"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="188"/>
+        <location filename="../src/dirwidget.cpp" line="190"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="191"/>
+        <location filename="../src/dirwidget.cpp" line="193"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="194"/>
+        <location filename="../src/dirwidget.cpp" line="196"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="226"/>
+        <location filename="../src/dirwidget.cpp" line="228"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="283"/>
+        <location filename="../src/dirwidget.cpp" line="285"/>
         <source>Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
         <translation>Автомзамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="428"/>
+        <location filename="../src/dirwidget.cpp" line="430"/>
         <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
         <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="525"/>
+        <location filename="../src/dirwidget.cpp" line="527"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="560"/>
-        <location filename="../src/dirwidget.cpp" line="564"/>
+        <location filename="../src/dirwidget.cpp" line="562"/>
+        <location filename="../src/dirwidget.cpp" line="566"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="646"/>
+        <location filename="../src/dirwidget.cpp" line="648"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="661"/>
+        <location filename="../src/dirwidget.cpp" line="663"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="681"/>
+        <location filename="../src/dirwidget.cpp" line="683"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="826"/>
+        <location filename="../src/dirwidget.cpp" line="828"/>
         <source>Failed to open console &apos;%1&apos; in &apos;%2&apos;</source>
         <translation>Ошибка открытия консоли &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="854"/>
+        <location filename="../src/dirwidget.cpp" line="856"/>
         <source>Failed to open editor &apos;%1&apos;</source>
         <translation>Ошибка открытия редактора &apos;%1&apos;</translation>
     </message>
@@ -228,27 +228,45 @@ Modified: </source>
     </message>
 </context>
 <context>
-    <name>GroupControl</name>
+    <name>FileViewer</name>
     <message>
-        <location filename="../src/groupcontrol.cpp" line="23"/>
+        <location filename="../src/fileviewer.cpp" line="59"/>
+        <source>Failed to view file &apos;%1&apos;</source>
+        <translation>Ошибка просмотра файла &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location filename="../src/fileviewer.cpp" line="67"/>
+        <source>File is too big. Continue?</source>
+        <translation>Файл слишком большой. Продолжить?</translation>
+    </message>
+    <message>
+        <location filename="../src/fileviewer.cpp" line="112"/>
+        <source>Failed to read file &apos;%1&apos;: &apos;%2&apos;</source>
+        <translation>Ошибка чтения файла &apos;%1&apos;: &apos;%2&apos;</translation>
+    </message>
+</context>
+<context>
+    <name>GroupsMenu</name>
+    <message>
+        <location filename="../src/groupsmenu.cpp" line="14"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
     <message>
-        <location filename="../src/groupcontrol.cpp" line="111"/>
+        <location filename="../src/groupsmenu.cpp" line="83"/>
         <source>Group title</source>
         <translation>Название группы</translation>
     </message>
     <message>
-        <location filename="../src/groupcontrol.cpp" line="127"/>
+        <location filename="../src/groupsmenu.cpp" line="99"/>
         <source>Close group &quot;%1&quot;?</source>
         <translation>Закрыть группу &quot;%1&quot;?</translation>
     </message>
 </context>
 <context>
-    <name>GroupHolder</name>
+    <name>GroupsView</name>
     <message>
-        <location filename="../src/groupholder.cpp" line="110"/>
+        <location filename="../src/groupsview.cpp" line="108"/>
         <source>Group %1</source>
         <translation>Группа %1</translation>
     </message>
@@ -256,67 +274,67 @@ Modified: </source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.cpp" line="69"/>
+        <location filename="../src/mainwindow.cpp" line="64"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="97"/>
+        <location filename="../src/mainwindow.cpp" line="93"/>
         <source>Help</source>
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="112"/>
+        <location filename="../src/mainwindow.cpp" line="108"/>
         <source>Name pattern</source>
         <translation>Шаблон имени</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
         <source>Multidir update available</source>
         <translation>Доступно обновление</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
         <source>New version: %1</source>
         <translation>Новая версия: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="291"/>
+        <location filename="../src/mainwindow.cpp" line="285"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; версия %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="293"/>
+        <location filename="../src/mainwindow.cpp" line="287"/>
         <source>Homepage: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Сайт: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="294"/>
+        <location filename="../src/mainwindow.cpp" line="288"/>
         <source>Issues: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Поддержка: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="295"/>
+        <location filename="../src/mainwindow.cpp" line="289"/>
         <source>Sources: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Исходники: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="292"/>
+        <location filename="../src/mainwindow.cpp" line="286"/>
         <source>Author: Gres (&lt;a href=&apos;mailto:%1&apos;&gt;%1&lt;/a&gt;)</source>
         <translation>Автор: Gres (&lt;a href=&apos;mailto:%1&apos;&gt;%1&lt;/a&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="297"/>
+        <location filename="../src/mainwindow.cpp" line="291"/>
         <source>Icons designed by Madebyoliver from Flaticon</source>
         <translation>Иконки - Madebyoliver из Flaticon</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="299"/>
+        <location filename="../src/mainwindow.cpp" line="293"/>
         <source>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</source>
         <translation>Эта программа распространяется в надежде, что она будет полезной, но БЕЗО ВСЯКИХ ГАРАНТИЙ; даже без неявной гарантии ТОВАРНГО ВИДА или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛИ.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="303"/>
+        <location filename="../src/mainwindow.cpp" line="297"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
@@ -380,12 +398,12 @@ Modified: </source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/debug.cpp" line="56"/>
+        <location filename="../src/debug.cpp" line="58"/>
         <source>Failed to create log file: %1</source>
         <translation>Ошибка создания лог-файла: %1</translation>
     </message>
     <message>
-        <location filename="../src/debug.cpp" line="62"/>
+        <location filename="../src/debug.cpp" line="64"/>
         <source>Started logging to file: %1</source>
         <translation>Запущена запись лога в файл: %1</translation>
     </message>
@@ -807,24 +825,6 @@ Modified: </source>
         <location filename="../src/settingseditor.cpp" line="256"/>
         <source>Yes</source>
         <translation>Да</translation>
-    </message>
-</context>
-<context>
-    <name>Viewer</name>
-    <message>
-        <location filename="../src/viewer.cpp" line="59"/>
-        <source>Failed to view file &apos;%1&apos;</source>
-        <translation>Ошибка просмотра файла &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location filename="../src/viewer.cpp" line="67"/>
-        <source>File is too big. Continue?</source>
-        <translation>Файл слишком большой. Продолжить?</translation>
-    </message>
-    <message>
-        <location filename="../src/viewer.cpp" line="112"/>
-        <source>Failed to read file &apos;%1&apos;: &apos;%2&apos;</source>
-        <translation>Ошибка чтения файла &apos;%1&apos;: &apos;%2&apos;</translation>
     </message>
 </context>
 </TS>
