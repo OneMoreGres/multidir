@@ -40,12 +40,32 @@ bool createDir (QDir parent, const QString &name)
 
 bool removeDir (const QFileInfo &info)
 {
+  const auto flags = QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot;
+  for (const auto &i: QDir (info.absoluteFilePath ()).entryInfoList (flags))
+  {
+    if (i.isDir ())
+    {
+      if (!removeDir (i))
+      {
+        return false;
+      }
+      continue;
+    }
+
+    if (!QFile::remove (i.absoluteFilePath ()))
+    {
+      Notifier::error (QObject::tr ("Failed to remove file ") + info.absoluteFilePath ());
+      return false;
+    }
+  }
+
   auto parent = info.absoluteDir ();
   if (!parent.rmdir (info.fileName ()))
   {
     Notifier::error (QObject::tr ("Failed to remove directory ") + info.absoluteFilePath ());
     return false;
   }
+
   return true;
 }
 
