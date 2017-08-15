@@ -198,7 +198,7 @@ void MainWindow::updateTrayMenu ()
 {
   disconnect (toggleAction_, &QAction::toggled,
               this, &MainWindow::toggleVisible);
-  toggleAction_->setChecked (groups_->isVisible ());
+  toggleAction_->setChecked (isVisible ());
   connect (toggleAction_, &QAction::toggled,
            this, &MainWindow::toggleVisible);
 }
@@ -219,6 +219,7 @@ void MainWindow::toggleVisible ()
   }
   else
   {
+    hide ();
     show ();
     raise ();
     activateWindow ();
