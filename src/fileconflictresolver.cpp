@@ -91,7 +91,14 @@ void FileConflictResolver::resolve (const QFileInfo &source, const QFileInfo &ta
                        i.absoluteFilePath (), i.lastModified ().toString (Qt::ISODate));
                    };
 
-  merge_->setVisible (target.isDir () && source.isDir ());
+  if (target.isDir () && source.isDir ())
+  {
+    merge_->show ();
+  }
+  else
+  {
+    merge_->hide ();
+  }
   applyToAll_->setChecked (false);
 
   switch (FileOperation::Action (action))
