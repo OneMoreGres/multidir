@@ -91,6 +91,7 @@ private:
   void fixateSizeAsMinimal (bool isOn);
 
   void showViewContextMenu ();
+  void createSiblingActions ();
   void updateSiblingActions ();
 
   void showCommandPrompt ();

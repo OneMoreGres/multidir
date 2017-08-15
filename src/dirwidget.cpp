@@ -369,9 +369,13 @@ const QList<DirWidget *> &DirWidget::siblings () const
 void DirWidget::setSiblings (const QList<DirWidget *> siblings)
 {
   siblings_ = siblings;
+  createSiblingActions ();
+}
 
+void DirWidget::createSiblingActions ()
+{
   using SM = ShortcutManager;
-  auto handle = [this, siblings](SM::Shortcut s, QMenu *menu, Qt::DropAction drop) {
+  auto handle = [this](SM::Shortcut s, QMenu *menu, Qt::DropAction drop) {
                   for (auto *i: menu->actions ())
                   {
                     removeAction (i);
@@ -380,7 +384,7 @@ void DirWidget::setSiblings (const QList<DirWidget *> siblings)
 
                   const auto common = SM::get (s).toString ();
                   auto number = 0;
-                  for (auto *i: siblings)
+                  for (auto *i: siblings_)
                   {
                     const auto index = i->index ();
                     auto action = menu->addAction (QString::number (++number) + index);
@@ -401,8 +405,6 @@ void DirWidget::setSiblings (const QList<DirWidget *> siblings)
   handle (SM::CopyTo, copyToMenu_, Qt::CopyAction);
   handle (SM::MoveTo, moveToMenu_, Qt::MoveAction);
   handle (SM::LinkTo, linkToMenu_, Qt::LinkAction);
-
-  updateSiblingActions ();
 }
 
 void DirWidget::updateSiblingActions ()
