@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QObject>
+#include <QMenu>
 
 class GroupsView;
 
@@ -9,15 +9,12 @@ class QMenu;
 class QActionGroup;
 class QSettings;
 
-class GroupsMenu : public QObject
+class GroupsMenu : public QMenu
 {
 Q_OBJECT
 public:
-  explicit GroupsMenu (GroupsView *view, QObject *parent = nullptr);
+  explicit GroupsMenu (GroupsView *view, QWidget *parent = nullptr);
   ~GroupsMenu ();
-
-  QMenu * menu () const;
-  GroupsView * view () const;
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
@@ -42,7 +39,6 @@ private:
   int index (QAction *action) const;
 
   GroupsView *view_;
-  QMenu *menu_;
   QAction *renameAction_;
   QAction *closeAction_;
   QActionGroup *actions_;

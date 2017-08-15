@@ -87,7 +87,7 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
-  menuBar->addMenu (groupsMenu_->menu ());
+  menuBar->addMenu (groupsMenu_);
 
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
