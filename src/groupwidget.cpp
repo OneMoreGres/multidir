@@ -29,7 +29,7 @@ GroupWidget::GroupWidget (FileSystemModel *model, QWidget *parent) :
   model_ (model),
   widgets_ (),
   view_ (new TiledView (this)),
-  ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))
+  ids_ ()
 {
   auto layout = new QVBoxLayout (this);
   layout->setMargin (0);
