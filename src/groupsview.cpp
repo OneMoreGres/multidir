@@ -12,7 +12,7 @@ const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
 }
 
-GroupsView::GroupsView (FileSystemModel &model, QWidget *parent) :
+GroupsView::GroupsView (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
   model_ (model),
   groups_ (new QStackedWidget (this))

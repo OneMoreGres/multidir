@@ -14,7 +14,7 @@ class GroupWidget : public QWidget
 {
 Q_OBJECT
 public:
-  GroupWidget (FileSystemModel &model, QWidget *parent = nullptr);
+  GroupWidget (FileSystemModel *model, QWidget *parent = nullptr);
   ~GroupWidget ();
 
   void save (QSettings &settings) const;

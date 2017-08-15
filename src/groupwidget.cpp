@@ -23,10 +23,10 @@ const QString qs_name = "name";
 }
 
 
-GroupWidget::GroupWidget (FileSystemModel &model, QWidget *parent) :
+GroupWidget::GroupWidget (FileSystemModel *model, QWidget *parent) :
   QWidget (parent),
   name_ (),
-  model_ (&model),
+  model_ (model),
   widgets_ (),
   view_ (new TiledView (this)),
   ids_ (utils::uniqueChars (QLatin1String ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")))

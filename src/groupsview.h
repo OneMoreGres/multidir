@@ -12,7 +12,7 @@ class GroupsView : public QWidget
 {
 Q_OBJECT
 public:
-  explicit GroupsView (FileSystemModel &model, QWidget *parent = nullptr);
+  explicit GroupsView (FileSystemModel *model, QWidget *parent = nullptr);
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
@@ -35,6 +35,6 @@ signals:
   void setNameFilter (const QString &filter);
 
 private:
-  FileSystemModel &model_;
+  FileSystemModel *model_;
   QStackedWidget *groups_;
 };

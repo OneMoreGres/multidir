@@ -31,7 +31,7 @@ const QString qs_geometry = "geometry";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groups_ (new GroupsView (*model_, this)),
+  groups_ (new GroupsView (model_, this)),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
