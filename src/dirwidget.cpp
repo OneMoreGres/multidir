@@ -4,7 +4,6 @@
 #include "copypaste.h"
 #include "dirview.h"
 #include "fileoperation.h"
-#include "constants.h"
 #include "openwith.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
@@ -74,6 +73,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   permissionsAction_ (nullptr),
   trashAction_ (nullptr),
   removeAction_ (nullptr),
+  showPropertiesAction_ (nullptr),
   cutAction_ (nullptr),
   copyAction_ (nullptr),
   pasteAction_ (nullptr),
@@ -147,7 +147,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   openAction_ = makeShortcut (ShortcutManager::OpenItem, viewMenu_);
   connect (openAction_, &QAction::triggered,
-           this, [this]() {openPath (view_->currentIndex ());});
+           this, &DirWidget::openSelected);
 
   openWith_ = viewMenu_->addMenu (tr ("Open with"));
 
@@ -216,8 +216,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   viewMenu_->addSeparator ();
 
-  auto showProperties = makeShortcut (ShortcutManager::ShowProperties, viewMenu_);
-  connect (showProperties, &QAction::triggered,
+  showPropertiesAction_ = makeShortcut (ShortcutManager::ShowProperties, viewMenu_);
+  connect (showPropertiesAction_, &QAction::triggered,
            this, &DirWidget::showProperties);
 
 
@@ -259,7 +259,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr);
   connect (upAction_, &QAction::triggered,
-           this, [this] {openPath (view_->rootIndex ().parent ());});
+           this, &DirWidget::moveUp);
   auto up = new QToolButton (this);
   up->setDefaultAction (upAction_);
 
@@ -302,12 +302,12 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   connect (view_, &DirView::contextMenuRequested,
            this, &DirWidget::showViewContextMenu);
   connect (view_, &DirView::activated,
-           this, &DirWidget::openPath);
+           this, &DirWidget::openSelected);
   connect (view_, &DirView::movedBackward,
            upAction_, &QAction::trigger);
   connect (view_, &DirView::backgroundActivated,
            this, &DirWidget::openInBackground);
-  connect (view_, &DirView::currentChanged,
+  connect (view_, &DirView::selectionChanged,
            this, &DirWidget::updateActions);
   connect (view_, &DirView::selectionChanged,
            this, &DirWidget::updateStatusSelection);
@@ -507,6 +507,11 @@ void DirWidget::setNameFilter (const QString &filter)
 
 void DirWidget::openPath (const QModelIndex &index)
 {
+  if (isLocked ())
+  {
+    return;
+  }
+
   if (!index.isValid ()) // drives
   {
     // do not change proxy current path to disable possible dir filtering
@@ -514,32 +519,8 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent ({});
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
-    return;
   }
-
-  const auto info = fileInfo (index);
-  if (!info.isDir ())
-  {
-    if (info.permission (QFile::ExeUser))
-    {
-      if (!QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ()))
-      {
-        Notifier::error (tr ("Failed to open '%1'").arg (info.absoluteFilePath ()));
-      }
-    }
-    else
-    {
-      QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
-    }
-    return;
-  }
-
-  if (isLocked () || !info.permission (QFile::ExeUser))
-  {
-    return;
-  }
-
-  if (info.fileName () == constants::dotdot)
+  else if (proxy_->isDotDot (index))
   {
     openPath (index.parent ().parent ());
   }
@@ -553,6 +534,25 @@ void DirWidget::openPath (const QModelIndex &index)
     proxy_->setCurrent (newIndex);
     path_ = fileInfo (view_->rootIndex ());
     pathWidget_->setPath (path_);
+  }
+}
+
+void DirWidget::openFile (const QFileInfo &info)
+{
+  if (info.isDir ())
+  {
+    return;
+  }
+
+  if (!info.permission (QFile::ExeUser))
+  {
+    QDesktopServices::openUrl (QUrl::fromLocalFile (info.absoluteFilePath ()));
+    return;
+  }
+
+  if (!QProcess::startDetached (info.absoluteFilePath (), {}, info.absolutePath ()))
+  {
+    Notifier::error (tr ("Failed to open '%1'").arg (info.absoluteFilePath ()));
   }
 }
 
@@ -743,6 +743,29 @@ QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
   return names;
 }
 
+void DirWidget::openSelected ()
+{
+  const auto indexes = view_->selectedRows ();
+  if (indexes.size () < 2)
+  {
+    const auto current = fileInfo (view_->currentIndex ());
+    if (current.isDir ())
+    {
+      openPath (view_->currentIndex ());
+      return;
+    }
+    if (indexes.isEmpty ())
+    {
+      return;
+    }
+  }
+
+  for (const auto &i: indexes)
+  {
+    openFile (fileInfo (i));
+  }
+}
+
 void DirWidget::cut ()
 {
   CopyPaste::cut (selected ());
@@ -813,6 +836,11 @@ void DirWidget::viewCurrent ()
   {
     setPath (current ());
   }
+}
+
+void DirWidget::moveUp ()
+{
+  openPath (view_->rootIndex ().parent ());
 }
 
 void DirWidget::openConsole ()
@@ -907,36 +935,40 @@ void DirWidget::updateActions ()
   const auto dirs = showDirs_->isChecked ();
   const auto locked = isLocked_->isChecked ();
   const auto index = view_->currentIndex ();
-  const auto isDotDot = index.isValid () && index.data () == constants::dotdot;
-  const auto isDir = current ().isDir ();
-  const auto isValid = view_->currentIndex ().isValid ();
+  const auto isDotDot = index.isValid () && proxy_->isDotDot (index);
+  const auto isDir =  proxy_->isDir (index.row ());
+  const auto isValid = index.isValid ();
+  const auto isSingleSelected = (view_->selectedRows ().size () <= 1);
 
   newFolderAction_->setEnabled (dirs && !locked);
   upAction_->setEnabled (!locked);
 
-  openAction_->setEnabled (isValid);
-  openWith_->setEnabled (isValid && !isDir);
-  viewAction_->setEnabled (isValid);
+  openAction_->setEnabled (true);
+  openWith_->setEnabled (isValid && !isDir && isSingleSelected);
   if (openWith_->isEnabled ())
   {
     OpenWith::popupateMenu (*openWith_, current ());
   }
-  openInTabAction_->setEnabled (isValid && isDir);
-  openInEditorAction_->setEnabled (isValid && !isDir);
+  viewAction_->setEnabled (isValid && !isDir && isSingleSelected);
+  openInTabAction_->setEnabled (isValid && isDir && isSingleSelected);
+  openInEditorAction_->setEnabled (isValid && !isDir && isSingleSelected);
 
-  copyPathAction_->setEnabled (isValid);
+  copyPathAction_->setEnabled (isValid && isSingleSelected);
 
   cutAction_->setEnabled (!locked && isValid);
   copyAction_->setEnabled (isValid);
   pasteAction_->setEnabled (!locked);
 
-  copyToMenu_->setEnabled (isValid);
-  moveToMenu_->setEnabled (!locked && isValid);
-  linkToMenu_->setEnabled (isValid);
+  copyToMenu_->setEnabled (isValid && !isDotDot);
+  moveToMenu_->setEnabled (!locked && isValid && !isDotDot);
+  linkToMenu_->setEnabled (isValid && !isDotDot);
 
-  renameAction_->setEnabled (!locked && isValid && !isDotDot);
+  permissionsAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
+  renameAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
   removeAction_->setEnabled (!locked && isValid && !isDotDot);
   trashAction_->setEnabled (!locked && isValid && !isDotDot);
+
+  showPropertiesAction_->setEnabled (isValid && isSingleSelected);
 }
 
 void DirWidget::checkDirExistence ()

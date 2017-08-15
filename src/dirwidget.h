@@ -58,7 +58,6 @@ protected:
   void resizeEvent (QResizeEvent *event) override;
 
 private:
-  void openPath (const QModelIndex &index);
   void newFolder ();
   QAction * makeShortcut (int shortcutType, QMenu *menu, bool isCheckable = false);
 
@@ -67,7 +66,10 @@ private:
   QFileInfo fileInfo (const QModelIndex &index) const;
   QStringList names (const QList<QModelIndex> &indexes) const;
 
-  void startRenaming ();
+  void openSelected ();
+  void openPath (const QModelIndex &index);
+  void openFile (const QFileInfo &info);
+
   void promptClose ();
   void promptTrash ();
   void promptRemove ();
@@ -78,6 +80,7 @@ private:
   void openInBackground (const QModelIndex &index);
   void showProperties ();
   void viewCurrent ();
+  void moveUp ();
 
   void openConsole ();
   void openInEditor ();
@@ -133,6 +136,7 @@ private:
   QAction *permissionsAction_;
   QAction *trashAction_;
   QAction *removeAction_;
+  QAction *showPropertiesAction_;
   QAction *cutAction_;
   QAction *copyAction_;
   QAction *pasteAction_;
