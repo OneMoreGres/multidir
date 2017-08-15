@@ -959,9 +959,9 @@ void DirWidget::updateActions ()
   copyAction_->setEnabled (isValid);
   pasteAction_->setEnabled (!locked);
 
-  copyToMenu_->setEnabled (isValid && !isDotDot && isSingleSelected);
-  moveToMenu_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
-  linkToMenu_->setEnabled (isValid && !isDotDot && isSingleSelected);
+  copyToMenu_->setEnabled (isValid && !isDotDot);
+  moveToMenu_->setEnabled (!locked && isValid && !isDotDot);
+  linkToMenu_->setEnabled (isValid && !isDotDot);
 
   permissionsAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
   renameAction_->setEnabled (!locked && isValid && !isDotDot && isSingleSelected);
