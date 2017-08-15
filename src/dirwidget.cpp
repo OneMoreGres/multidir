@@ -255,7 +255,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   isMinSizeFixed_ = makeShortcut (ShortcutManager::FixMinSize, representMenu, true);
   connect (isMinSizeFixed_, &QAction::toggled,
-           this, &DirWidget::fixMinSize);
+           this, &DirWidget::fixateSizeAsMinimal);
 
   upAction_ = makeShortcut (ShortcutManager::MoveUp, nullptr);
   connect (upAction_, &QAction::triggered,
@@ -863,7 +863,7 @@ bool DirWidget::isMinSizeFixed () const
   return isMinSizeFixed_->isChecked ();
 }
 
-void DirWidget::fixMinSize (bool isOn)
+void DirWidget::fixateSizeAsMinimal (bool isOn)
 {
   if (isOn)
   {

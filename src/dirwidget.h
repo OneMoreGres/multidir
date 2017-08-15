@@ -83,7 +83,7 @@ private:
   void openInEditor ();
 
   bool isMinSizeFixed () const;
-  void fixMinSize (bool isOn);
+  void fixateSizeAsMinimal (bool isOn);
 
   void showViewContextMenu ();
   void updateSiblingActions ();
