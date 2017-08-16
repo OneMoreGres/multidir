@@ -9,6 +9,7 @@ class DirView;
 class FileOperation;
 class PathWidget;
 class DirStatusWidget;
+class NavigationHistory;
 
 class QLabel;
 class QMenu;
@@ -119,6 +120,7 @@ private:
   QString consoleCommand_;
   QString editorCommand_;
   QList<DirWidget *> siblings_;
+  NavigationHistory *navigationHistory_;
 
   QMenu *menu_;
   QAction *isLocked_;

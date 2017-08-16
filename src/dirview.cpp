@@ -80,6 +80,7 @@ QModelIndex DirView::currentIndex () const
 
 void DirView::setCurrentIndex (const QModelIndex &index)
 {
+  view ()->clearSelection ();
   view ()->setCurrentIndex (index);
 }
 

@@ -15,6 +15,7 @@
 #include "dirstatuswidget.h"
 #include "settingsmanager.h"
 #include "shellcommand.h"
+#include "navigationhistory.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -57,6 +58,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   consoleCommand_ (),
   editorCommand_ (),
   siblings_ (),
+  navigationHistory_ (new NavigationHistory (this)),
   menu_ (new QMenu (this)),
   isLocked_ (nullptr),
   showDirs_ (nullptr),
@@ -271,6 +273,11 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   auto newFolder = new QToolButton (this);
   newFolder->setDefaultAction (newFolderAction_);
 
+  addAction (navigationHistory_->forwardAction ());
+  addAction (navigationHistory_->backwardAction ());
+  connect (navigationHistory_, &NavigationHistory::pathChanged,
+           this, &DirWidget::setPath);
+
   connect (pathWidget_, &PathWidget::pathChanged,
            this, &DirWidget::setPath);
   connect (pathWidget_, &PathWidget::editionFinished,
@@ -340,6 +347,7 @@ void DirWidget::save (QSettings &settings) const
 
 void DirWidget::restore (QSettings &settings)
 {
+  navigationHistory_->clear ();
   listMode_->setChecked (settings.value (qs_isList, isLocked ()).toBool ());
   setPath (settings.value (qs_dir).toString ());
   isLocked_->setChecked (settings.value (qs_isLocked, isLocked ()).toBool ());
@@ -476,17 +484,16 @@ void DirWidget::openPath (const QModelIndex &index)
     return;
   }
 
-  if (!index.isValid ()) // drives
-  {
-    // do not change proxy current path to disable possible dir filtering
-    view_->setRootIndex ({});
-    proxy_->setCurrent ({});
-    path_ = fileInfo (view_->rootIndex ());
-    pathWidget_->setPath (path_);
-  }
-  else if (proxy_->isDotDot (index))
+  if (index.isValid () && proxy_->isDotDot (index))
   {
     openPath (index.parent ().parent ());
+    return;
+  }
+
+  if (!index.isValid ()) // drives
+  {
+    view_->setRootIndex ({});
+    proxy_->setCurrent ({});
   }
   else
   {
@@ -496,9 +503,10 @@ void DirWidget::openPath (const QModelIndex &index)
     view_->setRootIndex (newIndex);
     view_->setCurrentIndex (moveUp ? previous : view_->firstItem ());
     proxy_->setCurrent (newIndex);
-    path_ = fileInfo (view_->rootIndex ());
-    pathWidget_->setPath (path_);
   }
+  path_ = fileInfo (view_->rootIndex ());
+  pathWidget_->setPath (path_);
+  navigationHistory_->addPath (path_);
 }
 
 void DirWidget::openFile (const QFileInfo &info)
