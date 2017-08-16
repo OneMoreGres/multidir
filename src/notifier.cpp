@@ -1,7 +1,7 @@
 #include "notifier.h"
 #include "debug.h"
 
-#include <qstatusbar.h>
+#include <QStatusBar>
 
 QStatusBar *Notifier::bar_ = nullptr;
 
