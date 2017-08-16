@@ -20,7 +20,7 @@ const auto defaultRunInConsole = QString ("cmd /C start %command%");
 const auto defaultEditor = QString ("notepad.exe");
 #endif
 #ifdef Q_OS_MAC
-const auto defaultConsole = QString ("open -a Terminal");
+const auto defaultConsole = QString ("open -n -a Terminal %d");
 const auto defaultRunInConsole =
   QString ("osascript -e 'tell application \"Terminal\" to do script \"cd %d && %command%\"'");
 const auto defaultEditor = QString ("open -a TextEdit");
