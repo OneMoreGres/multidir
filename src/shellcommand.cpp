@@ -100,7 +100,7 @@ void ShellCommand::setConsoleWrapper (const QString &wrapper)
   command_ = command.replace ("%command%", command_.mid (1));
 }
 
-QStringList ShellCommand::parse (const QString &command) const
+QStringList ShellCommand::parse (const QString &command)
 {
   QStringList parts;
   QChar separator;
@@ -118,6 +118,7 @@ QStringList ShellCommand::parse (const QString &command) const
       if (command[i] == separator)
       {
         parts << command.mid (startIndex, i - startIndex);
+        startIndex = i + int (separator != ' ');
         separator = QChar ();
       }
     }
