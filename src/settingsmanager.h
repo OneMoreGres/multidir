@@ -2,8 +2,6 @@
 
 #include <QSettings>
 
-#include <functional>
-
 class SettingsManager
 {
 public:
