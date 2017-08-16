@@ -55,7 +55,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathWidget_ (new PathWidget (model, this)),
   status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
-  consoleCommand_ (),
+  openConsoleCommand_ (),
+  runInConsoleCommand_ (),
   editorCommand_ (),
   siblings_ (),
   navigationHistory_ (new NavigationHistory (this)),
@@ -291,7 +292,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   commandPrompt_->hide ();
   commandPrompt_->installEventFilter (this);
-  commandPrompt_->setToolTip (tr ("Substitutions: %ID% - tab with ID, "
+  commandPrompt_->setToolTip (tr ("If starts with '+' - runs command in console. "
+                                  "Substitutions: %ID% - tab with ID, "
                                   "%-ID% - current item of tab,"
                                   "%<separator?>*ID% - selected items of tab"));
   connect (commandPrompt_, &QLineEdit::returnPressed,
@@ -369,11 +371,6 @@ QFileInfo DirWidget::path () const
   return path_;
 }
 
-const QList<DirWidget *> &DirWidget::siblings () const
-{
-  return siblings_;
-}
-
 void DirWidget::setSiblings (const QList<DirWidget *> siblings)
 {
   siblings_ = siblings;
@@ -441,7 +438,13 @@ void DirWidget::showCommandPrompt ()
 void DirWidget::execCommandPrompt ()
 {
   ShellCommand command (commandPrompt_->text ());
-  command.preprocessSelections (*this);
+  command.preprocessSelection ("", path_, current (), selected ());
+  for (const auto *i: siblings_)
+  {
+    command.preprocessSelection (i->index (), i->path_, i->current (), i->selected ());
+  }
+  command.setConsoleWrapper (runInConsoleCommand_);
+  command.preprocessFileArguments (path_);
   command.setWorkDir (path_);
   if (!command.run ())
   {
@@ -611,7 +614,8 @@ void DirWidget::updateSettings ()
 {
   SettingsManager settings;
   using Type = SettingsManager::Type;
-  consoleCommand_ = settings.get (Type::ConsoleCommand).toString ().trimmed ();
+  openConsoleCommand_ = settings.get (Type::OpenConsoleCommand).toString ().trimmed ();
+  runInConsoleCommand_ = settings.get (Type::RunInConsoleCommand).toString ().trimmed ();
   editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
 }
 
@@ -817,7 +821,7 @@ void DirWidget::moveUp ()
 
 void DirWidget::openConsole ()
 {
-  ShellCommand command (consoleCommand_);
+  ShellCommand command (openConsoleCommand_);
   command.preprocessFileArguments (path_);
   command.setWorkDir (path_);
   command.run ();

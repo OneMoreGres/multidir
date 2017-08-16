@@ -1,9 +1,10 @@
 #include "shellcommand.h"
-#include "dirwidget.h"
 #include "notifier.h"
+#include "debug.h"
 
 #include <QProcess>
 #include <QRegularExpression>
+#include <QDir>
 
 
 ShellCommand::ShellCommand (const QString &raw) :
@@ -35,25 +36,29 @@ bool ShellCommand::run ()
 
 void ShellCommand::setWorkDir (const QFileInfo &info)
 {
-  workDir_ = info.isDir () ? info.absoluteFilePath () : info.absolutePath ();
+  workDir_ = QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
+                                                     : info.absolutePath ());
 }
 
-void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString &index)
+void ShellCommand::preprocessSelection (const QString &index, const QFileInfo &path,
+                                        const QFileInfo &current, const QList<QFileInfo> &selection)
 {
   const QString pathPlaceholder ("%%1%");
-  command_.replace (pathPlaceholder.arg (index), w.path ().absoluteFilePath ());
+  command_.replace (pathPlaceholder.arg (index),
+                    QDir::toNativeSeparators (path.absoluteFilePath ()));
 
   const QString itemPlaceholder ("%-%1%");
-  command_.replace (itemPlaceholder.arg (index), w.current ().absoluteFilePath ());
+  command_.replace (itemPlaceholder.arg (index),
+                    QDir::toNativeSeparators (current.absoluteFilePath ()));
 
   const QString selectedPlaceholder (R"(%(.)?\*%1%)");
   const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
   if (command_.contains (selectedRegex))
   {
     QStringList items;
-    for (const auto &i: w.selected ())
+    for (const auto &i: selection)
     {
-      items << i.absoluteFilePath ();
+      items << QDir::toNativeSeparators (i.absoluteFilePath ());
     }
 
     auto match = selectedRegex.match (command_);
@@ -68,26 +73,34 @@ void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString 
   }
 }
 
-void ShellCommand::preprocessSelections (const DirWidget &widget)
-{
-  preprocessWidgetSelection (widget, "");
-  for (const auto *i: widget.siblings ())
-  {
-    preprocessWidgetSelection (*i, i->index ());
-  }
-}
-
 void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFilePath)
 {
-  command_.replace ("%d", info.isDir () ? info.absoluteFilePath () : info.absolutePath ());
+  command_.replace ("%d", QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
+                                                                  : info.absolutePath ()));
   if (forceFilePath && !command_.contains ("%p"))
   {
     command_ += " %p";
   }
-  command_.replace ("%p", info.absoluteFilePath ());
+  command_.replace ("%p", QDir::toNativeSeparators (info.absoluteFilePath ()));
 }
 
-QStringList ShellCommand::parse (const QString &command) const
+void ShellCommand::setConsoleWrapper (const QString &wrapper)
+{
+  if (!command_.startsWith ('+'))
+  {
+    return;
+  }
+
+  auto command = wrapper;
+  if (!command.contains ("%command%"))
+  {
+    command += " %command%";
+  }
+
+  command_ = command.replace ("%command%", command_.mid (1));
+}
+
+QStringList ShellCommand::parse (const QString &command)
 {
   QStringList parts;
   QChar separator;
@@ -97,13 +110,15 @@ QStringList ShellCommand::parse (const QString &command) const
     if (separator.isNull ())
     {
       separator = (command[i] == '"' ? '"' : ' ');
-      startIndex = i + int (separator == '"');
+      separator = (command[i] == '\'' ? '\'' : separator);
+      startIndex = i + int (separator != ' ');
     }
     else
     {
       if (command[i] == separator)
       {
         parts << command.mid (startIndex, i - startIndex);
+        startIndex = i + int (separator != ' ');
         separator = QChar ();
       }
     }

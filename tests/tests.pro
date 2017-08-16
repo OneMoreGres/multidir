@@ -1,6 +1,8 @@
 TARGET = tests
 TEMPLATE = app
 
+QT += widgets
+
 CONFIG += c++11
 
 OTHER_FILES += \
@@ -12,8 +14,10 @@ VPATH += $$PWD/..
 SOURCES += \
     main.cpp \
     src/filepermissions.cpp \
-    filepermissions_test.cpp
+    src/shellcommand.cpp \
+    src/notifier.cpp \
+    filepermissions_test.cpp \
+    shellcommand_test.cpp
 
 HEADERS  += \
-    catch.hpp \
-    src/filepermissions.h
+    catch.hpp

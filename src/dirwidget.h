@@ -32,7 +32,6 @@ public:
   void setPath (const QFileInfo &path);
   QFileInfo path () const;
 
-  const QList<DirWidget *> &siblings () const;
   void setSiblings (const QList<DirWidget *> siblings);
 
   QString index () const;
@@ -117,7 +116,8 @@ private:
   PathWidget *pathWidget_;
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
-  QString consoleCommand_;
+  QString openConsoleCommand_;
+  QString runInConsoleCommand_;
   QString editorCommand_;
   QList<DirWidget *> siblings_;
   NavigationHistory *navigationHistory_;
