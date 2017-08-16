@@ -5,6 +5,7 @@
 
 #include <QProcess>
 #include <QRegularExpression>
+#include <QDir>
 
 
 ShellCommand::ShellCommand (const QString &raw) :
@@ -36,16 +37,19 @@ bool ShellCommand::run ()
 
 void ShellCommand::setWorkDir (const QFileInfo &info)
 {
-  workDir_ = info.isDir () ? info.absoluteFilePath () : info.absolutePath ();
+  workDir_ = QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
+                                                     : info.absolutePath ());
 }
 
 void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString &index)
 {
   const QString pathPlaceholder ("%%1%");
-  command_.replace (pathPlaceholder.arg (index), w.path ().absoluteFilePath ());
+  command_.replace (pathPlaceholder.arg (index),
+                    QDir::toNativeSeparators (w.path ().absoluteFilePath ()));
 
   const QString itemPlaceholder ("%-%1%");
-  command_.replace (itemPlaceholder.arg (index), w.current ().absoluteFilePath ());
+  command_.replace (itemPlaceholder.arg (index),
+                    QDir::toNativeSeparators (w.current ().absoluteFilePath ()));
 
   const QString selectedPlaceholder (R"(%(.)?\*%1%)");
   const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
@@ -54,7 +58,7 @@ void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString 
     QStringList items;
     for (const auto &i: w.selected ())
     {
-      items << i.absoluteFilePath ();
+      items << QDir::toNativeSeparators (i.absoluteFilePath ());
     }
 
     auto match = selectedRegex.match (command_);
@@ -80,13 +84,14 @@ void ShellCommand::preprocessSelections (const DirWidget &widget)
 
 void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFilePath)
 {
-  command_.replace ("%d", info.isDir () ? info.absoluteFilePath () : info.absolutePath ());
+  command_.replace ("%d", QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
+                                                                  : info.absolutePath ()));
   if (forceFilePath && !command_.contains ("%p"))
   {
     command_ += " %p";
   }
-  command_.replace ("%p", info.absoluteFilePath ());
- }
+  command_.replace ("%p", QDir::toNativeSeparators (info.absoluteFilePath ()));
+}
 
 void ShellCommand::setConsoleWrapper (const QString &wrapper)
 {
