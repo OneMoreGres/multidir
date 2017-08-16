@@ -119,7 +119,8 @@ QStringList ShellCommand::parse (const QString &command) const
     if (separator.isNull ())
     {
       separator = (command[i] == '"' ? '"' : ' ');
-      startIndex = i + int (separator == '"');
+      separator = (command[i] == '\'' ? '\'' : separator);
+      startIndex = i + int (separator != ' ');
     }
     else
     {
