@@ -1,5 +1,4 @@
 #include "shellcommand.h"
-#include "dirwidget.h"
 #include "notifier.h"
 #include "debug.h"
 
@@ -41,22 +40,23 @@ void ShellCommand::setWorkDir (const QFileInfo &info)
                                                      : info.absolutePath ());
 }
 
-void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString &index)
+void ShellCommand::preprocessSelection (const QString &index, const QFileInfo &path,
+                                        const QFileInfo &current, const QList<QFileInfo> &selection)
 {
   const QString pathPlaceholder ("%%1%");
   command_.replace (pathPlaceholder.arg (index),
-                    QDir::toNativeSeparators (w.path ().absoluteFilePath ()));
+                    QDir::toNativeSeparators (path.absoluteFilePath ()));
 
   const QString itemPlaceholder ("%-%1%");
   command_.replace (itemPlaceholder.arg (index),
-                    QDir::toNativeSeparators (w.current ().absoluteFilePath ()));
+                    QDir::toNativeSeparators (current.absoluteFilePath ()));
 
   const QString selectedPlaceholder (R"(%(.)?\*%1%)");
   const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
   if (command_.contains (selectedRegex))
   {
     QStringList items;
-    for (const auto &i: w.selected ())
+    for (const auto &i: selection)
     {
       items << QDir::toNativeSeparators (i.absoluteFilePath ());
     }
@@ -70,15 +70,6 @@ void ShellCommand::preprocessWidgetSelection (const DirWidget &w, const QString 
                         items.join (separator));
       match = selectedRegex.match (command_);
     }
-  }
-}
-
-void ShellCommand::preprocessSelections (const DirWidget &widget)
-{
-  preprocessWidgetSelection (widget, "");
-  for (const auto *i: widget.siblings ())
-  {
-    preprocessWidgetSelection (*i, i->index ());
   }
 }
 

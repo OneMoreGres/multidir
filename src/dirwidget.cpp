@@ -371,11 +371,6 @@ QFileInfo DirWidget::path () const
   return path_;
 }
 
-const QList<DirWidget *> &DirWidget::siblings () const
-{
-  return siblings_;
-}
-
 void DirWidget::setSiblings (const QList<DirWidget *> siblings)
 {
   siblings_ = siblings;
@@ -443,7 +438,11 @@ void DirWidget::showCommandPrompt ()
 void DirWidget::execCommandPrompt ()
 {
   ShellCommand command (commandPrompt_->text ());
-  command.preprocessSelections (*this);
+  command.preprocessSelection ("", path_, current (), selected ());
+  for (const auto *i: siblings_)
+  {
+    command.preprocessSelection (i->index (), i->path_, i->current (), i->selected ());
+  }
   command.setConsoleWrapper (runInConsoleCommand_);
   command.preprocessFileArguments (path_);
   command.setWorkDir (path_);

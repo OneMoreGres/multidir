@@ -2,8 +2,6 @@
 
 #include <QStringList>
 
-class DirWidget;
-
 class QFileInfo;
 
 class ShellCommand
@@ -15,13 +13,13 @@ public:
 
   void setWorkDir (const QFileInfo &info);
 
-  void preprocessSelections (const DirWidget &widget);
+  void preprocessSelection (const QString &index, const QFileInfo &path,
+                            const QFileInfo &current, const QList<QFileInfo> &selection);
   void preprocessFileArguments (const QFileInfo &info, bool forceFilePath = false);
 
   void setConsoleWrapper (const QString &wrapper);
 
 private:
-  void preprocessWidgetSelection (const DirWidget &w, const QString &index);
   QStringList parse (const QString &command) const;
 
   QString command_;
