@@ -14,7 +14,7 @@ const auto defaultConsole = QString ("xterm");
 const auto defaultEditor = QString ("gedit");
 #endif
 #ifdef Q_OS_WIN
-const auto defaultConsole = QString ("cmd");
+const auto defaultConsole = QString ("cmd /C start cmd");
 const auto defaultEditor = QString ("notepad.exe");
 #endif
 #ifdef Q_OS_MAC
