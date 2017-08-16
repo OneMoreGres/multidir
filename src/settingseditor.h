@@ -37,7 +37,8 @@ private:
 
   QTabWidget *tabs_;
 
-  QLineEdit *console_;
+  QLineEdit *openConsole_;
+  QLineEdit *runInConsole_;
   QLineEdit *editor_;
   QCheckBox *checkUpdates_;
   QCheckBox *startInBackground_;

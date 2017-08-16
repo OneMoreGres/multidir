@@ -117,7 +117,8 @@ private:
   PathWidget *pathWidget_;
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
-  QString consoleCommand_;
+  QString openConsoleCommand_;
+  QString runInConsoleCommand_;
   QString editorCommand_;
   QList<DirWidget *> siblings_;
   NavigationHistory *navigationHistory_;

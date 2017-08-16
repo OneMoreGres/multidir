@@ -18,6 +18,8 @@ public:
   void preprocessSelections (const DirWidget &widget);
   void preprocessFileArguments (const QFileInfo &info, bool forceFilePath = false);
 
+  void setConsoleWrapper (const QString &wrapper);
+
 private:
   void preprocessWidgetSelection (const DirWidget &w, const QString &index);
   QStringList parse (const QString &command) const;

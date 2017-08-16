@@ -59,7 +59,8 @@ public:
 SettingsEditor::SettingsEditor (QWidget *parent) :
   QDialog (parent),
   tabs_ (new QTabWidget (this)),
-  console_ (new QLineEdit (this)),
+  openConsole_ (new QLineEdit (this)),
+  runInConsole_ (new QLineEdit (this)),
   editor_ (new QLineEdit (this)),
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
   startInBackground_ (new QCheckBox (tr ("Start in background"), this)),
@@ -84,8 +85,13 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
 
     auto row = 0;
     layout->addWidget (new QLabel (tr ("Console command")), row, 0);
-    layout->addWidget (console_, row, 1);
-    console_->setToolTip (tr ("%d will be replaced with opening folder"));
+    layout->addWidget (openConsole_, row, 1);
+    openConsole_->setToolTip (tr ("%d will be replaced with opening folder"));
+
+    ++row;
+    layout->addWidget (new QLabel (tr ("Run in console command")), row, 0);
+    layout->addWidget (runInConsole_, row, 1);
+    runInConsole_->setToolTip (tr ("%command% will be replaced with concrete command"));
 
     ++row;
     layout->addWidget (new QLabel (tr ("Default editor")), row, 0);
@@ -187,7 +193,8 @@ SettingsEditor::~SettingsEditor ()
 void SettingsEditor::init ()
 {
   using S = SettingsManager;
-  editorToSettings_[console_] = S::ConsoleCommand;
+  editorToSettings_[openConsole_] = S::OpenConsoleCommand;
+  editorToSettings_[runInConsole_] = S::RunInConsoleCommand;
   editorToSettings_[editor_] = S::EditorCommand;
   editorToSettings_[checkUpdates_] = S::CheckUpdates;
   editorToSettings_[startInBackground_] = S::StartInBackground;

@@ -9,7 +9,8 @@ class SettingsManager
 public:
   enum Type
   {
-    ConsoleCommand, EditorCommand, CheckUpdates, StartInBackground, ImageCacheSize,
+    OpenConsoleCommand, RunInConsoleCommand, EditorCommand,
+    CheckUpdates, StartInBackground, ImageCacheSize,
     GroupIds, TabIds, Translation,
     ShowFreeSpace, ShowFilesInfo, ShowSelectionInfo,
     TypeCount

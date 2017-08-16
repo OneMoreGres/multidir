@@ -11,14 +11,18 @@ namespace
 {
 #ifdef Q_OS_LINUX
 const auto defaultConsole = QString ("xterm");
+const auto defaultRunInConsole = QString ("xterm -hold -e %command%");
 const auto defaultEditor = QString ("gedit");
 #endif
 #ifdef Q_OS_WIN
 const auto defaultConsole = QString ("cmd /C start cmd");
+const auto defaultRunInConsole = QString ("cmd /C start %command%");
 const auto defaultEditor = QString ("notepad.exe");
 #endif
 #ifdef Q_OS_MAC
 const auto defaultConsole = QString ("open -a Terminal");
+const auto defaultRunInConsole =
+  QString ("osascript -e 'tell application \"Terminal\" to do script \"cd %d && %command%\"'");
 const auto defaultEditor = QString ("open -a TextEdit");
 #endif
 
@@ -33,7 +37,8 @@ QVector<Entry> entries = [] {
 
 #define SET(XXX) result[SettingsManager::XXX]
 
-  SET (ConsoleCommand) = {QS ("console"), defaultConsole};
+  SET (OpenConsoleCommand) = {QS ("console"), defaultConsole};
+  SET (RunInConsoleCommand) = {QS ("runInConsole"), defaultRunInConsole};
   SET (EditorCommand) = {QS ("editor"), defaultEditor};
   SET (CheckUpdates) = {QS ("checkUpdates"), false};
   SET (StartInBackground) = {QS ("startBackground"), false};

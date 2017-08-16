@@ -1,6 +1,7 @@
 #include "shellcommand.h"
 #include "dirwidget.h"
 #include "notifier.h"
+#include "debug.h"
 
 #include <QProcess>
 #include <QRegularExpression>
@@ -85,6 +86,22 @@ void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFil
     command_ += " %p";
   }
   command_.replace ("%p", info.absoluteFilePath ());
+ }
+
+void ShellCommand::setConsoleWrapper (const QString &wrapper)
+{
+  if (!command_.startsWith ('+'))
+  {
+    return;
+  }
+
+  auto command = wrapper;
+  if (!command.contains ("%command%"))
+  {
+    command += " %command%";
+  }
+
+  command_ = command.replace ("%command%", command_.mid (1));
 }
 
 QStringList ShellCommand::parse (const QString &command) const
