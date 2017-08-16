@@ -112,6 +112,10 @@ void ShortcutManager::setDefaults ()
                            QIcon (":/up.png"), c};
   shortcuts[SM::RunCommand] = {{QS ("Ctrl+R")}, QObject::tr ("Run command here..."),
                                QIcon (":/command.png"), c};
+  shortcuts[SM::HistoryForward] = {{QS ("Ctrl+Y")}, QObject::tr ("Forward"),
+                                   {}, c};
+  shortcuts[SM::HistoryBackward] = {{QS ("Ctrl+Z")}, QObject::tr ("Backward"),
+                                    {}, c};
 
   c = SM::Item;
   shortcuts[SM::OpenItem] = {{}, QObject::tr ("Open"),

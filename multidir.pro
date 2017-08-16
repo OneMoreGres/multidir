@@ -82,7 +82,8 @@ SOURCES += \
     src/groupsview.cpp \
     src/groupsmenu.cpp \
     src/fileviewer.cpp \
-    src/shellcommand.cpp
+    src/shellcommand.cpp \
+    src/navigationhistory.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -121,7 +122,8 @@ HEADERS  += \
     src/groupsview.h \
     src/groupsmenu.h \
     src/fileviewer.h \
-    src/shellcommand.h
+    src/shellcommand.h \
+    src/navigationhistory.h
 
 RESOURCES += \
     resources.qrc

@@ -16,7 +16,7 @@ public:
     Trash, Remove, ShowDirectories, ShowHidden, ExtensiveMode, ListMode, ShowThumbnails,
     AddGroup, RenameGroup, RemoveGroup, CreateFolder, SwitchGroup, SwitchTab,
     NextTab, OpenItem, MoveUp, Settings, Quit, Debug, About, CopyTo, MoveTo, LinkTo,
-    FixMinSize, RunCommand, ShowProperties, ChangePermissions, View,
+    FixMinSize, RunCommand, ShowProperties, ChangePermissions, View, HistoryForward, HistoryBackward,
     ShortcutCount
   };
 
