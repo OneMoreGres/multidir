@@ -370,7 +370,7 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   {
     auto effect = new QGraphicsDropShadowEffect ();
     effect->setOffset (0.);
-    effect->setBlurRadius (10.0);
+    effect->setBlurRadius (20.0);
     effect->setColor (QColor (0,153,204));
     setGraphicsEffect (effect);
   }
