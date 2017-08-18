@@ -298,6 +298,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
                                   "%<separator?>*ID% - selected items of tab"));
   connect (commandPrompt_, &QLineEdit::returnPressed,
            this, &DirWidget::execCommandPrompt);
+  connect (commandPrompt_, &QLineEdit::editingFinished,
+           this, &DirWidget::activate);
 
 
   // defaults
