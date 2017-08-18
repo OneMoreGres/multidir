@@ -60,6 +60,8 @@ private:
   void selectFirst ();
   void initTable ();
   void initList ();
+  void updateStyle ();
+  void setGlowColor (const QColor &color);
 
   bool isList_;
   bool isLocked_;
@@ -68,4 +70,5 @@ private:
   QAbstractItemModel *model_;
   QTableView *table_;
   QListView *list_;
+  QColor glowColor_;
 };

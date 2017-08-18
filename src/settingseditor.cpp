@@ -74,6 +74,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   showSelectionInfo_ (new QCheckBox (tr ("Show selection info"), this)),
   editorToSettings_ ()
 {
+  setObjectName ("settings");
   setWindowTitle (tr ("Settings"));
 
   init ();

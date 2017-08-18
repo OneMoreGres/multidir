@@ -2,6 +2,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QFileInfo>
+#include <QColor>
 
 class FileSystemModel;
 
@@ -57,6 +58,7 @@ protected:
 private:
   void detectContentsChange (const QModelIndex &parent);
   void updateIcon (const QString &fileName, const QPixmap &pixmap);
+  void updateStyle ();
 
   FileSystemModel *model_;
   bool showDirs_;
@@ -67,4 +69,8 @@ private:
   QString nameFilter_;
   QPersistentModelIndex current_;
   QThread *iconReaderThread_;
+  QColor dirColor_;
+  QColor inaccessibleDirColor_;
+  QColor executableColor_;
+  QColor unreadableFileColor_;
 };

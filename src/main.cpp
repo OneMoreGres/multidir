@@ -4,6 +4,7 @@
 #include "settingseditor.h"
 #include "settingsmanager.h"
 #include "constants.h"
+#include "styleoptionsproxy.h"
 
 #include <QApplication>
 #include <QDir>
@@ -46,6 +47,7 @@ int main (int argc, char *argv[])
 
   OpenWith::init ();
   SettingsEditor::initOrphanSettings ();
+  StyleOptionsProxy::init ();
 
   MainWindow window;
   return a.exec ();

@@ -91,6 +91,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   newFolderAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
 {
+  setObjectName ("dir");
   proxy_->setDynamicSortFilter (true);
 
   connect (model_, &QAbstractItemModel::rowsRemoved,
