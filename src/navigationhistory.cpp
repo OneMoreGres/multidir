@@ -7,8 +7,8 @@
 
 NavigationHistory::NavigationHistory (QObject *parent) :
   QObject (parent),
-  forward_ (new QAction (tr ("Forward"), this)),
-  backward_ (new QAction (tr ("Backward"), this)),
+  forward_ (new QAction ({}, this)),
+  backward_ (new QAction ({}, this)),
   history_ (),
   currentIndex_ (-1)
 {
