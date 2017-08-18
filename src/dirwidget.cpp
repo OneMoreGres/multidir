@@ -726,6 +726,12 @@ void DirWidget::openSelected ()
   const auto indexes = view_->selectedRows ();
   if (indexes.size () < 2)
   {
+    const auto index = view_->currentIndex ();
+    if (indexes.size () == 1 && indexes.first () != index)
+    {
+      return;
+    }
+
     const auto current = fileInfo (view_->currentIndex ());
     if (current.isDir ())
     {
