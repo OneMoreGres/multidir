@@ -17,6 +17,7 @@ ShellCommand::ShellCommand (const QString &raw) :
 bool ShellCommand::run ()
 {
   const auto parts = parse (command_);
+  LDEBUG () << "Shell" << command_;
   if (!parts.isEmpty () && QProcess::startDetached (parts[0], parts.mid (1), workDir_))
   {
     return true;
