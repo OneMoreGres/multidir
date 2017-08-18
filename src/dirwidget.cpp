@@ -52,6 +52,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   view_ (new DirView (*proxy_, this)),
   index_ (),
   path_ (),
+  lastCurrentFile_ (),
   pathWidget_ (new PathWidget (model, this)),
   status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
@@ -96,6 +97,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::checkDirExistence);
   connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleDirRename);
+  connect (model_, &QFileSystemModel::fileRenamed,
+           this, &DirWidget::handleFileRename);
   connect (this, &DirWidget::fileOperation,
            model_, &FileSystemModel::fileOperation);
 
@@ -324,6 +327,8 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::updateActions);
   connect (view_, &DirView::selectionChanged,
            this, &DirWidget::updateStatusSelection);
+  connect (view_, &DirView::currentChanged,
+           this, &DirWidget::updateCurrentFile);
 
   installEventFilter (this);
 
@@ -953,11 +958,25 @@ void DirWidget::checkDirExistence ()
   setPath (newPath);
 }
 
+void DirWidget::updateCurrentFile ()
+{
+  lastCurrentFile_ = current ().fileName ();
+}
+
 void DirWidget::handleDirRename (const QString &path, const QString &old, const QString &now)
 {
-  if (this->path ().absoluteFilePath () == (path + '/' + old))
+  if (path_.absoluteFilePath () == (path + '/' + old))
   {
     setPath (path + '/' + now);
+  }
+}
+
+void DirWidget::handleFileRename (const QString &path, const QString &old, const QString &now)
+{
+  if (path_ == path && old == lastCurrentFile_)
+  {
+    lastCurrentFile_ = now;
+    view_->setCurrentIndex (proxy_->mapFromSource (model_->index (path + '/' + now)));
   }
 }
 

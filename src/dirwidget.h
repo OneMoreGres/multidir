@@ -105,7 +105,9 @@ private:
   void updateStatusSelection ();
   void updateActions ();
   void checkDirExistence ();
+  void updateCurrentFile ();
   void handleDirRename (const QString &path, const QString &old, const QString &now);
+  void handleFileRename (const QString &path, const QString &old, const QString &now);
 
 
   FileSystemModel *model_;
@@ -113,6 +115,7 @@ private:
   DirView *view_;
   QString index_;
   QFileInfo path_;
+  QString lastCurrentFile_;
   PathWidget *pathWidget_;
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
