@@ -16,6 +16,7 @@ SOURCES += \
     src/filepermissions.cpp \
     src/shellcommand.cpp \
     src/notifier.cpp \
+    src/debug.cpp \
     filepermissions_test.cpp \
     shellcommand_test.cpp
 
