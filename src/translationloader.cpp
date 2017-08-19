@@ -53,7 +53,11 @@ QStringList TranslationLoader::availableLanguages ()
         }
         const auto suffix = name.mid (suffixIndex + 1);
         const auto locale = QLocale (suffix);
-        result.append (locale.nativeLanguageName ());
+        const auto language = locale.nativeLanguageName ();
+        if (!result.contains (language))
+        {
+          result.append (language);
+        }
       }
     }
   }
