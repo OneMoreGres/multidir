@@ -44,7 +44,8 @@ OTHER_FILES += \
     LICENSE.md \
     translations/LICENSE_ru.md \
     README.md \
-    utils/*
+    utils/* \
+    styles/*
 
 SOURCES += \
     src/main.cpp \
@@ -83,7 +84,9 @@ SOURCES += \
     src/groupsmenu.cpp \
     src/fileviewer.cpp \
     src/shellcommand.cpp \
-    src/navigationhistory.cpp
+    src/navigationhistory.cpp \
+    src/styleoptionsproxy.cpp \
+    src/styleloader.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -123,7 +126,9 @@ HEADERS  += \
     src/groupsmenu.h \
     src/fileviewer.h \
     src/shellcommand.h \
-    src/navigationhistory.h
+    src/navigationhistory.h \
+    src/styleoptionsproxy.h \
+    src/styleloader.h
 
 RESOURCES += \
     resources.qrc
@@ -151,8 +156,10 @@ linux {
     pixmaps.path = $$PREFIX/share/pixmaps/
     translations.files += translations/*.qm
     translations.path = $$PREFIX/share/multidir/translations
+    styles.files += styles/*.css
+    styles.path = $$PREFIX/share/multidir/styles
 
-    INSTALLS += target shortcuts pixmaps translations
+    INSTALLS += target shortcuts pixmaps translations styles
 }
 
 mac {
@@ -160,5 +167,8 @@ mac {
 
     translations.files = $$[QT_INSTALL_TRANSLATIONS]/qtbase_ru.qm translations/multidir_ru.qm
     translations.path = Contents/Translations
-    QMAKE_BUNDLE_DATA += translations
+    styles.files += styles/*.css
+    styles.path = Contents/Resources/styles
+
+    QMAKE_BUNDLE_DATA += translations styles
 }

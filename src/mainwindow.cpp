@@ -40,6 +40,7 @@ MainWindow::MainWindow (QWidget *parent) :
   checkUpdates_ (false),
   startInBackground_ (false)
 {
+  setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
 
   auto status = new QStatusBar (this);

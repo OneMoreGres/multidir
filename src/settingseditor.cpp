@@ -2,6 +2,7 @@
 #include "shortcutmanager.h"
 #include "translationloader.h"
 #include "settingsmanager.h"
+#include "styleloader.h"
 #include "debug.h"
 
 #include <QGridLayout>
@@ -69,11 +70,13 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
   tabShortcuts_ (new QLineEdit (this)),
+  styles_ (new QComboBox (this)),
   showFreeSpace_ (new QCheckBox (tr ("Show free space"), this)),
   showFilesInfo_ (new QCheckBox (tr ("Show files info"), this)),
   showSelectionInfo_ (new QCheckBox (tr ("Show selection info"), this)),
   editorToSettings_ ()
 {
+  setObjectName ("settings");
   setWindowTitle (tr ("Settings"));
 
   init ();
@@ -153,6 +156,11 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     auto layout = new QGridLayout (tab);
 
     auto row = 0;
+    layout->addWidget (new QLabel (tr ("Style:")), row, 0);
+    layout->addWidget (styles_, row, 1);
+    styles_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    ++row;
     layout->addWidget (showFreeSpace_, row, 0);
 
     ++row;
@@ -226,6 +234,8 @@ void SettingsEditor::initOrphanSettings ()
 {
   TranslationLoader::load ();
 
+  StyleLoader::load ();
+
   QSettings qsettings;
   ShortcutManager::setDefaults ();
   ShortcutManager::restore (qsettings);
@@ -291,10 +301,22 @@ void SettingsEditor::saveLanguage ()
   TranslationLoader::setLanguage (languages_->currentText ());
 }
 
+void SettingsEditor::loadStyle ()
+{
+  styles_->addItems (StyleLoader::available ());
+  styles_->setCurrentText (StyleLoader::current ());
+}
+
+void SettingsEditor::saveStyle ()
+{
+  StyleLoader::setCurrent (styles_->currentText ());
+}
+
 void SettingsEditor::load ()
 {
   loadShortcuts ();
   loadLanguage ();
+  loadStyle ();
 
   SettingsManager settings;
   using Type = SettingsManager::Type;
@@ -321,6 +343,7 @@ void SettingsEditor::save ()
 {
   saveShortcuts ();
   saveLanguage ();
+  saveStyle ();
 
   SettingsManager settings;
   using Type = SettingsManager::Type;

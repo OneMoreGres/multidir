@@ -4,6 +4,7 @@
 #include "filedelegate.h"
 #include "debug.h"
 #include "filepermissiondelegate.h"
+#include "styleoptionsproxy.h"
 
 #include <QTableView>
 #include <QHeaderView>
@@ -29,13 +30,18 @@ DirView::DirView (QAbstractItemModel &model, QWidget *parent) :
   delegate_ (nullptr),
   model_ (&model),
   table_ (nullptr),
-  list_ (nullptr)
+  list_ (nullptr),
+  glowColor_ ()
 {
   setLayout (new QVBoxLayout);
   layout ()->setMargin (0);
   setIsList (isList_);
   connect (&model, &QAbstractItemModel::rowsInserted,
            this, &DirView::selectFirst);
+
+  connect (&StyleOptionsProxy::instance (), &StyleOptionsProxy::changed,
+           this, &DirView::updateStyle);
+  updateStyle ();
 }
 
 void DirView::save (QSettings &settings) const
@@ -201,6 +207,7 @@ void DirView::initTable ()
   }
 
   table_ = new QTableView (this);
+  table_->setObjectName ("table");
   table_->setModel (model_);
 
   table_->setSortingEnabled (true);
@@ -223,6 +230,7 @@ void DirView::initList ()
   }
 
   list_ = new QListView (this);
+  list_->setObjectName ("list");
   list_->setModel (model_);
 
   list_->setWrapping (true);
@@ -238,6 +246,15 @@ void DirView::initList ()
   }
 
   list_->setItemDelegate (delegate_);
+}
+
+void DirView::setGlowColor (const QColor &color)
+{
+  glowColor_ = color;
+  if (auto effect = qobject_cast<QGraphicsDropShadowEffect *>(graphicsEffect ()))
+  {
+    effect->setColor (glowColor_);
+  }
 }
 
 bool DirView::isLocked () const
@@ -368,10 +385,11 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
   }
   else if (event->type () == QEvent::FocusIn)
   {
-    auto effect = new QGraphicsDropShadowEffect ();
+    auto effect = new QGraphicsDropShadowEffect (this);
     effect->setOffset (0.);
     effect->setBlurRadius (20.0);
     effect->setColor (QColor (0,153,204));
+    effect->setColor (glowColor_);
     setGraphicsEffect (effect);
   }
   else if (event->type () == QEvent::FocusOut)
@@ -379,6 +397,12 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
     setGraphicsEffect (nullptr);
   }
   return false;
+}
+
+void DirView::updateStyle ()
+{
+  const auto &options = StyleOptionsProxy::instance ();
+  setGlowColor (options.activeGlowColor ());
 }
 
 #include "moc_dirview.cpp"

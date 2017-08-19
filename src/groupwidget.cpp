@@ -30,6 +30,7 @@ GroupWidget::GroupWidget (FileSystemModel *model, QWidget *parent) :
   view_ (new TiledView (this)),
   ids_ ()
 {
+  setObjectName ("group");
   auto layout = new QVBoxLayout (this);
   layout->setMargin (0);
   layout->addWidget (view_);

@@ -53,6 +53,8 @@ QVector<Entry> entries = [] {
   SET (ShowFreeSpace) = {QS ("statusShowFree"), true};
   SET (ShowFilesInfo) = {QS ("statusShowFiles"), true};
   SET (ShowSelectionInfo) = {QS ("statusShowSelection"), true};
+
+  SET (Style) = {QS ("style"), QS ("")};
 #undef SET
 
   return result;

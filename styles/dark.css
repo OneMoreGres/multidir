@@ -1,0 +1,62 @@
+#settings, #settings * {
+background: darkGray;
+}
+
+#main, #main * {
+background: darkGray;
+}
+
+#group, #group * {
+background: darkGray;
+}
+
+#dir, #dir * {
+background: darkGray;
+}
+
+QHeaderView::section {
+background: darkGray;
+}
+
+QTableCornerButton::section {
+background: darkGray;
+}
+
+QMessageBox {
+background: darkGray;
+}
+
+#path, #pathLabel, #dirLabel {
+font: normal;
+}
+
+#dirLabel {
+font: bold;
+}
+
+#dirStatus * {
+background: none;
+font: normal 9px;
+}
+
+#table {
+color: black;
+gridline-color: darkGray;
+selection-background-color: gray;
+selection-color: white;
+}
+
+#list {
+color: black;
+selection-background-color: gray;
+selection-color: white;
+}
+
+#style {
+qproperty-dirColor: #cccccc;
+qproperty-inaccessibleDirColor: #ff6666;
+qproperty-executableColor: #ffcc99;
+qproperty-unreadableFileColor: #ff6666;
+qproperty-activeGlowColor: white;
+}
+

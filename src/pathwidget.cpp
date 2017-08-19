@@ -18,13 +18,16 @@ PathWidget::PathWidget (FileSystemModel *model, QWidget *parent) :
   dirLabel_ (new QLabel (this)),
   pathEdit_ (new QLineEdit (this))
 {
+  setObjectName ("path");
   installEventFilter (this);
 
   pathLabel_->setAlignment (pathLabel_->alignment () | Qt::AlignRight);
+  pathLabel_->setObjectName ("pathLabel");
 
   auto dirFont = dirLabel_->font ();
   dirFont.setBold (true);
   dirLabel_->setFont (dirFont);
+  dirLabel_->setObjectName ("dirLabel");
 
   pathEdit_->setCompleter (new FileSystemCompleter (model, this));
   connect (pathEdit_, &QLineEdit::editingFinished,

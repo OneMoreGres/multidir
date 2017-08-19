@@ -2,6 +2,7 @@
 #include "filesystemmodel.h"
 #include "constants.h"
 #include "backgroundreader.h"
+#include "styleoptionsproxy.h"
 #include "debug.h"
 
 #include <QDateTime>
@@ -20,7 +21,11 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   showThumbnails_ (false),
   nameFilter_ (),
   current_ (),
-  iconReaderThread_ (new QThread (this))
+  iconReaderThread_ (new QThread (this)),
+  dirColor_ (),
+  inaccessibleDirColor_ (),
+  executableColor_ (),
+  unreadableFileColor_ ()
 {
   setSourceModel (model);
 
@@ -39,6 +44,10 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   connect (iconReaderThread_, &QThread::finished,
            reader, &QObject::deleteLater);
   iconReaderThread_->start ();
+
+  connect (&StyleOptionsProxy::instance (), &StyleOptionsProxy::changed,
+           this, &ProxyModel::updateStyle);
+  updateStyle ();
 }
 
 ProxyModel::~ProxyModel ()
@@ -236,17 +245,17 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
     {
       if (!info.isExecutable () || !info.isReadable ())
       {
-        return QColor (255,153,153);
+        return inaccessibleDirColor_;
       }
-      return QColor (204,255,255);
+      return dirColor_;
     }
     if (info.isExecutable ())
     {
-      return QColor (255,204,153);
+      return executableColor_;
     }
     else if (!info.isReadable ())
     {
-      return QColor (255,153,153);
+      return unreadableFileColor_;
     }
     return {};
   }
@@ -285,6 +294,24 @@ void ProxyModel::updateIcon (const QString &fileName, const QPixmap &pixmap)
   }
 }
 
+void ProxyModel::updateStyle ()
+{
+  const auto &options = StyleOptionsProxy::instance ();
+  dirColor_ =  options.dirColor ();
+  inaccessibleDirColor_ =  options.inaccessibleDirColor ();
+  executableColor_ =  options.executableColor ();
+  unreadableFileColor_ =  options.unreadableFileColor ();
+
+  if (current_.isValid ())
+  {
+    const auto parent = mapFromSource (current_);
+    const auto rows = rowCount (parent);
+    if (rows > 0)
+    {
+      emit dataChanged (index (0,0, parent), index (rows - 1, 0, parent), {Qt::BackgroundRole});
+    }
+  }
+}
 
 QVariant ProxyModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
