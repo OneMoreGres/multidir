@@ -156,8 +156,10 @@ linux {
     pixmaps.path = $$PREFIX/share/pixmaps/
     translations.files += translations/*.qm
     translations.path = $$PREFIX/share/multidir/translations
+    styles.files += styles/*.css
+    styles.path = $$PREFIX/share/multidir/styles
 
-    INSTALLS += target shortcuts pixmaps translations
+    INSTALLS += target shortcuts pixmaps translations styles
 }
 
 mac {
@@ -165,5 +167,8 @@ mac {
 
     translations.files = $$[QT_INSTALL_TRANSLATIONS]/qtbase_ru.qm translations/multidir_ru.qm
     translations.path = Contents/Translations
-    QMAKE_BUNDLE_DATA += translations
+    styles.files += styles/*.css
+    styles.path = Contents/Resources/styles
+
+    QMAKE_BUNDLE_DATA += translations styles
 }

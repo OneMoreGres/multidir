@@ -113,6 +113,8 @@ Section !$(SECT_APP) SECT_APP_ID
     File "${CONTENT_DIR}\app\imageformats\*.dll"
     SetOutPath "$INSTDIR\translations"
     File "${CONTENT_DIR}\app\translations\*.qm"
+    SetOutPath "$INSTDIR\styles"
+    File "${CONTENT_DIR}\app\styles\*.css"
     SetOutPath "$INSTDIR\iconengines"
     File "${CONTENT_DIR}\app\iconengines\*.dll"
     

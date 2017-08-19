@@ -25,6 +25,7 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 mkdir content
 mkdir content\app
 mkdir content\app\translations
+mkdir content\app\styles
 copy /Y release\multidir.exe content\app
 
 windeployqt --release content\app\multidir.exe
@@ -36,6 +37,7 @@ echo !define VERSION "%VERSION%" >> content\defines.nsi
 echo !define ARCH "%ARCH%" >> content\defines.nsi
 
 copy /Y %ROOT%\translations\*.qm content\app\translations
+copy /Y %ROOT%\styles\*.css content\app\styles
 copy /Y %SELF_PATH%\multidir.nsi content
 copy /Y %ROOT%\LICENSE.md content\LICENSE_en.md
 copy /Y %ROOT%\utils\LICENSE_ru.md content\LICENSE_ru.md
