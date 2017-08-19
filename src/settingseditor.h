@@ -31,6 +31,8 @@ private:
   void saveShortcuts ();
   void loadLanguage ();
   void saveLanguage ();
+  void loadStyle ();
+  void saveStyle ();
 
   void load ();
   void save ();
@@ -49,6 +51,7 @@ private:
   QLineEdit *groupShortcuts_;
   QLineEdit *tabShortcuts_;
 
+  QComboBox *styles_;
   QCheckBox *showFreeSpace_;
   QCheckBox *showFilesInfo_;
   QCheckBox *showSelectionInfo_;

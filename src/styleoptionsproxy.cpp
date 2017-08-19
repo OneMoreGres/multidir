@@ -21,13 +21,23 @@ StyleOptionsProxy &StyleOptionsProxy::instance ()
 
 StyleOptionsProxy::StyleOptionsProxy (QWidget *parent) :
   QWidget (parent),
-  activeGlowColor_ (0,153,204),
-  dirColor_ (204,255,255),
-  inaccessibleDirColor_ (255,153,153),
-  executableColor_ (255,204,153),
-  unreadableFileColor_ (255,153,153)
+  activeGlowColor_ (),
+  dirColor_ (),
+  inaccessibleDirColor_ (),
+  executableColor_ (),
+  unreadableFileColor_ ()
 {
   setObjectName ("style");
+  setDefaults ();
+}
+
+void StyleOptionsProxy::setDefaults ()
+{
+  activeGlowColor_ = QColor (0,153,204);
+  dirColor_ = QColor (204,255,255);
+  inaccessibleDirColor_ = QColor (255,153,153);
+  executableColor_ = QColor (255,204,153);
+  unreadableFileColor_ = QColor (255,153,153);
 }
 
 QColor StyleOptionsProxy::fileColor () const
@@ -93,6 +103,15 @@ void StyleOptionsProxy::setDirColor (const QColor &color)
 {
   dirColor_ = color;
   emit changed ();
+}
+
+void StyleOptionsProxy::changeEvent (QEvent *event)
+{
+  if (event->type () == QEvent::StyleChange && qApp->styleSheet ().isEmpty ())
+  {
+    setDefaults ();
+    emit changed ();
+  }
 }
 
 #include "moc_styleoptionsproxy.cpp"

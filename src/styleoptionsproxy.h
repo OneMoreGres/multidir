@@ -37,8 +37,12 @@ public:
 signals:
   void changed ();
 
+protected:
+  void changeEvent (QEvent *event) override;
+
 private:
   explicit StyleOptionsProxy (QWidget *parent = nullptr);
+  void setDefaults ();
 
   QColor activeGlowColor_;
   QColor dirColor_;

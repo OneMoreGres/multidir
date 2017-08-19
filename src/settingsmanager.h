@@ -11,6 +11,7 @@ public:
     CheckUpdates, StartInBackground, ImageCacheSize,
     GroupIds, TabIds, Translation,
     ShowFreeSpace, ShowFilesInfo, ShowSelectionInfo,
+    Style,
     TypeCount
   };
 

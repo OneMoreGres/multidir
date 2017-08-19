@@ -85,7 +85,8 @@ SOURCES += \
     src/fileviewer.cpp \
     src/shellcommand.cpp \
     src/navigationhistory.cpp \
-    src/styleoptionsproxy.cpp
+    src/styleoptionsproxy.cpp \
+    src/styleloader.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -126,7 +127,8 @@ HEADERS  += \
     src/fileviewer.h \
     src/shellcommand.h \
     src/navigationhistory.h \
-    src/styleoptionsproxy.h
+    src/styleoptionsproxy.h \
+    src/styleloader.h
 
 RESOURCES += \
     resources.qrc
