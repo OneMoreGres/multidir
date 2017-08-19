@@ -14,6 +14,31 @@ background: darkGray;
 background: darkGray;
 }
 
+QHeaderView::section {
+background: darkGray;
+}
+
+QTableCornerButton::section {
+background: darkGray;
+}
+
+QMessageBox {
+background: darkGray;
+}
+
+#path, #pathLabel, #dirLabel {
+font: normal;
+}
+
+#dirLabel {
+font: bold;
+}
+
+#dirStatus * {
+background: none;
+font: normal 9px;
+}
+
 #table {
 color: black;
 gridline-color: darkGray;

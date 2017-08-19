@@ -44,7 +44,8 @@ OTHER_FILES += \
     LICENSE.md \
     translations/LICENSE_ru.md \
     README.md \
-    utils/*
+    utils/* \
+    styles/*
 
 SOURCES += \
     src/main.cpp \

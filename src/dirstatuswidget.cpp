@@ -19,6 +19,8 @@ DirStatusWidget::DirStatusWidget (ProxyModel *model, QWidget *parent) :
   entries_ (new QLabel (this)),
   selection_ (new QLabel (this))
 {
+  setObjectName ("dirStatus");
+
   connect (model_, &ProxyModel::currentChanged,
            this, &DirStatusWidget::updatePath);
   connect (model_, &ProxyModel::contentsChanged,
