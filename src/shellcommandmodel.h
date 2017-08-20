@@ -48,6 +48,8 @@ private:
   void update (ShellCommandWidget *widget);
   void remove (QObject *widget);
 
+  void updateStyle ();
+
   QVector<ShellCommandWidget *> widgets_;
 
   QString commandWrapper_;

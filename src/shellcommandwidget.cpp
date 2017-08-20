@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "shellcommand.h"
 #include "shortcutmanager.h"
+#include "styleoptionsproxy.h"
 
 #include <QTextEdit>
 #include <QBoxLayout>
@@ -20,7 +21,7 @@ ShellCommandWidget::ShellCommandWidget (QWidget *parent) :
   process_ (new QProcess (this)),
   log_ (new QTextEdit (this)),
   userInput_ (new QTextEdit (this)),
-  errorColor_ (Qt::darkRed)
+  errorColor_ ()
 {
   // self
   setObjectName ("command");
@@ -69,6 +70,10 @@ ShellCommandWidget::ShellCommandWidget (QWidget *parent) :
 
   // initialize
   userInput_->setFocus ();
+
+  connect (&StyleOptionsProxy::instance (), &StyleOptionsProxy::changed,
+           this, &ShellCommandWidget::updateStyle);
+  updateStyle ();
 
   QSettings settings;
   const auto size = settings.value (qs_size).toSize ();
@@ -179,6 +184,12 @@ void ShellCommandWidget::terminate ()
     process_->waitForFinished (timeout);
     process_->kill ();
   }
+}
+
+void ShellCommandWidget::updateStyle ()
+{
+  const auto &options = StyleOptionsProxy::instance ();
+  errorColor_ = options.stdErrOutputColor ();
 }
 
 void ShellCommandWidget::closeEvent (QCloseEvent *event)

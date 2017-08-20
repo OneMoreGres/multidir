@@ -3,17 +3,22 @@
 #include "shellcommandwidget.h"
 #include "shellcommand.h"
 #include "settingsmanager.h"
+#include "styleoptionsproxy.h"
 
 ShellCommandModel::ShellCommandModel (QObject *parent) :
   QAbstractListModel (parent),
   widgets_ (),
   commandWrapper_ (),
-  runningColor_ (Qt::yellow),
-  finishedColor_ (Qt::green),
-  erroredColor_ (Qt::red)
+  runningColor_ (),
+  finishedColor_ (),
+  erroredColor_ ()
 {
   SettingsManager::subscribeForUpdates (this);
   updateSettings ();
+
+  connect (&StyleOptionsProxy::instance (), &StyleOptionsProxy::changed,
+           this, &ShellCommandModel::updateStyle);
+  updateStyle ();
 }
 
 ShellCommandModel::~ShellCommandModel ()
@@ -179,6 +184,14 @@ void ShellCommandModel::remove (QObject *widget)
   {
     emit emptied ();
   }
+}
+
+void ShellCommandModel::updateStyle ()
+{
+  const auto &options = StyleOptionsProxy::instance ();
+  runningColor_ = options.runningCommandColor ();
+  finishedColor_ = options.finishedCommandColor ();
+  erroredColor_ = options.erroredCommandColor ();
 }
 
 #include "moc_shellcommandmodel.cpp"

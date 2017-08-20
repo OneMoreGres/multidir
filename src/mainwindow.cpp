@@ -70,6 +70,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   commandsView_->setModel (commandsModel_);
+  commandsView_->setObjectName ("commandList");
   commandsView_->setMaximumHeight (status->height () - 2);
   commandsView_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
   commandsView_->setFocusPolicy (Qt::NoFocus);

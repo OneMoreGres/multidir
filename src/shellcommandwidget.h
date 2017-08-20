@@ -36,6 +36,8 @@ private:
   void processUserInputWithEot ();
   void terminate ();
 
+  void updateStyle ();
+
   QProcess *process_;
   QTextEdit *log_;
   QTextEdit *userInput_;
