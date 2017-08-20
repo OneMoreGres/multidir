@@ -10,6 +10,7 @@ class FileOperation;
 class PathWidget;
 class DirStatusWidget;
 class NavigationHistory;
+class ShellCommandModel;
 
 class QLabel;
 class QMenu;
@@ -23,7 +24,7 @@ class DirWidget : public QWidget
 {
 Q_OBJECT
 public:
-  DirWidget (FileSystemModel *model, QWidget *parent = nullptr);
+  DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidget *parent = nullptr);
   ~DirWidget ();
 
   void save (QSettings &settings) const;
@@ -47,9 +48,6 @@ public:
 
   void activate ();
   void adjustItems ();
-
-public slots:
-  void updateSettings ();
 
 signals:
   void closeRequested (DirWidget *widget);
@@ -118,9 +116,7 @@ private:
   PathWidget *pathWidget_;
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
-  QString openConsoleCommand_;
-  QString runInConsoleCommand_;
-  QString editorCommand_;
+  ShellCommandModel *commandRunner_;
   QList<DirWidget *> siblings_;
   NavigationHistory *navigationHistory_;
 

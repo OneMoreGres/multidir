@@ -14,8 +14,8 @@
 #include "fileviewer.h"
 #include "dirstatuswidget.h"
 #include "settingsmanager.h"
-#include "shellcommand.h"
 #include "navigationhistory.h"
+#include "shellcommandmodel.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -45,7 +45,7 @@ const QString qs_showThumbs = "showThumbs";
 const QString qs_minSize = "minSize";
 }
 
-DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
+DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidget *parent) :
   QWidget (parent),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
@@ -56,9 +56,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
   pathWidget_ (new PathWidget (model, this)),
   status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
-  openConsoleCommand_ (),
-  runInConsoleCommand_ (),
-  editorCommand_ (),
+  commandRunner_ (commands),
   siblings_ (),
   navigationHistory_ (new NavigationHistory (this)),
   menu_ (new QMenu (this)),
@@ -333,9 +331,6 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
            this, &DirWidget::updateCurrentFile);
 
   installEventFilter (this);
-
-  SettingsManager::subscribeForUpdates (this);
-  updateSettings ();
 }
 
 DirWidget::~DirWidget ()
@@ -446,21 +441,41 @@ void DirWidget::showCommandPrompt ()
 
 void DirWidget::execCommandPrompt ()
 {
-  ShellCommand command (commandPrompt_->text ());
-  command.preprocessSelection ("", path_, current (), selected ());
-  for (const auto *i: siblings_)
+  if (commandPrompt_->text ().isEmpty ())
   {
-    command.preprocessSelection (i->index (), i->path_, i->current (), i->selected ());
-  }
-  command.setWrapper (runInConsoleCommand_);
-  command.preprocessFileArguments (path_);
-  command.setWorkDir (path_);
-  if (!command.run ())
-  {
-    commandPrompt_->selectAll ();
+    commandPrompt_->hide ();
     return;
   }
-  commandPrompt_->hide ();
+
+  QMap<QString, ShellCommandModel::Selection> selections;
+  selections.insert ("", {path_, current (), selected ()});
+  for (const auto *i: siblings_)
+  {
+    const auto index = i->index ();
+    if (!index.isEmpty ())
+    {
+      selections.insert (index, {i->path_, i->current (), i->selected ()});
+    }
+  }
+
+  if (commandRunner_->run (commandPrompt_->text (), selections, path_))
+  {
+    commandPrompt_->selectAll ();
+  }
+  else
+  {
+    commandPrompt_->hide ();
+  }
+}
+
+void DirWidget::openConsole ()
+{
+  commandRunner_->openConsole (path_);
+}
+
+void DirWidget::openInEditor ()
+{
+  commandRunner_->openInEditor (current (), path_);
 }
 
 QString DirWidget::index () const
@@ -600,15 +615,6 @@ void DirWidget::activate ()
 void DirWidget::adjustItems ()
 {
   view_->adjustItems ();
-}
-
-void DirWidget::updateSettings ()
-{
-  SettingsManager settings;
-  using Type = SettingsManager::Type;
-  openConsoleCommand_ = settings.get (Type::OpenConsoleCommand).toString ().trimmed ();
-  runInConsoleCommand_ = settings.get (Type::RunInConsoleCommand).toString ().trimmed ();
-  editorCommand_ = settings.get (Type::EditorCommand).toString ().trimmed ();
 }
 
 void DirWidget::promptClose ()
@@ -815,24 +821,6 @@ void DirWidget::viewCurrent ()
 void DirWidget::moveUp ()
 {
   openPath (view_->rootIndex ().parent ());
-}
-
-void DirWidget::openConsole ()
-{
-  ShellCommand command (openConsoleCommand_);
-  command.setWrapper (runInConsoleCommand_);
-  command.preprocessFileArguments (path_);
-  command.setWorkDir (path_);
-  command.run ();
-}
-
-void DirWidget::openInEditor ()
-{
-  ShellCommand command (editorCommand_);
-  command.preprocessFileArguments (current (), true);
-  command.setWrapper (runInConsoleCommand_);
-  command.setWorkDir (path_);
-  command.run ();
 }
 
 bool DirWidget::isMinSizeFixed () const

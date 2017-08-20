@@ -46,27 +46,35 @@ bool ShellCommandModel::run (const ShellCommand &command)
   return ok;
 }
 
-bool ShellCommandModel::run (const ShellCommand &command, const QFileInfo &workingDir)
+bool ShellCommandModel::run (const QString &command, const QMap<QString, Selection> &selectionPerIndex,
+                             const QFileInfo &workingDir)
 {
-  auto local = command;
-  local.setWrapper (commandWrapper_);
-  local.preprocessFileArguments (workingDir);
-  local.setWorkDir (workingDir);
-  return run (local);
+  ShellCommand shell (command);
+  for (auto i = selectionPerIndex.cbegin (), end = selectionPerIndex.cend (); i != end; ++i)
+  {
+    const auto &s = i.value ();
+    shell.preprocessSelection (i.key (), s.path, s.current, s.selected);
+  }
+  shell.setWrapper (commandWrapper_);
+  shell.preprocessFileArguments (workingDir);
+  shell.setWorkDir (workingDir);
+  return run (shell);
 }
 
 void ShellCommandModel::openConsole (const QFileInfo &path)
 {
   ShellCommand command (openConsoleCommand_);
   command.preprocessFileArguments (path);
-  run (command, path);
+  command.setWorkDir (path);
+  run (command);
 }
 
 void ShellCommandModel::openInEditor (const QFileInfo &path, const QFileInfo &workingDir)
 {
   ShellCommand command (editorCommand_);
   command.preprocessFileArguments (path, true);
-  run (command, workingDir);
+  command.setWorkDir (workingDir);
+  run (command);
 }
 
 void ShellCommandModel::updateSettings ()

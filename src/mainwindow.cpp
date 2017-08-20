@@ -12,6 +12,7 @@
 #include "notifier.h"
 #include "shortcutmanager.h"
 #include "settingsmanager.h"
+#include "shellcommandmodel.h"
 #include "dirwidgetfactory.h"
 
 #include <QSystemTrayIcon>
@@ -38,13 +39,14 @@ MainWindow::MainWindow (QWidget *parent) :
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
+  commandsModel_ (new ShellCommandModel (this)),
   checkUpdates_ (false),
   startInBackground_ (false)
 {
   setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
 
-  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_);
+  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_);
   groups_ = new GroupsView (widgetFactory, this);
 
   auto status = new QStatusBar (this);

@@ -7,6 +7,7 @@ class GroupsView;
 class FileSystemModel;
 class FileOperation;
 class FileConflictResolver;
+class ShellCommandModel;
 
 class QSettings;
 class QAction;
@@ -47,6 +48,7 @@ private:
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
+  ShellCommandModel *commandsModel_;
   bool checkUpdates_;
   bool startInBackground_;
 };

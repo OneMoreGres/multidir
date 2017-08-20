@@ -2,20 +2,27 @@
 
 #include <QAbstractListModel>
 #include <QColor>
+#include <QFileInfo>
 
 class ShellCommandWidget;
 class ShellCommand;
-
-class QFileInfo;
 
 class ShellCommandModel : public QAbstractListModel
 {
 Q_OBJECT
 public:
+  struct Selection
+  {
+    QFileInfo path;
+    QFileInfo current;
+    QList<QFileInfo> selected;
+  };
+
   explicit ShellCommandModel (QObject *parent = nullptr);
   ~ShellCommandModel ();
 
-  bool run (const ShellCommand &command, const QFileInfo &workingDir);
+  bool run (const QString &command, const QMap<QString, Selection> &selectionPerIndex,
+            const QFileInfo &workingDir);
   void openConsole (const QFileInfo &path);
   void openInEditor (const QFileInfo &path, const QFileInfo &workingDir);
 
