@@ -24,6 +24,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QListView>
 
 namespace
 {
@@ -40,12 +41,15 @@ MainWindow::MainWindow (QWidget *parent) :
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
   commandsModel_ (new ShellCommandModel (this)),
+  commandsView_ (new QListView (this)),
   checkUpdates_ (false),
   startInBackground_ (false)
 {
+  // self
   setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
 
+  // widgets
   auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_, this);
   groups_ = new GroupsView (widgetFactory, this);
 
@@ -63,6 +67,21 @@ MainWindow::MainWindow (QWidget *parent) :
            this, &MainWindow::nameFilterChanged);
   connect (groups_, &GroupsView::currentChanged,
            this, &MainWindow::updateWindowTitle);
+
+
+  commandsView_->setModel (commandsModel_);
+  commandsView_->setMaximumHeight (status->height () - 2);
+  commandsView_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
+  commandsView_->setFocusPolicy (Qt::NoFocus);
+  commandsView_->setFlow (QListView::Flow::LeftToRight);
+  commandsView_->setSelectionMode (QAbstractItemView::NoSelection);
+  connect (commandsView_, &QListView::doubleClicked,
+           commandsModel_, &ShellCommandModel::show);
+  connect (commandsModel_, &ShellCommandModel::filled,
+           commandsView_, &QListView::show);
+  connect (commandsModel_, &ShellCommandModel::emptied,
+           commandsView_, &QListView::hide);
+  commandsView_->hide ();
 
 
   //menu bar
@@ -124,6 +143,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   // layout
+  status->addPermanentWidget (commandsView_);
+
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
   menuBarLayout->addLayout (fileOperationsLayout_);

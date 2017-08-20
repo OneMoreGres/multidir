@@ -12,6 +12,7 @@ class ShellCommandModel;
 class QSettings;
 class QAction;
 class QLineEdit;
+class QListView;
 
 class MainWindow : public QWidget
 {
@@ -52,6 +53,7 @@ private:
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
   ShellCommandModel *commandsModel_;
+  QListView *commandsView_;
   bool checkUpdates_;
   bool startInBackground_;
 };
