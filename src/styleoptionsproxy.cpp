@@ -20,12 +20,7 @@ StyleOptionsProxy &StyleOptionsProxy::instance ()
 
 
 StyleOptionsProxy::StyleOptionsProxy (QWidget *parent) :
-  QWidget (parent),
-  activeGlowColor_ (),
-  dirColor_ (),
-  inaccessibleDirColor_ (),
-  executableColor_ (),
-  unreadableFileColor_ ()
+  QWidget (parent)
 {
   setObjectName ("style");
   setDefaults ();
@@ -38,16 +33,54 @@ void StyleOptionsProxy::setDefaults ()
   inaccessibleDirColor_ = QColor (255,153,153);
   executableColor_ = QColor (255,204,153);
   unreadableFileColor_ = QColor (255,153,153);
+  stdErrOutputColor_ = Qt::darkRed;
+  runningCommandColor_ = Qt::yellow;
+  finishedCommandColor_ = Qt::green;
+  erroredCommandColor_ = Qt::red;
 }
 
-QColor StyleOptionsProxy::fileColor () const
+QColor StyleOptionsProxy::erroredCommandColor () const
 {
-  return fileColor_;
+  return erroredCommandColor_;
 }
 
-void StyleOptionsProxy::setFileColor (const QColor &color)
+void StyleOptionsProxy::setErroredCommandColor (const QColor &erroredCommandColor)
 {
-  fileColor_ = color;
+  erroredCommandColor_ = erroredCommandColor;
+  emit changed ();
+}
+
+QColor StyleOptionsProxy::finishedCommandColor () const
+{
+  return finishedCommandColor_;
+}
+
+void StyleOptionsProxy::setFinishedCommandColor (const QColor &finishedCommandColor)
+{
+  finishedCommandColor_ = finishedCommandColor;
+  emit changed ();
+}
+
+QColor StyleOptionsProxy::runningCommandColor () const
+{
+  return runningCommandColor_;
+}
+
+void StyleOptionsProxy::setRunningCommandColor (const QColor &runningCommandColor)
+{
+  runningCommandColor_ = runningCommandColor;
+  emit changed ();
+}
+
+QColor StyleOptionsProxy::stdErrOutputColor () const
+{
+  return stdErrOutputColor_;
+}
+
+void StyleOptionsProxy::setStdErrOutputColor (const QColor &stdErrOutputColor)
+{
+  stdErrOutputColor_ = stdErrOutputColor;
+  emit changed ();
 }
 
 QColor StyleOptionsProxy::unreadableFileColor () const

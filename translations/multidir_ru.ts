@@ -37,58 +37,58 @@
 <context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirwidget.cpp" line="161"/>
+        <location filename="../src/dirwidget.cpp" line="160"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="199"/>
+        <location filename="../src/dirwidget.cpp" line="198"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="202"/>
+        <location filename="../src/dirwidget.cpp" line="201"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="205"/>
+        <location filename="../src/dirwidget.cpp" line="204"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="237"/>
+        <location filename="../src/dirwidget.cpp" line="236"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="299"/>
-        <source>If starts with &apos;+&apos; - runs command in console. Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
-        <translation>При первом символе &apos;+&apos; - запуск в консоли. Автозамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
+        <location filename="../src/dirwidget.cpp" line="298"/>
+        <source>Prefix with &apos;+&apos; to show output. Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
+        <translation>Начните с &apos;+&apos; для показа вывода. Автозамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="538"/>
+        <location filename="../src/dirwidget.cpp" line="554"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="545"/>
-        <location filename="../src/dirwidget.cpp" line="549"/>
+        <location filename="../src/dirwidget.cpp" line="561"/>
+        <location filename="../src/dirwidget.cpp" line="565"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="632"/>
+        <location filename="../src/dirwidget.cpp" line="622"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="647"/>
+        <location filename="../src/dirwidget.cpp" line="637"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="667"/>
+        <location filename="../src/dirwidget.cpp" line="657"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
     </message>
@@ -222,17 +222,17 @@ Modified: %3</source>
 <context>
     <name>FileViewer</name>
     <message>
-        <location filename="../src/fileviewer.cpp" line="59"/>
+        <location filename="../src/fileviewer.cpp" line="56"/>
         <source>Failed to view file &apos;%1&apos;</source>
         <translation>Ошибка просмотра файла &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/fileviewer.cpp" line="67"/>
+        <location filename="../src/fileviewer.cpp" line="64"/>
         <source>File is too big. Continue?</source>
         <translation>Файл слишком большой. Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/fileviewer.cpp" line="112"/>
+        <location filename="../src/fileviewer.cpp" line="109"/>
         <source>Failed to read file &apos;%1&apos;: &apos;%2&apos;</source>
         <translation>Ошибка чтения файла &apos;%1&apos;: &apos;%2&apos;</translation>
     </message>
@@ -245,12 +245,12 @@ Modified: %3</source>
         <translation>Группы</translation>
     </message>
     <message>
-        <location filename="../src/groupsmenu.cpp" line="83"/>
+        <location filename="../src/groupsmenu.cpp" line="77"/>
         <source>Group title</source>
         <translation>Название группы</translation>
     </message>
     <message>
-        <location filename="../src/groupsmenu.cpp" line="99"/>
+        <location filename="../src/groupsmenu.cpp" line="93"/>
         <source>Close group &quot;%1&quot;?</source>
         <translation>Закрыть группу &quot;%1&quot;?</translation>
     </message>
@@ -258,7 +258,7 @@ Modified: %3</source>
 <context>
     <name>GroupsView</name>
     <message>
-        <location filename="../src/groupsview.cpp" line="108"/>
+        <location filename="../src/groupsview.cpp" line="105"/>
         <source>Group %1</source>
         <translation>Группа %1</translation>
     </message>
@@ -266,67 +266,67 @@ Modified: %3</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.cpp" line="65"/>
+        <location filename="../src/mainwindow.cpp" line="90"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="94"/>
+        <location filename="../src/mainwindow.cpp" line="111"/>
         <source>Help</source>
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="109"/>
+        <location filename="../src/mainwindow.cpp" line="121"/>
         <source>Name pattern</source>
         <translation>Шаблон имени</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
         <source>Multidir update available</source>
         <translation>Доступно обновление</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
         <source>New version: %1</source>
         <translation>Новая версия: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="286"/>
+        <location filename="../src/mainwindow.cpp" line="303"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; версия %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="288"/>
+        <location filename="../src/mainwindow.cpp" line="305"/>
         <source>Homepage: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Сайт: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="289"/>
+        <location filename="../src/mainwindow.cpp" line="306"/>
         <source>Issues: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Поддержка: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="290"/>
+        <location filename="../src/mainwindow.cpp" line="307"/>
         <source>Sources: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</source>
         <translation>Исходники: &lt;a href=&apos;https://%1&apos;&gt;%1&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="287"/>
+        <location filename="../src/mainwindow.cpp" line="304"/>
         <source>Author: Gres (&lt;a href=&apos;mailto:%1&apos;&gt;%1&lt;/a&gt;)</source>
         <translation>Автор: Gres (&lt;a href=&apos;mailto:%1&apos;&gt;%1&lt;/a&gt;)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="292"/>
+        <location filename="../src/mainwindow.cpp" line="309"/>
         <source>Icons designed by Madebyoliver from Flaticon</source>
         <translation>Иконки - Madebyoliver из Flaticon</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="294"/>
+        <location filename="../src/mainwindow.cpp" line="311"/>
         <source>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</source>
         <translation>Эта программа распространяется в надежде, что она будет полезной, но БЕЗО ВСЯКИХ ГАРАНТИЙ; даже без неявной гарантии ТОВАРНГО ВИДА или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛИ.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="298"/>
+        <location filename="../src/mainwindow.cpp" line="315"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
@@ -415,252 +415,252 @@ Modified: %3</source>
         <translation>Ошибка удаления папки </translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="48"/>
+        <location filename="../src/shortcutmanager.cpp" line="74"/>
         <source>General</source>
         <translation>Общее</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="49"/>
+        <location filename="../src/shortcutmanager.cpp" line="75"/>
         <source>Group</source>
         <translation>Группа</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="50"/>
+        <location filename="../src/shortcutmanager.cpp" line="76"/>
         <source>Tab</source>
         <translation>Вкладка</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="51"/>
+        <location filename="../src/shortcutmanager.cpp" line="77"/>
         <source>Item</source>
         <translation>Элемент</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="55"/>
+        <location filename="../src/shortcutmanager.cpp" line="81"/>
         <source>Toggle</source>
         <translation>Показать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="57"/>
+        <location filename="../src/shortcutmanager.cpp" line="83"/>
         <source>Filter</source>
         <translation>Фильтровать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="59"/>
+        <location filename="../src/shortcutmanager.cpp" line="85"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="61"/>
+        <location filename="../src/shortcutmanager.cpp" line="87"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="63"/>
+        <location filename="../src/shortcutmanager.cpp" line="89"/>
         <source>Debug mode</source>
         <translation>Режим отладки</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="65"/>
+        <location filename="../src/shortcutmanager.cpp" line="91"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="69"/>
+        <location filename="../src/shortcutmanager.cpp" line="95"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="71"/>
+        <location filename="../src/shortcutmanager.cpp" line="97"/>
         <source>Rename...</source>
         <translation>Переименовать...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="73"/>
+        <location filename="../src/shortcutmanager.cpp" line="99"/>
         <source>Delete...</source>
         <translation>Удалить...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="75"/>
+        <location filename="../src/shortcutmanager.cpp" line="101"/>
         <source>Switch (plus ID)</source>
         <translation>Перейти (плюс ID)</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="79"/>
+        <location filename="../src/shortcutmanager.cpp" line="105"/>
         <source>Add tab</source>
         <translation>Добавить вкладку</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="81"/>
+        <location filename="../src/shortcutmanager.cpp" line="107"/>
         <source>Open in explorer</source>
         <translation>Открыть в диспетчере</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="83"/>
+        <location filename="../src/shortcutmanager.cpp" line="109"/>
         <source>Open in console</source>
         <translation>Открыть в консоли</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="85"/>
+        <location filename="../src/shortcutmanager.cpp" line="111"/>
         <source>Edit path</source>
         <translation>Изменить путь</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="87"/>
+        <location filename="../src/shortcutmanager.cpp" line="113"/>
         <source>Lock</source>
         <translation>Заблокировать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="89"/>
+        <location filename="../src/shortcutmanager.cpp" line="115"/>
         <source>Duplicate...</source>
         <translation>Дублировать...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="91"/>
+        <location filename="../src/shortcutmanager.cpp" line="117"/>
         <source>Close...</source>
         <translation>Закрыть...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="93"/>
+        <location filename="../src/shortcutmanager.cpp" line="119"/>
         <source>Show directories</source>
         <translation>Показывать папки</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="95"/>
+        <location filename="../src/shortcutmanager.cpp" line="121"/>
         <source>Show hidden</source>
         <translation>Показывать скрытые</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="97"/>
+        <location filename="../src/shortcutmanager.cpp" line="123"/>
         <source>Extensive view</source>
         <translation>Расширенный режим</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="99"/>
+        <location filename="../src/shortcutmanager.cpp" line="125"/>
         <source>List mode</source>
         <translation>Список</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="101"/>
+        <location filename="../src/shortcutmanager.cpp" line="127"/>
         <source>Show thumbnails</source>
         <translation>Показывать миниатюры</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="103"/>
+        <location filename="../src/shortcutmanager.cpp" line="129"/>
         <source>Fix min size</source>
         <translation>Задать минимальный размер</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="105"/>
+        <location filename="../src/shortcutmanager.cpp" line="131"/>
         <source>Create folder</source>
         <translation>Создать папку</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="107"/>
+        <location filename="../src/shortcutmanager.cpp" line="133"/>
         <source>Switch to next</source>
         <translation>К следующей</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="109"/>
+        <location filename="../src/shortcutmanager.cpp" line="135"/>
         <source>Switch tab (plus ID)</source>
         <translation>Перейти к вкладке (плюс ID)</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="111"/>
+        <location filename="../src/shortcutmanager.cpp" line="137"/>
         <source>Move up</source>
         <translation>Наверх</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="113"/>
+        <location filename="../src/shortcutmanager.cpp" line="139"/>
         <source>Run command here...</source>
         <translation>Выполнить команду...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="115"/>
+        <location filename="../src/shortcutmanager.cpp" line="141"/>
         <source>Forward</source>
         <translation>Вперед</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="117"/>
+        <location filename="../src/shortcutmanager.cpp" line="143"/>
         <source>Backward</source>
         <translation>Назад</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="121"/>
+        <location filename="../src/shortcutmanager.cpp" line="147"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="123"/>
+        <location filename="../src/shortcutmanager.cpp" line="149"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="125"/>
+        <location filename="../src/shortcutmanager.cpp" line="151"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="127"/>
+        <location filename="../src/shortcutmanager.cpp" line="153"/>
         <source>Cut</source>
         <translation>Вырезать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="129"/>
+        <location filename="../src/shortcutmanager.cpp" line="155"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="131"/>
+        <location filename="../src/shortcutmanager.cpp" line="157"/>
         <source>Open in tab</source>
         <translation>Открыть во вкладке</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="133"/>
+        <location filename="../src/shortcutmanager.cpp" line="159"/>
         <source>Open in editor</source>
         <translation>Открыть в редакторе</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="135"/>
+        <location filename="../src/shortcutmanager.cpp" line="161"/>
         <source>Move to trash...</source>
         <translation>В корзину...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="137"/>
+        <location filename="../src/shortcutmanager.cpp" line="163"/>
         <source>Remove...</source>
         <translation>Удалить...</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="139"/>
+        <location filename="../src/shortcutmanager.cpp" line="165"/>
         <source>Copy path</source>
         <translation>Копировать путь</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="141"/>
+        <location filename="../src/shortcutmanager.cpp" line="167"/>
         <source>Copy to (plus ID)</source>
         <translation>Копировать в (плюс ID)</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="143"/>
+        <location filename="../src/shortcutmanager.cpp" line="169"/>
         <source>Move to (plus ID)</source>
         <translation>Переместить в (плюс ID)</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="145"/>
+        <location filename="../src/shortcutmanager.cpp" line="171"/>
         <source>Link to (plus ID)</source>
         <translation>Создать ссылку в (плюс ID)</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="147"/>
+        <location filename="../src/shortcutmanager.cpp" line="173"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="149"/>
+        <location filename="../src/shortcutmanager.cpp" line="175"/>
         <source>Change permissions</source>
         <translation>Изменить права</translation>
     </message>
     <message>
-        <location filename="../src/shortcutmanager.cpp" line="151"/>
+        <location filename="../src/shortcutmanager.cpp" line="177"/>
         <source>View</source>
         <translation>Просмотреть</translation>
     </message>
@@ -696,12 +696,13 @@ Modified: %3</source>
         <translation>Ошибка запуска программы &apos;%1&apos; командой &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/shellcommand.cpp" line="28"/>
+        <location filename="../src/shellcommand.cpp" line="32"/>
+        <location filename="../src/shellcommand.cpp" line="48"/>
         <source>Empty command</source>
         <translation>Пустая команда</translation>
     </message>
     <message>
-        <location filename="../src/shellcommand.cpp" line="32"/>
+        <location filename="../src/shellcommand.cpp" line="36"/>
         <source>Failed to run command &apos;%1&apos; in &apos;%2&apos;</source>
         <translation>Ошибка выполнения &apos;%1&apos; в &apos;%2&apos;</translation>
     </message>
@@ -760,8 +761,8 @@ Modified: %3</source>
     </message>
     <message>
         <location filename="../src/settingseditor.cpp" line="95"/>
-        <source>Run in console command</source>
-        <translation>Команда запуска к консоли</translation>
+        <source>Custom command wrapper</source>
+        <translation>Обертка для произвольной команды</translation>
     </message>
     <message>
         <location filename="../src/settingseditor.cpp" line="97"/>
@@ -862,6 +863,54 @@ Modified: %3</source>
         <location filename="../src/settingseditor.cpp" line="273"/>
         <source>Yes</source>
         <translation>Да</translation>
+    </message>
+</context>
+<context>
+    <name>ShellCommandWidget</name>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="34"/>
+        <source>File</source>
+        <translation>Файл</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="47"/>
+        <source>Terminate</source>
+        <translation>Завершить</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="92"/>
+        <source>&lt;b&gt;running &quot;%1&quot; in &quot;%2&quot;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;запуск &quot;%1&quot; в &quot;%2&quot;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="117"/>
+        <source>&lt;b&gt;started&lt;/b&gt;</source>
+        <translation>&lt;b&gt;запущено&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="123"/>
+        <source>&lt;b&gt;%1 with code %2&lt;/b&gt;</source>
+        <translation>&lt;b&gt;%1 с кодом %2&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="124"/>
+        <source>Finished</source>
+        <translation>Завершено</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="124"/>
+        <source>Crashed</source>
+        <translation>Крах</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="158"/>
+        <source>&lt;b&gt;user input &quot;%1&quot;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;пользовательский ввод &quot;%1&quot;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/shellcommandwidget.cpp" line="169"/>
+        <source>&lt;b&gt;closed write channel&lt;/b&gt;</source>
+        <translation>&lt;b&gt;закрыт канал ввода&lt;/b&gt;</translation>
     </message>
 </context>
 </TS>

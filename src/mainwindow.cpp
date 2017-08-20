@@ -12,6 +12,8 @@
 #include "notifier.h"
 #include "shortcutmanager.h"
 #include "settingsmanager.h"
+#include "shellcommandmodel.h"
+#include "dirwidgetfactory.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -22,6 +24,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QListView>
 
 namespace
 {
@@ -31,17 +34,24 @@ const QString qs_geometry = "geometry";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groups_ (new GroupsView (model_, this)),
+  groups_ (nullptr),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
+  commandsModel_ (new ShellCommandModel (this)),
+  commandsView_ (new QListView (this)),
   checkUpdates_ (false),
   startInBackground_ (false)
 {
+  // self
   setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
+
+  // widgets
+  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_, this);
+  groups_ = new GroupsView (widgetFactory, this);
 
   auto status = new QStatusBar (this);
   Notifier::setMain (status);
@@ -54,9 +64,25 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   connect (findEdit_, &QLineEdit::textChanged,
-           groups_, &GroupsView::setNameFilter);
+           this, &MainWindow::nameFilterChanged);
   connect (groups_, &GroupsView::currentChanged,
            this, &MainWindow::updateWindowTitle);
+
+
+  commandsView_->setModel (commandsModel_);
+  commandsView_->setObjectName ("commandList");
+  commandsView_->setMaximumHeight (status->height () - 2);
+  commandsView_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
+  commandsView_->setFocusPolicy (Qt::NoFocus);
+  commandsView_->setFlow (QListView::Flow::LeftToRight);
+  commandsView_->setSelectionMode (QAbstractItemView::NoSelection);
+  connect (commandsView_, &QListView::doubleClicked,
+           commandsModel_, &ShellCommandModel::show);
+  connect (commandsModel_, &ShellCommandModel::filled,
+           commandsView_, &QListView::show);
+  connect (commandsModel_, &ShellCommandModel::emptied,
+           commandsView_, &QListView::hide);
+  commandsView_->hide ();
 
 
   //menu bar
@@ -64,26 +90,18 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto fileMenu = menuBar->addMenu (tr ("File"));
 
-  auto add = new QAction (this);
-  fileMenu->addAction (add);
-  ShortcutManager::add (ShortcutManager::AddTab, add);
+  auto add = ShortcutManager::create (this, ShortcutManager::AddTab, fileMenu);
   connect (add, &QAction::triggered, groups_, &GroupsView::addWidgetToCurrent);
 
-  auto find = new QAction (this);
-  fileMenu->addAction (find);
-  ShortcutManager::add (ShortcutManager::Find, find);
+  auto find = ShortcutManager::create (this, ShortcutManager::Find, fileMenu);
   connect (find, &QAction::triggered, this, &MainWindow::activateFindMode);
 
   fileMenu->addSeparator ();
 
-  auto settings = new QAction (this);
-  fileMenu->addAction (settings);
-  ShortcutManager::add (ShortcutManager::Settings, settings);
+  auto settings = ShortcutManager::create (this, ShortcutManager::Settings, fileMenu);
   connect (settings, &QAction::triggered, this, &MainWindow::editSettings);
 
-  auto quit = new QAction (this);
-  fileMenu->addAction (quit);
-  ShortcutManager::add (ShortcutManager::Quit, quit);
+  auto quit = ShortcutManager::create (this, ShortcutManager::Quit, fileMenu);
   connect (quit, &QAction::triggered, qApp, &QApplication::quit);
 
 
@@ -93,15 +111,10 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto helpMenu = menuBar->addMenu (tr ("Help"));
 
-  auto debug = new QAction (this);
-  debug->setCheckable (true);
-  helpMenu->addAction (debug);
-  ShortcutManager::add (ShortcutManager::Debug, debug);
+  auto debug = ShortcutManager::create (this, ShortcutManager::Debug, helpMenu, true);
   connect (debug, &QAction::toggled, this, &debug::setDebugMode);
 
-  auto about = new QAction (this);
-  helpMenu->addAction (about);
-  ShortcutManager::add (ShortcutManager::About, about);
+  auto about = ShortcutManager::create (this, ShortcutManager::About, helpMenu);
   connect (about, &QAction::triggered, this, &MainWindow::showAbout);
 
 
@@ -115,10 +128,7 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (trayMenu, &QMenu::aboutToShow,
            this, &MainWindow::updateTrayMenu);
 
-  toggleAction_ = new QAction (this);
-  trayMenu->addAction (toggleAction_);
-  ShortcutManager::add (ShortcutManager::ToggleGui, toggleAction_);
-  toggleAction_->setCheckable (true);
+  toggleAction_ = ShortcutManager::create (this, ShortcutManager::ToggleGui, trayMenu, true);
   toggleAction_->setChecked (true);
 
   trayMenu->addAction (quit);
@@ -134,6 +144,8 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   // layout
+  status->addPermanentWidget (commandsView_);
+
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
   menuBarLayout->addLayout (fileOperationsLayout_);
@@ -272,6 +284,12 @@ void MainWindow::keyPressEvent (QKeyEvent *event)
     }
     event->accept ();
   }
+}
+
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+  commandsModel_->closeAll ();
+  event->accept ();
 }
 
 void MainWindow::activateFindMode ()

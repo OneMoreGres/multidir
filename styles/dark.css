@@ -14,6 +14,10 @@ background: darkGray;
 background: darkGray;
 }
 
+#command, #command * {
+background: darkGray;
+}
+
 QHeaderView::section {
 background: darkGray;
 }
@@ -58,5 +62,11 @@ qproperty-inaccessibleDirColor: #ff6666;
 qproperty-executableColor: #ffcc99;
 qproperty-unreadableFileColor: #ff6666;
 qproperty-activeGlowColor: white;
+
+qproperty-stdErrOutputColor: #cc0033;
+
+qproperty-runningCommandColor: #ffcc99;
+qproperty-finishedCommandColor: #66cc99;
+qproperty-erroredCommandColor: #ff6666;
 }
 

@@ -6,6 +6,7 @@
 #include "shortcutmanager.h"
 #include "utils.h"
 #include "settingsmanager.h"
+#include "dirwidgetfactory.h"
 
 #include <QBoxLayout>
 #include <QSettings>
@@ -22,10 +23,10 @@ const QString qs_name = "name";
 }
 
 
-GroupWidget::GroupWidget (FileSystemModel *model, QWidget *parent) :
+GroupWidget::GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidget *parent) :
   QWidget (parent),
   name_ (),
-  model_ (model),
+  widgetFactory_ (widgetFactory),
   widgets_ (),
   view_ (new TiledView (this)),
   ids_ ()
@@ -106,17 +107,9 @@ void GroupWidget::updateSettings ()
   setIds (settings.get (SettingsManager::TabIds).toString ());
 }
 
-void GroupWidget::setNameFilter (const QString &filter)
-{
-  for (auto &i: as_const (widgets_))
-  {
-    i.widget->setNameFilter (filter);
-  }
-}
-
 DirWidget * GroupWidget::addWidget ()
 {
-  auto *w = new DirWidget (model_, this);
+  auto *w = widgetFactory_->create (this);
   auto *action = new QAction (this);
   widgets_ << Widget {w, action};
 

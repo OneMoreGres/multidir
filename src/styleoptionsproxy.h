@@ -10,7 +10,10 @@ Q_PROPERTY (QColor dirColor READ dirColor WRITE setDirColor)
 Q_PROPERTY (QColor inaccessibleDirColor READ inaccessibleDirColor WRITE setInaccessibleDirColor)
 Q_PROPERTY (QColor executableColor READ executableColor WRITE setExecutableColor)
 Q_PROPERTY (QColor unreadableFileColor READ unreadableFileColor WRITE setUnreadableFileColor)
-Q_PROPERTY (QColor fileColor READ fileColor WRITE setFileColor)
+Q_PROPERTY (QColor stdErrOutputColor READ stdErrOutputColor WRITE setStdErrOutputColor)
+Q_PROPERTY (QColor runningCommandColor READ runningCommandColor WRITE setRunningCommandColor)
+Q_PROPERTY (QColor finishedCommandColor READ finishedCommandColor WRITE setFinishedCommandColor)
+Q_PROPERTY (QColor erroredCommandColor READ erroredCommandColor WRITE setErroredCommandColor)
 
 public:
   static void init ();
@@ -31,8 +34,17 @@ public:
   QColor unreadableFileColor () const;
   void setUnreadableFileColor (const QColor &color);
 
-  QColor fileColor () const;
-  void setFileColor (const QColor &color);
+  QColor stdErrOutputColor () const;
+  void setStdErrOutputColor (const QColor &stdErrOutputColor);
+
+  QColor runningCommandColor () const;
+  void setRunningCommandColor (const QColor &runningCommandColor);
+
+  QColor finishedCommandColor () const;
+  void setFinishedCommandColor (const QColor &finishedCommandColor);
+
+  QColor erroredCommandColor () const;
+  void setErroredCommandColor (const QColor &erroredCommandColor);
 
 signals:
   void changed ();
@@ -49,5 +61,10 @@ private:
   QColor inaccessibleDirColor_;
   QColor executableColor_;
   QColor unreadableFileColor_;
-  QColor fileColor_;
+
+  QColor stdErrOutputColor_;
+
+  QColor runningCommandColor_;
+  QColor finishedCommandColor_;
+  QColor erroredCommandColor_;
 };

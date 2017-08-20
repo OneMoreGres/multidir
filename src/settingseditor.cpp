@@ -92,7 +92,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     openConsole_->setToolTip (tr ("%d will be replaced with opening folder"));
 
     ++row;
-    layout->addWidget (new QLabel (tr ("Run in console command")), row, 0);
+    layout->addWidget (new QLabel (tr ("Custom command wrapper")), row, 0);
     layout->addWidget (runInConsole_, row, 1);
     runInConsole_->setToolTip (tr ("%command% will be replaced with concrete command"));
 

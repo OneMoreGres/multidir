@@ -7,10 +7,12 @@ class GroupsView;
 class FileSystemModel;
 class FileOperation;
 class FileConflictResolver;
+class ShellCommandModel;
 
 class QSettings;
 class QAction;
 class QLineEdit;
+class QListView;
 
 class MainWindow : public QWidget
 {
@@ -22,11 +24,15 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+signals:
+  void nameFilterChanged (const QString &filter);
+
 public slots:
   void updateSettings ();
 
 protected:
   void keyPressEvent (QKeyEvent *event) override;
+  void closeEvent (QCloseEvent *event) override;
 
 private:
   void toggleVisible ();
@@ -47,6 +53,8 @@ private:
   QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
+  ShellCommandModel *commandsModel_;
+  QListView *commandsView_;
   bool checkUpdates_;
   bool startInBackground_;
 };

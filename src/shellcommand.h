@@ -3,13 +3,19 @@
 #include <QStringList>
 
 class QFileInfo;
+class QProcess;
 
 class ShellCommand
 {
 public:
-  ShellCommand (const QString &raw);
+  explicit ShellCommand (const QString &raw);
 
-  bool run ();
+  bool run () const;
+  bool run (QProcess &process) const;
+
+  bool isManaged () const;
+  QString command () const;
+  QString workDir () const;
 
   void setWorkDir (const QFileInfo &info);
 
@@ -17,11 +23,12 @@ public:
                             const QFileInfo &current, const QList<QFileInfo> &selection);
   void preprocessFileArguments (const QFileInfo &info, bool forceFilePath = false);
 
-  void setConsoleWrapper (const QString &wrapper);
+  void setWrapper (const QString &wrapper);
 
 protected:
   static QStringList parse (const QString &command);
 
   QString command_;
   QString workDir_;
+  bool isManaged_;
 };

@@ -22,19 +22,13 @@ GroupsMenu::GroupsMenu (GroupsView *view, QWidget *parent) :
   connect (actions_, &QActionGroup::triggered,
            this, &GroupsMenu::setCurrent);
 
-  auto addGroup = new QAction (this);
-  addAction (addGroup);
-  ShortcutManager::add (ShortcutManager::AddGroup, addGroup);
+  auto addGroup = ShortcutManager::create (this, ShortcutManager::AddGroup);
   connect (addGroup, &QAction::triggered, this, &GroupsMenu::add);
 
-  renameAction_ = new QAction (this);
-  addAction (renameAction_);
-  ShortcutManager::add (ShortcutManager::RenameGroup, renameAction_);
+  renameAction_ = ShortcutManager::create (this, ShortcutManager::RenameGroup);
   connect (renameAction_, &QAction::triggered, this, &GroupsMenu::renameCurrent);
 
-  closeAction_ = new QAction (this);
-  addAction (closeAction_);
-  ShortcutManager::add (ShortcutManager::RemoveGroup, closeAction_);
+  closeAction_ = ShortcutManager::create (this, ShortcutManager::RemoveGroup);
   connect (closeAction_, &QAction::triggered, this, &GroupsMenu::removeCurrent);
 
   addSeparator ();

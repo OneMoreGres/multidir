@@ -4,7 +4,7 @@
 
 class DirWidget;
 class TiledView;
-class FileSystemModel;
+class DirWidgetFactory;
 
 class QSettings;
 class QFileInfo;
@@ -13,13 +13,12 @@ class GroupWidget : public QWidget
 {
 Q_OBJECT
 public:
-  GroupWidget (FileSystemModel *model, QWidget *parent = nullptr);
+  GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidget *parent = nullptr);
   ~GroupWidget ();
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
-  void setNameFilter (const QString &filter);
   DirWidget * addWidget ();
 
   QString name () const;
@@ -46,7 +45,7 @@ private:
   };
 
   QString name_;
-  FileSystemModel *model_;
+  QSharedPointer<DirWidgetFactory> widgetFactory_;
   QList<Widget> widgets_;
   TiledView *view_;
   QString ids_;

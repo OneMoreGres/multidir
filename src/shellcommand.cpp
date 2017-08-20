@@ -9,15 +9,19 @@
 
 ShellCommand::ShellCommand (const QString &raw) :
   command_ (raw.trimmed ()),
-  workDir_ ()
+  workDir_ (),
+  isManaged_ (raw.startsWith ('+'))
 {
-
+  if (isManaged_)
+  {
+    command_ = command_.mid (1);
+  }
 }
 
-bool ShellCommand::run ()
+bool ShellCommand::run () const
 {
   const auto parts = parse (command_);
-  LDEBUG () << "Shell" << command_;
+  LDEBUG () << "Shell" << parts;
   if (!parts.isEmpty () && QProcess::startDetached (parts[0], parts.mid (1), workDir_))
   {
     return true;
@@ -33,6 +37,36 @@ bool ShellCommand::run ()
                      .arg (command_, workDir_));
   }
   return false;
+}
+
+bool ShellCommand::run (QProcess &process) const
+{
+  const auto parts = parse (command_);
+  LDEBUG () << "Shell" << parts;
+  if (parts.isEmpty ())
+  {
+    Notifier::error (QObject::tr ("Empty command"));
+    return false;
+  }
+
+  process.setWorkingDirectory (workDir_);
+  process.start (parts[0], parts.mid (1));
+  return true;
+}
+
+QString ShellCommand::command () const
+{
+  return command_;
+}
+
+QString ShellCommand::workDir () const
+{
+  return workDir_;
+}
+
+bool ShellCommand::isManaged () const
+{
+  return isManaged_;
 }
 
 void ShellCommand::setWorkDir (const QFileInfo &info)
@@ -85,20 +119,15 @@ void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFil
   command_.replace ("%p", QDir::toNativeSeparators (info.absoluteFilePath ()));
 }
 
-void ShellCommand::setConsoleWrapper (const QString &wrapper)
+void ShellCommand::setWrapper (const QString &wrapper)
 {
-  if (!command_.startsWith ('+'))
-  {
-    return;
-  }
-
   auto command = wrapper;
   if (!command.contains ("%command%"))
   {
     command += " %command%";
   }
 
-  command_ = command.replace ("%command%", command_.mid (1));
+  command_ = command.replace ("%command%", command_);
 }
 
 QStringList ShellCommand::parse (const QString &command)
