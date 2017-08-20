@@ -30,6 +30,7 @@ public:
   QVariant data (const QModelIndex &index, int role) const override;
 
   void show (const QModelIndex &index) const;
+  void closeAll ();
 
 signals:
   void filled ();

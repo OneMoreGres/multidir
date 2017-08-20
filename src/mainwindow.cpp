@@ -285,6 +285,12 @@ void MainWindow::keyPressEvent (QKeyEvent *event)
   }
 }
 
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+  commandsModel_->closeAll ();
+  event->accept ();
+}
+
 void MainWindow::activateFindMode ()
 {
   findEdit_->show ();

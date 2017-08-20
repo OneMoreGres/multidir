@@ -139,6 +139,14 @@ void ShellCommandModel::show (const QModelIndex &index) const
   w->activateWindow ();
 }
 
+void ShellCommandModel::closeAll ()
+{
+  for (auto *i: widgets_)
+  {
+    i->close ();
+  }
+}
+
 QModelIndex ShellCommandModel::toIndex (ShellCommandWidget *widget) const
 {
   const auto row = widgets_.indexOf (widget);

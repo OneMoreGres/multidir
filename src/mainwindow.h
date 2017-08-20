@@ -32,6 +32,7 @@ public slots:
 
 protected:
   void keyPressEvent (QKeyEvent *event) override;
+  void closeEvent (QCloseEvent *event) override;
 
 private:
   void toggleVisible ();
