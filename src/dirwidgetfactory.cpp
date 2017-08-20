@@ -1,10 +1,13 @@
 #include "dirwidgetfactory.h"
 #include "debug.h"
 #include "dirwidget.h"
+#include "mainwindow.h"
 
-DirWidgetFactory::DirWidgetFactory (FileSystemModel *model, ShellCommandModel *commands) :
+DirWidgetFactory::DirWidgetFactory (FileSystemModel *model, ShellCommandModel *commands,
+                                    MainWindow *main) :
   model_ (model),
-  commands_ (commands)
+  commands_ (commands),
+  main_ (main)
 {
 
 }
@@ -12,5 +15,6 @@ DirWidgetFactory::DirWidgetFactory (FileSystemModel *model, ShellCommandModel *c
 DirWidget * DirWidgetFactory::create (QWidget *parent)
 {
   auto *widget = new DirWidget (model_, commands_, parent);
+  QObject::connect (main_, &MainWindow::nameFilterChanged, widget, &DirWidget::setNameFilter);
   return widget;
 }

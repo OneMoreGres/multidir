@@ -34,8 +34,6 @@ signals:
   void currentChanged (const QString &name);
   void restored ();
 
-  void setNameFilter (const QString &filter);
-
 private:
   QSharedPointer<DirWidgetFactory> widgetFactory_;
   QStackedWidget *groups_;

@@ -100,9 +100,6 @@ GroupWidget &GroupsView::at (int index) const
 GroupWidget &GroupsView::add ()
 {
   auto group = new GroupWidget (widgetFactory_, this);
-  connect (this, &GroupsView::setNameFilter,
-           group, &GroupWidget::setNameFilter);
-
   const auto index = groups_->addWidget (group);
   groups_->setCurrentIndex (index);
   group->setName (tr ("Group %1").arg (index + 1));

@@ -19,7 +19,6 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
-  void setNameFilter (const QString &filter);
   DirWidget * addWidget ();
 
   QString name () const;

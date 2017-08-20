@@ -23,6 +23,9 @@ public:
   void save (QSettings &settings) const;
   void restore (QSettings &settings);
 
+signals:
+  void nameFilterChanged (const QString &filter);
+
 public slots:
   void updateSettings ();
 

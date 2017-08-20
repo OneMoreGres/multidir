@@ -107,14 +107,6 @@ void GroupWidget::updateSettings ()
   setIds (settings.get (SettingsManager::TabIds).toString ());
 }
 
-void GroupWidget::setNameFilter (const QString &filter)
-{
-  for (auto &i: as_const (widgets_))
-  {
-    i.widget->setNameFilter (filter);
-  }
-}
-
 DirWidget * GroupWidget::addWidget ()
 {
   auto *w = widgetFactory_->create (this);

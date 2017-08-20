@@ -46,7 +46,7 @@ MainWindow::MainWindow (QWidget *parent) :
   setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
 
-  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_);
+  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_, this);
   groups_ = new GroupsView (widgetFactory, this);
 
   auto status = new QStatusBar (this);
@@ -60,7 +60,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
 
   connect (findEdit_, &QLineEdit::textChanged,
-           groups_, &GroupsView::setNameFilter);
+           this, &MainWindow::nameFilterChanged);
   connect (groups_, &GroupsView::currentChanged,
            this, &MainWindow::updateWindowTitle);
 
