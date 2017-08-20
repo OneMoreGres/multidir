@@ -10,7 +10,7 @@ class ShellCommand
 public:
   explicit ShellCommand (const QString &raw);
 
-  bool run ();
+  bool run () const;
   bool run (QProcess &process) const;
 
   bool isManaged () const;

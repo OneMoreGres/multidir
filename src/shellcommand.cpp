@@ -18,7 +18,7 @@ ShellCommand::ShellCommand (const QString &raw) :
   }
 }
 
-bool ShellCommand::run ()
+bool ShellCommand::run () const
 {
   const auto parts = parse (command_);
   LDEBUG () << "Shell" << parts;
