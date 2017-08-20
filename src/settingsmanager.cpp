@@ -11,18 +11,17 @@ namespace
 {
 #ifdef Q_OS_LINUX
 const auto defaultConsole = QString ("xterm");
-const auto defaultRunInConsole = QString ("xterm -hold -e %command%");
+const auto defaultRunInConsole = QString ("%command%");
 const auto defaultEditor = QString ("gedit");
 #endif
 #ifdef Q_OS_WIN
 const auto defaultConsole = QString ("cmd /C start cmd");
-const auto defaultRunInConsole = QString ("cmd /C start %command%");
+const auto defaultRunInConsole = QString ("cmd /C %command%");
 const auto defaultEditor = QString ("notepad.exe");
 #endif
 #ifdef Q_OS_MAC
 const auto defaultConsole = QString ("open -n -a Terminal %d");
-const auto defaultRunInConsole =
-  QString ("osascript -e 'tell application \"Terminal\" to do script \"cd %d && %command%\"'");
+const auto defaultRunInConsole = QString ("%command%");
 const auto defaultEditor = QString ("open -a TextEdit");
 #endif
 

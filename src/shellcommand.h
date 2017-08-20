@@ -23,7 +23,7 @@ public:
                             const QFileInfo &current, const QList<QFileInfo> &selection);
   void preprocessFileArguments (const QFileInfo &info, bool forceFilePath = false);
 
-  void setConsoleWrapper (const QString &wrapper);
+  void setWrapper (const QString &wrapper);
 
 protected:
   static QStringList parse (const QString &command);

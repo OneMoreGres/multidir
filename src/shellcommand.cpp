@@ -119,7 +119,7 @@ void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFil
   command_.replace ("%p", QDir::toNativeSeparators (info.absoluteFilePath ()));
 }
 
-void ShellCommand::setConsoleWrapper (const QString &wrapper)
+void ShellCommand::setWrapper (const QString &wrapper)
 {
   auto command = wrapper;
   if (!command.contains ("%command%"))

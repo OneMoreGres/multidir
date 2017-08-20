@@ -297,7 +297,7 @@ DirWidget::DirWidget (FileSystemModel *model, QWidget *parent) :
 
   commandPrompt_->hide ();
   commandPrompt_->installEventFilter (this);
-  commandPrompt_->setToolTip (tr ("If starts with '+' - runs command in console. "
+  commandPrompt_->setToolTip (tr ("Prefix with '+' to show output. "
                                   "Substitutions: %ID% - tab with ID, "
                                   "%-ID% - current item of tab,"
                                   "%<separator?>*ID% - selected items of tab"));
@@ -452,7 +452,7 @@ void DirWidget::execCommandPrompt ()
   {
     command.preprocessSelection (i->index (), i->path_, i->current (), i->selected ());
   }
-  command.setConsoleWrapper (runInConsoleCommand_);
+  command.setWrapper (runInConsoleCommand_);
   command.preprocessFileArguments (path_);
   command.setWorkDir (path_);
   if (!command.run ())
@@ -820,6 +820,7 @@ void DirWidget::moveUp ()
 void DirWidget::openConsole ()
 {
   ShellCommand command (openConsoleCommand_);
+  command.setWrapper (runInConsoleCommand_);
   command.preprocessFileArguments (path_);
   command.setWorkDir (path_);
   command.run ();
@@ -829,6 +830,7 @@ void DirWidget::openInEditor ()
 {
   ShellCommand command (editorCommand_);
   command.preprocessFileArguments (current (), true);
+  command.setWrapper (runInConsoleCommand_);
   command.setWorkDir (path_);
   command.run ();
 }
