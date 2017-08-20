@@ -12,9 +12,9 @@ const QString qs_groups = "groups";
 const QString qs_currentGroup = "currentGroup";
 }
 
-GroupsView::GroupsView (FileSystemModel *model, QWidget *parent) :
+GroupsView::GroupsView (QSharedPointer<DirWidgetFactory> widgetFactory, QWidget *parent) :
   QWidget (parent),
-  model_ (model),
+  widgetFactory_ (widgetFactory),
   groups_ (new QStackedWidget (this))
 {
   auto layout = new QVBoxLayout (this);
@@ -99,7 +99,7 @@ GroupWidget &GroupsView::at (int index) const
 
 GroupWidget &GroupsView::add ()
 {
-  auto group = new GroupWidget (model_, this);
+  auto group = new GroupWidget (widgetFactory_, this);
   connect (this, &GroupsView::setNameFilter,
            group, &GroupWidget::setNameFilter);
 

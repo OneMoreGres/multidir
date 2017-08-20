@@ -12,6 +12,7 @@
 #include "notifier.h"
 #include "shortcutmanager.h"
 #include "settingsmanager.h"
+#include "dirwidgetfactory.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -31,7 +32,7 @@ const QString qs_geometry = "geometry";
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
   model_ (new FileSystemModel (this)),
-  groups_ (new GroupsView (model_, this)),
+  groups_ (nullptr),
   conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
   fileOperationsLayout_ (new QHBoxLayout),
@@ -42,6 +43,9 @@ MainWindow::MainWindow (QWidget *parent) :
 {
   setObjectName ("main");
   setWindowIcon (QIcon (":/app.png"));
+
+  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_);
+  groups_ = new GroupsView (widgetFactory, this);
 
   auto status = new QStatusBar (this);
   Notifier::setMain (status);

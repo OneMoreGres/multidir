@@ -88,7 +88,8 @@ SOURCES += \
     src/styleoptionsproxy.cpp \
     src/styleloader.cpp \
     src/shellcommandwidget.cpp \
-    src/shellcommandmodel.cpp
+    src/shellcommandmodel.cpp \
+    src/dirwidgetfactory.cpp
 
 HEADERS  += \
     src/dirwidget.h \
@@ -133,6 +134,7 @@ HEADERS  += \
     src/styleloader.h \
     src/shellcommandwidget.h \
     src/shellcommandmodel.h \
+    src/dirwidgetfactory.h
 
 RESOURCES += \
     resources.qrc
