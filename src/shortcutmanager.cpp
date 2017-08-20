@@ -6,11 +6,37 @@
 #include <QObject>
 #include <QSettings>
 #include <QAction>
+#include <QMenu>
 
 namespace
 {
 const auto qs_group = QString ("shortcuts");
 using SM = ShortcutManager;
+
+
+QAction * createAction (QWidget *context, QMenu *menu, bool isCheckable)
+{
+  auto action = new QAction (context);
+
+  if (context)
+  {
+    action->setShortcutContext (Qt::WidgetWithChildrenShortcut);
+    context->addAction (action);
+  }
+
+  if (isCheckable)
+  {
+    action->setCheckable (true);
+  }
+
+  if (menu)
+  {
+    menu->addAction (action);
+  }
+
+  return action;
+}
+
 
 struct Shortcut
 {
@@ -150,6 +176,30 @@ void ShortcutManager::setDefaults ()
                                       QIcon (":/permissions.png"), c};
   shortcuts[SM::View] = {{QS ("F3")}, QObject::tr ("View"),
                          QIcon (":/read.png"), c};
+}
+
+QAction * ShortcutManager::create (QWidget *context, Shortcut type, QMenu *menu,
+                                   bool isCheckable)
+{
+  auto action = createAction (context, menu, isCheckable);
+
+  ASSERT (0 <= type && type < ShortcutCount)
+  add (type, action);
+
+  return action;
+}
+
+QAction * ShortcutManager::create (QWidget *context, QKeySequence keys, QMenu *menu,
+                                   bool isCheckable)
+{
+  auto action = createAction (context, menu, isCheckable);
+
+  if (!keys.isEmpty ())
+  {
+    action->setShortcut (keys);
+  }
+
+  return action;
 }
 
 void ShortcutManager::save (QSettings &settings)

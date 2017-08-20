@@ -5,6 +5,8 @@
 
 class QSettings;
 class QAction;
+class QWidget;
+class QMenu;
 
 class ShortcutManager
 {
@@ -27,6 +29,11 @@ public:
   };
 
   static void setDefaults ();
+
+  static QAction * create (QWidget *context, Shortcut type,
+                           QMenu *menu = nullptr, bool isCheckable = false);
+  static QAction * create (QWidget *context, QKeySequence keys,
+                           QMenu *menu = nullptr, bool isCheckable = false);
 
   static void save (QSettings &settings);
   static void restore (QSettings &settings);

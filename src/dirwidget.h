@@ -63,7 +63,6 @@ protected:
 
 private:
   void newFolder ();
-  QAction * makeShortcut (int shortcutType, QMenu *menu, bool isCheckable = false);
 
   QFileInfo fileInfo (const QModelIndex &index) const;
   QStringList names (const QList<QModelIndex> &indexes) const;

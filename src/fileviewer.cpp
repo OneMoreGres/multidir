@@ -1,6 +1,7 @@
 #include "fileviewer.h"
 #include "debug.h"
 #include "notifier.h"
+#include "shortcutmanager.h"
 
 #include <QTextEdit>
 #include <QBoxLayout>
@@ -26,12 +27,8 @@ FileViewer::FileViewer (QWidget *parent) :
   setAttribute (Qt::WA_DeleteOnClose);
   setWindowModality (Qt::WindowModality::ApplicationModal);
 
-  auto *close = new QAction (this);
-  close->setShortcut ({Qt::Key_Escape});
-  close->setShortcutContext (Qt::WidgetWithChildrenShortcut);
-  addAction (close);
-  connect (close, &QAction::triggered,
-           this, &QWidget::close);
+  auto close = ShortcutManager::create (this,  Qt::Key_Escape);
+  connect (close, &QAction::triggered, this, &QWidget::close);
 
   edit_->setReadOnly (true);
 
