@@ -3,13 +3,19 @@
 #include <QStringList>
 
 class QFileInfo;
+class QProcess;
 
 class ShellCommand
 {
 public:
-  ShellCommand (const QString &raw);
+  explicit ShellCommand (const QString &raw);
 
   bool run ();
+  bool run (QProcess &process) const;
+
+  bool isManaged () const;
+  QString command () const;
+  QString workDir () const;
 
   void setWorkDir (const QFileInfo &info);
 
@@ -24,4 +30,5 @@ protected:
 
   QString command_;
   QString workDir_;
+  bool isManaged_;
 };
