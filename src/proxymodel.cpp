@@ -9,6 +9,7 @@
 #include <QPixmapCache>
 #include <QImageReader>
 #include <QThread>
+#include <QRegExp>
 
 
 ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
@@ -226,9 +227,15 @@ bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParen
       {
         return false;
       }
-      if (!nameFilter_.isEmpty () && !QDir::match (nameFilter_, info.fileName ()))
+      if (!nameFilter_.isEmpty () )
       {
-        return false;
+        QRegExp re (nameFilter_);
+        re.setPatternSyntax (QRegExp::Wildcard);
+        re.setCaseSensitivity (Qt::CaseInsensitive);
+        if (!re.exactMatch (info.fileName ()))
+        {
+          return false;
+        }
       }
     }
   }

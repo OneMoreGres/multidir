@@ -495,7 +495,7 @@ void DirWidget::setPath (const QFileInfo &path)
 
 void DirWidget::setNameFilter (const QString &filter)
 {
-  proxy_->setNameFilter (QLatin1String ("*") + filter + QLatin1String ("*"));
+  proxy_->setNameFilter (QLatin1Char ('*') + filter + QLatin1Char ('*'));
 }
 
 void DirWidget::openPath (const QModelIndex &index)
