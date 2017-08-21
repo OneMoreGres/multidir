@@ -31,6 +31,7 @@ FileViewer::FileViewer (QWidget *parent) :
   connect (close, &QAction::triggered, this, &QWidget::close);
 
   edit_->setReadOnly (true);
+  edit_->setFontFamily (QLatin1String ("Monospace"));
 
   auto layout = new QVBoxLayout (this);
   layout->addWidget (edit_);
