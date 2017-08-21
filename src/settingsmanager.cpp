@@ -46,6 +46,7 @@ QVector<Entry> entries = [] {
                     QS ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")};
   SET (TabIds) = {QS ("tabIds"),
                   QS ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")};
+  SET (TabSwitchOrder) = {QS ("tabSwitchOrder"), 0};
 
   SET (Translation) = {QS ("language"), {}};
 

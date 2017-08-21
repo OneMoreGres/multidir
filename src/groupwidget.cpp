@@ -29,7 +29,8 @@ GroupWidget::GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidge
   widgetFactory_ (widgetFactory),
   widgets_ (),
   view_ (new TiledView (this)),
-  ids_ ()
+  ids_ (),
+  tabSwitchOrder_ (TabSwitchOrder::ByIndex)
 {
   setObjectName ("group");
   auto layout = new QVBoxLayout (this);
@@ -105,6 +106,9 @@ void GroupWidget::updateSettings ()
 {
   SettingsManager settings;
   setIds (settings.get (SettingsManager::TabIds).toString ());
+  using Order = TabSwitchOrder;
+  tabSwitchOrder_ = settings.get (SettingsManager::TabSwitchOrder).toInt () == int (Order::ByPosition)
+                    ? Order::ByPosition : Order::ByIndex;
 }
 
 DirWidget * GroupWidget::addWidget ()
@@ -214,8 +218,17 @@ void GroupWidget::clone (DirWidget *widget)
 
 void GroupWidget::nextTab (DirWidget *widget)
 {
-  const auto order = view_->widgets ();
+  auto order = view_->widgets ();
   ASSERT (!order.isEmpty ());
+
+  if (tabSwitchOrder_ == TabSwitchOrder::ByPosition)
+  {
+    std::sort (order.begin (), order.end (), [](const QWidget *l, const QWidget *r) {
+                 return std::make_tuple (l->y (), l->x ()) <
+                 std::make_tuple (r->y (), r->x ());
+               });
+  }
+
   auto found = false;
   auto *target = order.first ();
   for (auto i: order)

@@ -9,7 +9,7 @@ public:
   {
     OpenConsoleCommand, RunInConsoleCommand, EditorCommand,
     CheckUpdates, StartInBackground, ImageCacheSize,
-    GroupIds, TabIds, Translation,
+    GroupIds, TabIds, TabSwitchOrder, Translation,
     ShowFreeSpace, ShowFilesInfo, ShowSelectionInfo,
     Style,
     TypeCount

@@ -13,6 +13,11 @@ class GroupWidget : public QWidget
 {
 Q_OBJECT
 public:
+  enum class TabSwitchOrder : int
+  {
+    ByIndex, ByPosition
+  };
+
   GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidget *parent = nullptr);
   ~GroupWidget ();
 
@@ -49,4 +54,5 @@ private:
   QList<Widget> widgets_;
   TiledView *view_;
   QString ids_;
+  TabSwitchOrder tabSwitchOrder_;
 };

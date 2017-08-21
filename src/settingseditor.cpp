@@ -4,6 +4,7 @@
 #include "settingsmanager.h"
 #include "styleloader.h"
 #include "debug.h"
+#include "groupwidget.h"
 
 #include <QGridLayout>
 #include <QKeySequenceEdit>
@@ -67,6 +68,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   startInBackground_ (new QCheckBox (tr ("Start in background"), this)),
   imageCache_ (new QSpinBox (this)),
   languages_ (new QComboBox (this)),
+  tabSwitchOrder_ (new QComboBox (this)),
   shortcuts_ (new QTableWidget (this)),
   groupShortcuts_ (new QLineEdit (this)),
   tabShortcuts_ (new QLineEdit (this)),
@@ -115,6 +117,11 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     layout->addWidget (new QLabel (tr ("Language")), row, 0);
     layout->addWidget (languages_, row, 1);
     languages_->setToolTip (tr ("Restart required"));
+
+    ++row;
+    layout->addWidget (new QLabel (tr ("Tab switch order")), row, 0);
+    layout->addWidget (tabSwitchOrder_, row, 1);
+    tabSwitchOrder_->addItems ({tr ("By id"), tr ("By position")});
 
     ++row;
     layout->addItem (new QSpacerItem (1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), row, 0);
@@ -336,6 +343,12 @@ void SettingsEditor::load ()
     }
   }
 
+  {
+    const auto tabSwitchOrder = settings.get (Type::TabSwitchOrder).toInt ();
+    tabSwitchOrder_->setCurrentIndex (tabSwitchOrder == int (GroupWidget::TabSwitchOrder::ByPosition)
+                                      ? 1 : 0);
+  }
+
   imageCache_->setValue (settings.get (Type::ImageCacheSize).toInt () / 1024);
 }
 
@@ -361,6 +374,12 @@ void SettingsEditor::save ()
     {
       settings.set (Type (i.value ()), casted->value ());
     }
+  }
+
+  {
+    settings.set (Type::TabSwitchOrder, int (tabSwitchOrder_->currentIndex () == 1
+                                             ? GroupWidget::TabSwitchOrder::ByPosition
+                                             : GroupWidget::TabSwitchOrder::ByIndex));
   }
 
   settings.set (Type::ImageCacheSize, imageCache_->value () * 1024);

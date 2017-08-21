@@ -46,6 +46,7 @@ private:
   QCheckBox *startInBackground_;
   QSpinBox *imageCache_;
   QComboBox *languages_;
+  QComboBox *tabSwitchOrder_;
 
   QTableWidget *shortcuts_;
   QLineEdit *groupShortcuts_;
