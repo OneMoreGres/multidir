@@ -16,6 +16,7 @@
 namespace
 {
 const QString qs_grometry = "viewer/geometry";
+const QString qs_zoom = "viewer/fontSize";
 }
 
 FileViewer::FileViewer (QWidget *parent) :
@@ -36,15 +37,33 @@ FileViewer::FileViewer (QWidget *parent) :
   auto layout = new QVBoxLayout (this);
   layout->addWidget (edit_);
 
-
   QSettings settings;
-  restoreGeometry (settings.value (qs_grometry, saveGeometry ()).toByteArray ());
+  restore (settings);
 }
 
 FileViewer::~FileViewer ()
 {
   QSettings settings;
+  save (settings);
+}
+
+void FileViewer::save (QSettings &settings) const
+{
   settings.setValue (qs_grometry, saveGeometry ());
+  settings.setValue (qs_zoom, edit_->font ().pointSizeF ());
+}
+
+void FileViewer::restore (QSettings &settings)
+{
+
+  restoreGeometry (settings.value (qs_grometry, saveGeometry ()).toByteArray ());
+  auto zoom = settings.value (qs_zoom).toDouble ();
+  if (zoom > 0)
+  {
+    auto f = edit_->font ();
+    f.setPointSizeF (zoom);
+    edit_->setFont (f);
+  }
 }
 
 bool FileViewer::setFile (const QString &name)

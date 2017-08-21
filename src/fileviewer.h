@@ -4,6 +4,7 @@
 #include <QFutureWatcher>
 
 class QTextEdit;
+class QSettings;
 
 class FileViewer : public QWidget
 {
@@ -18,6 +19,9 @@ public:
 private:
   void readInBackground (const QString &name);
   void setFileContents ();
+
+  void save (QSettings &settings) const;
+  void restore (QSettings &settings);
 
   QTextEdit *edit_;
   QFutureWatcher<QString> *watcher_;
