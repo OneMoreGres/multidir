@@ -5,7 +5,7 @@ set ROOT=%SELF_PATH%\..\..
 
 
 ::build
-lrelease %ROOT%\multidir.pro
+lrelease %ROOT%\src\multidir.pro
 qmake %ROOT%
 nmake
 if %errorlevel% neq 0 exit /b %errorlevel%

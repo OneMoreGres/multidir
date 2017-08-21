@@ -15,17 +15,12 @@ VERSION=`cat "$ROOT/version"`
 
 
 # build
-lrelease "$ROOT/multidir.pro"
+lrelease "$ROOT/src/multidir.pro"
 qmake "$ROOT/"
 make -j2
 
 
 # test
-#mkdir -p tests
-#cd tests
-#qmake "$ROOT/tests/"
-#make -j2
-#cd ..
 ./tests/tests.app/Contents/MacOS/tests
 
 

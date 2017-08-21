@@ -17,7 +17,7 @@ echo `qmake --version`
 
 
 # build
-lrelease "$ROOT/multidir.pro"
+lrelease "$ROOT/src/multidir.pro"
 qmake "$ROOT/"
 make -j`nproc`
 
