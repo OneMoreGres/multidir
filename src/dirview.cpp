@@ -173,6 +173,8 @@ void DirView::setIsList (bool isList)
 
   auto selection = view ()->selectionModel ();
   connect (selection, &QItemSelectionModel::currentChanged,
+           this, &DirView::fixCurrentColumn);
+  connect (selection, &QItemSelectionModel::currentRowChanged,
            this, &DirView::currentChanged);
   connect (selection, &QItemSelectionModel::selectionChanged,
            this, &DirView::selectionChanged);
@@ -254,6 +256,15 @@ void DirView::setGlowColor (const QColor &color)
   if (auto effect = qobject_cast<QGraphicsDropShadowEffect *>(graphicsEffect ()))
   {
     effect->setColor (glowColor_);
+  }
+}
+
+void DirView::fixCurrentColumn ()
+{
+  const auto current = currentIndex ();
+  if (current.isValid () && current.column () != 0)
+  {
+    setCurrentIndex (current.sibling (current.row (), FileSystemModel::Name));
   }
 }
 

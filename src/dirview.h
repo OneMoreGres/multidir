@@ -62,6 +62,7 @@ private:
   void initList ();
   void updateStyle ();
   void setGlowColor (const QColor &color);
+  void fixCurrentColumn ();
 
   bool isList_;
   bool isLocked_;
