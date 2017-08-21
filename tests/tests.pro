@@ -6,17 +6,17 @@ QT += widgets
 CONFIG += c++11
 
 OTHER_FILES += \
-    ../uncrustify.cfg
+    $$PWD/../uncrustify.cfg
 
 INCLUDEPATH += $$PWD/../src
 VPATH += $$PWD/..
 
 SOURCES += \
+    $$PWD/../src/filepermissions.cpp \
+    $$PWD/../src/shellcommand.cpp \
+    $$PWD/../src/notifier.cpp \
+    $$PWD/../src/debug.cpp \
     main.cpp \
-    src/filepermissions.cpp \
-    src/shellcommand.cpp \
-    src/notifier.cpp \
-    src/debug.cpp \
     filepermissions_test.cpp \
     shellcommand_test.cpp
 

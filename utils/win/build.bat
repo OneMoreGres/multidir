@@ -5,18 +5,13 @@ set ROOT=%SELF_PATH%\..\..
 
 
 ::build
-lrelease %ROOT%\multidir.pro
+lrelease %ROOT%\src\multidir.pro
 qmake %ROOT%
 nmake
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 
 ::test
-mkdir tests
-cd tests
-qmake %ROOT%\tests\
-nmake
-cd ..
 tests\release\tests.exe
 if %errorlevel% neq 0 exit /b %errorlevel%
 
@@ -26,7 +21,7 @@ mkdir content
 mkdir content\app
 mkdir content\app\translations
 mkdir content\app\styles
-copy /Y release\multidir.exe content\app
+copy /Y src\release\multidir.exe content\app
 
 windeployqt --release content\app\multidir.exe
 
