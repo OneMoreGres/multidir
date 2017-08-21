@@ -458,14 +458,8 @@ void DirWidget::execCommandPrompt ()
     }
   }
 
-  if (commandRunner_->run (commandPrompt_->text (), selections, path_))
-  {
-    commandPrompt_->selectAll ();
-  }
-  else
-  {
-    commandPrompt_->hide ();
-  }
+  commandRunner_->run (commandPrompt_->text (), selections, path_);
+  commandPrompt_->hide ();
 }
 
 void DirWidget::openConsole ()
