@@ -614,7 +614,8 @@ void DirWidget::adjustItems ()
 void DirWidget::promptClose ()
 {
   auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?")
-                                    .arg (path ().absoluteFilePath ()));
+                                    .arg (path ().absoluteFilePath ()),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
     emit closeRequested (this);
@@ -629,7 +630,8 @@ void DirWidget::promptTrash ()
     return;
   }
   auto res = QMessageBox::question (this, {}, tr ("Move files \"%1\" to trash?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))));
+                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
     QList<QFileInfo> infos;
@@ -649,7 +651,8 @@ void DirWidget::promptRemove ()
     return;
   }
   auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))));
+                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
     QList<QFileInfo> infos;

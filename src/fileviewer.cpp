@@ -81,7 +81,9 @@ bool FileViewer::setFile (const QString &name)
   const auto bigSize = 1 * 1024 * 1024;
   if (size > bigSize)
   {
-    const auto res = QMessageBox::question (this, {}, tr ("File is too big. Continue?"));
+    const auto res = QMessageBox::question (this, {}, tr ("File is too big. Continue?"),
+                                            QMessageBox::Yes | QMessageBox::No,
+                                            QMessageBox::Yes);
     if (res == QMessageBox::No)
     {
       return false;

@@ -90,8 +90,8 @@ void GroupsMenu::renameCurrent ()
 void GroupsMenu::removeCurrent ()
 {
   auto &group = view_->current ();
-  const auto res = QMessageBox::question (view_, {}, tr ("Close group \"%1\"?")
-                                          .arg (group.name ()));
+  const auto res = QMessageBox::question (view_, {}, tr ("Close group \"%1\"?").arg (group.name ()),
+                                          QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res != QMessageBox::Yes)
   {
     return;
