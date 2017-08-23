@@ -1,5 +1,27 @@
 Changes.
 
+0.2.0:
+
+* Added ability to show shell command output.
+* Added base styling support.
+* Added navigation history.
+* Added portable mode.
+* Added some status info for dir/selection.
+* Added simple text file viewer.
+* Added ability to change translation from GUI.
+* Added osx version.
+* Added permissions and link target columns to table view.
+* Fixed name filtering with spaces.
+* Set default button to Yes in all question dialogs.
+* Improved support of multiple selection.
+* Improved file operation conflict solving.
+* Fixed "frozen" notifications.
+* Fixed absence of tabs without id in "copy/... в" menus
+* Enabled column moving.
+* Other tweaks and fixes.
+
+---
+
 0.1.0:
 
 * Initial release
