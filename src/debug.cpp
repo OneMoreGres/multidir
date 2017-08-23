@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QThread>
 
 
 namespace
@@ -27,6 +28,7 @@ void handler (QtMsgType type, const QMessageLogContext &context, const QString &
   }.value (type);
 
   auto message = QDateTime::currentDateTime ().toString ("yyyy.MM.dd hh:mm:ss.zzz").toUtf8 () +
+                 ' ' + QByteArray::number (qintptr (QThread::currentThreadId ())) +
                  ' ' + QByteArray (context.file) + ':' + QByteArray::number (context.line) +
                  ' ' + typeName + ": " + msg.toUtf8 () + '\n';
 
