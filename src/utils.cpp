@@ -57,7 +57,8 @@ qint64 totalSize (const QFileInfo &info)
 Infos dirEntries (const QFileInfo &info)
 {
   QDir dir (info.absoluteFilePath ());
-  return dir.entryInfoList (QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+  return dir.entryInfoList (QDir::Files | QDir::Hidden | QDir::System |
+                            QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
 QString uniqueChars (const QString &source)
