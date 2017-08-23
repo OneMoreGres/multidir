@@ -49,7 +49,7 @@ replace traditional file managers.
 ### Compilation
 
 * run `qmake` then `make`
-* *optionally* run `lrelease multidir.pro` to compile translation files
+* *optionally* run `lrelease src/multidir.pro` to compile translation files
 
 ## License
 
