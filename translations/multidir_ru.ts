@@ -83,12 +83,12 @@
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="631"/>
+        <location filename="../src/dirwidget.cpp" line="632"/>
         <source>Move files &quot;%1&quot; to trash?</source>
         <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirwidget.cpp" line="651"/>
+        <location filename="../src/dirwidget.cpp" line="653"/>
         <source>Remove &quot;%1&quot; permanently?</source>
         <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
     </message>
@@ -232,7 +232,7 @@ Modified: %3</source>
         <translation>Файл слишком большой. Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/fileviewer.cpp" line="129"/>
+        <location filename="../src/fileviewer.cpp" line="131"/>
         <source>Failed to read file &apos;%1&apos;: &apos;%2&apos;</source>
         <translation>Ошибка чтения файла &apos;%1&apos;: &apos;%2&apos;</translation>
     </message>
@@ -342,47 +342,67 @@ Modified: %3</source>
 <context>
     <name>PropertiesWidget</name>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="36"/>
+        <location filename="../src/propertieswidget.cpp" line="69"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="40"/>
+        <location filename="../src/propertieswidget.cpp" line="73"/>
         <source>Name: </source>
         <translation>Имя: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="41"/>
+        <location filename="../src/propertieswidget.cpp" line="74"/>
         <source>Path: </source>
         <translation>Путь: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="42"/>
+        <location filename="../src/propertieswidget.cpp" line="76"/>
+        <source>Files: </source>
+        <translation>Файлов: </translation>
+    </message>
+    <message>
+        <location filename="../src/propertieswidget.cpp" line="77"/>
+        <source>Hidden: </source>
+        <translation>Скрытых: </translation>
+    </message>
+    <message>
+        <location filename="../src/propertieswidget.cpp" line="78"/>
+        <source>Links: </source>
+        <translation>Ссылок: </translation>
+    </message>
+    <message>
+        <location filename="../src/propertieswidget.cpp" line="79"/>
+        <source>Directories: </source>
+        <translation>Папок: </translation>
+    </message>
+    <message>
+        <location filename="../src/propertieswidget.cpp" line="80"/>
         <source>Size: </source>
         <translation>Размер: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="43"/>
+        <location filename="../src/propertieswidget.cpp" line="81"/>
         <source>Created: </source>
         <translation>Создано: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="44"/>
+        <location filename="../src/propertieswidget.cpp" line="82"/>
         <source>Last modified: </source>
         <translation>Последняя правка: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="45"/>
+        <location filename="../src/propertieswidget.cpp" line="83"/>
         <source>Owner: </source>
         <translation>Владелец: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="46"/>
+        <location filename="../src/propertieswidget.cpp" line="84"/>
         <source>Group: </source>
         <translation>Группа: </translation>
     </message>
     <message>
-        <location filename="../src/propertieswidget.cpp" line="47"/>
+        <location filename="../src/propertieswidget.cpp" line="85"/>
         <source>Access rights: </source>
         <translation>Права доступа: </translation>
     </message>
@@ -390,12 +410,12 @@ Modified: %3</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/debug.cpp" line="58"/>
+        <location filename="../src/debug.cpp" line="60"/>
         <source>Failed to create log file: %1</source>
         <translation>Ошибка создания лог-файла: %1</translation>
     </message>
     <message>
-        <location filename="../src/debug.cpp" line="64"/>
+        <location filename="../src/debug.cpp" line="66"/>
         <source>Started logging to file: %1</source>
         <translation>Запущена запись лога в файл: %1</translation>
     </message>
