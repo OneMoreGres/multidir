@@ -142,6 +142,8 @@ void ShortcutManager::setDefaults ()
                                    {}, c};
   shortcuts[SM::HistoryBackward] = {{QS ("Ctrl+Z")}, QObject::tr ("Backward"),
                                     {}, c};
+  shortcuts[SM::AdjustColumSizes] = {{QS ("Ctrl+Alt+R")}, QObject::tr ("Adjust column sizes"),
+                                     {}, c};
 
   c = SM::Item;
   shortcuts[SM::OpenItem] = {{}, QObject::tr ("Open"),
