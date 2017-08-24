@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include "catch_ext.h"
 #include "shellcommand.h"
 
 namespace
@@ -52,6 +52,24 @@ TEST_CASE ("parsing", "[shell command]")
   {
     QStringList expected {"test two three"};
     const auto actual = ShellCommandProxy::parse ("'test two three'");
+    REQUIRE (expected == actual);
+  }
+  SECTION ("two quotes")
+  {
+    QStringList expected {{"test"}, {"two"}, {"three"}};
+    const auto actual = ShellCommandProxy::parse ("test \"two\" \"three\"");
+    REQUIRE (expected == actual);
+  }
+  SECTION ("space escaped")
+  {
+    QStringList expected {{"test"}, {"two three"}};
+    const auto actual = ShellCommandProxy::parse ("test two\\ three");
+    REQUIRE (expected == actual);
+  }
+  SECTION ("quoted escaped")
+  {
+    QStringList expected {{"test"}, {"two three"}};
+    const auto actual = ShellCommandProxy::parse ("test 'two\\ three'");
     REQUIRE (expected == actual);
   }
 }

@@ -21,4 +21,5 @@ SOURCES += \
     shellcommand_test.cpp
 
 HEADERS  += \
-    catch.hpp
+    catch.hpp \
+    catch_ext.h

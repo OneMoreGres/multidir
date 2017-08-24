@@ -27,6 +27,9 @@ public:
 
 protected:
   static QStringList parse (const QString &command);
+  static QString toPath (const QFileInfo &info);
+  static QString toDir (const QFileInfo &info);
+  static QString toArg (const QString &arg);
 
   QString command_;
   QString workDir_;

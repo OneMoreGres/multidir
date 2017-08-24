@@ -6,6 +6,11 @@
 #include <QRegularExpression>
 #include <QDir>
 
+namespace
+{
+const QVector<QChar> quotes {QLatin1Char ('"'), QLatin1Char ('\'')};
+}
+
 
 ShellCommand::ShellCommand (const QString &raw) :
   command_ (raw.trimmed ()),
@@ -71,29 +76,32 @@ bool ShellCommand::isManaged () const
 
 void ShellCommand::setWorkDir (const QFileInfo &info)
 {
-  workDir_ = QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
-                                                     : info.absolutePath ());
+  workDir_ = toDir (info);
 }
 
 void ShellCommand::preprocessSelection (const QString &index, const QFileInfo &path,
                                         const QFileInfo &current, const QList<QFileInfo> &selection)
 {
-  const QString pathPlaceholder ("%%1%");
-  command_.replace (pathPlaceholder.arg (index),
-                    QDir::toNativeSeparators (path.absoluteFilePath ()));
+  const auto pathPlaceholder = QString ("%%1%").arg (index);
+  if (command_.contains (pathPlaceholder))
+  {
+    command_.replace (pathPlaceholder, toPath (path));
+  }
 
-  const QString itemPlaceholder ("%-%1%");
-  command_.replace (itemPlaceholder.arg (index),
-                    QDir::toNativeSeparators (current.absoluteFilePath ()));
+  const auto itemPlaceholder = QString ("%-%1%").arg (index);
+  if (command_.contains (itemPlaceholder))
+  {
+    command_.replace (itemPlaceholder, toPath (current));
+  }
 
-  const QString selectedPlaceholder (R"(%(.)?\*%1%)");
-  const QRegularExpression selectedRegex (selectedPlaceholder.arg (index));
+  const auto selectedPlaceholder = QString (R"(%(.)?\*%1%)").arg (index);
+  const QRegularExpression selectedRegex (selectedPlaceholder);
   if (command_.contains (selectedRegex))
   {
     QStringList items;
     for (const auto &i: selection)
     {
-      items << QDir::toNativeSeparators (i.absoluteFilePath ());
+      items << toPath (i);
     }
 
     auto match = selectedRegex.match (command_);
@@ -110,13 +118,12 @@ void ShellCommand::preprocessSelection (const QString &index, const QFileInfo &p
 
 void ShellCommand::preprocessFileArguments (const QFileInfo &info, bool forceFilePath)
 {
-  command_.replace ("%d", QDir::toNativeSeparators (info.isDir () ? info.absoluteFilePath ()
-                                                                  : info.absolutePath ()));
+  command_.replace ("%d", toDir (info));
   if (forceFilePath && !command_.contains ("%p"))
   {
     command_ += " %p";
   }
-  command_.replace ("%p", QDir::toNativeSeparators (info.absoluteFilePath ()));
+  command_.replace ("%p", toPath (info));
 }
 
 void ShellCommand::setWrapper (const QString &wrapper)
@@ -133,29 +140,61 @@ void ShellCommand::setWrapper (const QString &wrapper)
 QStringList ShellCommand::parse (const QString &command)
 {
   QStringList parts;
-  QChar separator;
   auto startIndex = -1;
+  auto isQuoted = false;
   for (auto i = 0, end = command.size (); i < end; ++i)
   {
-    if (separator.isNull ())
+    if (command[i] == QLatin1Char (' '))
     {
-      separator = (command[i] == '"' ? '"' : ' ');
-      separator = (command[i] == '\'' ? '\'' : separator);
-      startIndex = i + int (separator != ' ');
-    }
-    else
-    {
-      if (command[i] == separator)
+      if (isQuoted || (i > 1 && command[i - 1] == '\\'))
       {
-        parts << command.mid (startIndex, i - startIndex);
-        startIndex = i + int (separator != ' ');
-        separator = QChar ();
+        continue;
       }
+
+      parts << toArg (command.mid (startIndex, i - startIndex));
+      startIndex = i + 1;
+    }
+    else if (quotes.contains (command[i]))
+    {
+      isQuoted = !isQuoted;
     }
   }
+
   if (startIndex != command.size ())
   {
-    parts << command.mid (startIndex);
+    parts << toArg (command.mid (startIndex));
   }
+
+  parts.removeAll ({});
   return parts;
+}
+
+QString ShellCommand::toPath (const QFileInfo &info)
+{
+  auto path = QDir::toNativeSeparators (info.absoluteFilePath ());
+  return path.replace (' ', "\\ ");
+}
+
+QString ShellCommand::toDir (const QFileInfo &info)
+{
+  return toPath (info.isDir () ? info : info.absolutePath ());
+}
+
+QString ShellCommand::toArg (const QString &arg)
+{
+  if (arg.size () < 2)
+  {
+    return arg;
+  }
+
+  auto result = arg;
+  const auto first = *result.begin ();
+  const auto last = *(result.end () - 1);
+  if (first == last && quotes.contains (first))
+  {
+    result = result.mid (1, result.size () - 2);
+  }
+
+  result.replace ("\\ ", " ");
+  return result;
 }
