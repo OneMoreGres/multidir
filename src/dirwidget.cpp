@@ -107,6 +107,10 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidg
   connect (nextTab, &QAction::triggered,
            this, [this] {emit nextTabRequested (this);});
 
+  auto previousTab = Shortcut::create (this, Shortcut::PreviousTab, nullptr);
+  connect (previousTab, &QAction::triggered,
+           this, [this] {emit previousTabRequested (this);});
+
 
   auto adjustColumns = ShortcutManager::create (this, Shortcut::AdjustColumSizes);
   connect (adjustColumns, &QAction::triggered,

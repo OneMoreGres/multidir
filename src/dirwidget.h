@@ -53,6 +53,7 @@ signals:
   void closeRequested (DirWidget *widget);
   void cloneRequested (DirWidget *widget);
   void nextTabRequested (DirWidget *widget);
+  void previousTabRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
   void fileOperation (QSharedPointer<FileOperation> operation);
 

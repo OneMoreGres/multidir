@@ -36,10 +36,12 @@ private:
   void close (DirWidget *widget);
   void clone (DirWidget *widget);
   void nextTab (DirWidget *widget);
+  void previousTab (DirWidget *widget);
   void add (const QFileInfo &path);
   void updateWidgetNames ();
   void updateWidgetShortcuts ();
   void setIds (const QString &ids);
+  QList<QWidget *> orderedTabs () const;
 
   struct Widget
   {

@@ -123,6 +123,8 @@ DirWidget * GroupWidget::addWidget ()
            this, &GroupWidget::clone);
   connect (w, &DirWidget::nextTabRequested,
            this, &GroupWidget::nextTab);
+  connect (w, &DirWidget::previousTabRequested,
+           this, &GroupWidget::previousTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
 
@@ -218,6 +220,26 @@ void GroupWidget::clone (DirWidget *widget)
 
 void GroupWidget::nextTab (DirWidget *widget)
 {
+  const auto order = orderedTabs ();
+  auto it = std::find (order.cbegin (), order.cend (), widget);
+
+  auto casted = qobject_cast<DirWidget *>((++it == order.cend ()) ? order.first () : *it);
+  ASSERT (casted);
+  casted->activate ();
+}
+
+void GroupWidget::previousTab (DirWidget *widget)
+{
+  const auto order = orderedTabs ();
+  auto it = std::find (order.cbegin (), order.cend (), widget);
+
+  auto casted = qobject_cast<DirWidget *>((it == order.cbegin ()) ? order.last () : *(--it));
+  ASSERT (casted);
+  casted->activate ();
+}
+
+QList<QWidget *> GroupWidget::orderedTabs () const
+{
   auto order = view_->widgets ();
   ASSERT (!order.isEmpty ());
 
@@ -228,25 +250,7 @@ void GroupWidget::nextTab (DirWidget *widget)
                  std::make_tuple (r->y (), r->x ());
                });
   }
-
-  auto found = false;
-  auto *target = order.first ();
-  for (auto i: order)
-  {
-    if (i == widget)
-    {
-      found = true;
-    }
-    else if (found)
-    {
-      target = i;
-      break;
-    }
-  }
-
-  auto casted = qobject_cast<DirWidget *>(target);
-  ASSERT (casted);
-  casted->activate ();
+  return order;
 }
 
 void GroupWidget::add (const QFileInfo &path)

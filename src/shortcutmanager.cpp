@@ -132,6 +132,8 @@ void ShortcutManager::setDefaults ()
                                  QIcon (":/newFolder.png"), c};
   shortcuts[SM::NextTab] = {{QS ("Tab")}, QObject::tr ("Switch to next"),
                             {}, c};
+  shortcuts[SM::PreviousTab] = {{QS ("Ctrl+Tab")}, QObject::tr ("Switch to previous"),
+                                {}, c};
   shortcuts[SM::SwitchTab] = {{QS ("Ctrl+E")}, QObject::tr ("Switch tab (plus ID)"),
                               {}, c};
   shortcuts[SM::MoveUp] = {{}, QObject::tr ("Move up"),
