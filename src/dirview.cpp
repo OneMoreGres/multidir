@@ -174,8 +174,6 @@ void DirView::setIsList (bool isList)
   }
 
   auto selection = view ()->selectionModel ();
-  connect (selection, &QItemSelectionModel::currentChanged,
-           this, &DirView::fixCurrentColumn);
   connect (selection, &QItemSelectionModel::currentRowChanged,
            this, &DirView::currentChanged);
   connect (selection, &QItemSelectionModel::selectionChanged,
@@ -258,15 +256,6 @@ void DirView::setGlowColor (const QColor &color)
   if (auto effect = qobject_cast<QGraphicsDropShadowEffect *>(graphicsEffect ()))
   {
     effect->setColor (glowColor_);
-  }
-}
-
-void DirView::fixCurrentColumn ()
-{
-  const auto current = currentIndex ();
-  if (current.isValid () && current.column () != 0)
-  {
-    setCurrentIndex (current.sibling (current.row (), FileSystemModel::Name));
   }
 }
 
@@ -356,6 +345,7 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
     auto casted = static_cast<QKeyEvent *>(event);
     const auto key = casted->key ();
     const auto modifiers = casted->modifiers ();
+    const auto current = view ()->currentIndex ();
 
     if (modifiers == Qt::NoModifier)
     {
@@ -380,7 +370,7 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
         const auto rows = model_->rowCount (rootIndex ());
         if (rows > 0)
         {
-          setCurrentIndex (model_->index (0, 0, rootIndex ()));
+          setCurrentIndex (model_->index (0, current.column (), rootIndex ()));
         }
         return true;
       }
@@ -390,10 +380,16 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
         const auto rows = model_->rowCount (rootIndex ());
         if (rows > 0)
         {
-          setCurrentIndex (model_->index (rows - 1, 0, rootIndex ()));
+          setCurrentIndex (model_->index (rows - 1, current.column (), rootIndex ()));
         }
         return true;
       }
+    }
+
+    if (!casted->text ().isEmpty () &&
+        !(modifiers & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
+    {
+      setCurrentIndex (model_->index (current.row (), 0, rootIndex ()));
     }
   }
   else if (event->type () == QEvent::FocusIn)
