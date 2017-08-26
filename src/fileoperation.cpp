@@ -230,11 +230,12 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       }
     }
 
+    const auto targetFileName = targetDir.absoluteFilePath (name);
     if (source.isDir ())
     {
       const auto removeSource = action_ == FileOperation::Action::Move;
       if (createDir (targetDir, name)
-          && transfer (utils::dirEntries (source), targetDir.absoluteFilePath (name), depth + 1)
+          && transfer (utils::dirEntries (source), targetFileName, depth + 1)
           && ((removeSource && removeInfo (source)) || !removeSource))
       {
         continue;
@@ -247,11 +248,21 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
     switch (action_)
     {
       case FileOperation::Action::Copy:
-        ok &= QFile::copy (source.absoluteFilePath (), targetDir.absoluteFilePath (name));
+        if (!QFile::copy (source.absoluteFilePath (), targetFileName))
+        {
+          ok = false;
+          Notifier::error (tr ("Failed to copy file %1 to %2")
+                           .arg (source.fileName (), targetDir.absolutePath ()));
+        }
         break;
 
       case FileOperation::Action::Move:
-        ok &= QFile::rename (source.absoluteFilePath (), targetDir.absoluteFilePath (name));
+        if (!QFile::rename (source.absoluteFilePath (), targetFileName))
+        {
+          ok = false;
+          Notifier::error (tr ("Failed to move file %1 to %2")
+                           .arg (source.fileName (), targetDir.absolutePath ()));
+        }
         break;
 
       default:
@@ -280,14 +291,20 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
       break;
     }
     auto name = source.fileName ();
+    const auto targetFileName = targetDir.absoluteFilePath (name);
     if (targetDir.exists (name))
     {
       ok = false;
-      Notifier::error (tr ("Target already exists ") + targetDir.absoluteFilePath (name));
+      Notifier::error (tr ("Target already exists ") + targetFileName);
       continue;
     }
 
-    ok &= QFile::link (source.absoluteFilePath (), targetDir.absoluteFilePath (name));
+    if (!QFile::link (source.absoluteFilePath (), targetFileName))
+    {
+      ok = false;
+      Notifier::error (tr ("Failed to link file %1 to %2")
+                       .arg (source.fileName (), targetDir.absolutePath ()));
+    }
     advance (1);
   }
   emit finished (ok);
@@ -310,7 +327,11 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       case FileOperation::Action::Remove:
         if (!i.isDir ())
         {
-          ok &= QFile::remove (i.absoluteFilePath ());
+          if (!QFile::remove (i.absoluteFilePath ()))
+          {
+            ok = false;
+            Notifier::error (tr ("Failed to remove file ") + i.absoluteFilePath ());
+          }
         }
         else
         {
@@ -320,7 +341,11 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
         break;
 
       case FileOperation::Action::Trash:
-        ok &= Trash::trash (i);
+        if (!Trash::trash (i))
+        {
+          ok = false;
+          Notifier::error (tr ("Failed to trash ") + i.absoluteFilePath ());
+        }
         break;
 
       default:
