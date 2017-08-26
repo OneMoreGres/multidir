@@ -60,6 +60,15 @@ void DirStatusWidget::updateSettings ()
   entries_->setVisible (entries_->isEnabled ());
   selection_->setVisible (selection_->isEnabled ());
 
+  if (storage_->isEnabled ())
+  {
+    updateStorage ();
+  }
+  if (entries_->isEnabled ())
+  {
+    updateEntries ();
+  }
+
   if (storage_->isEnabled () || entries_->isEnabled () || selection_->isEnabled ())
   {
     show ();
