@@ -27,8 +27,8 @@ public:
 
   void setNameFilter (const QString &name);
 
-  void setCurrent (const QModelIndex &current);
-  QModelIndex current () const;
+  void setRootIndex (const QModelIndex &index);
+  QModelIndex rootIndex () const;
 
   QVariant data (const QModelIndex &index, int role) const override;
   QVariant headerData (int section, Qt::Orientation orientation,
@@ -45,6 +45,8 @@ public:
   bool isDotDot (const QModelIndex &index) const;
 
   QFileInfo currentPath () const;
+
+  void setCurrentIndex (const QModelIndex &index);
 
 signals:
   void contentsChanged ();
@@ -67,8 +69,10 @@ private:
   bool showHidden_;
   bool showThumbnails_;
   QString nameFilter_;
-  QPersistentModelIndex current_;
+  QPersistentModelIndex rootItem_;
+  QPersistentModelIndex currentItem_;
   QThread *iconReaderThread_;
+  QColor currentColor_;
   QColor dirColor_;
   QColor inaccessibleDirColor_;
   QColor executableColor_;

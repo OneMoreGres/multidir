@@ -21,8 +21,10 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   showHidden_ (false),
   showThumbnails_ (false),
   nameFilter_ (),
-  current_ (),
+  rootItem_ (),
+  currentItem_ (),
   iconReaderThread_ (new QThread (this)),
+  currentColor_ (),
   dirColor_ (),
   inaccessibleDirColor_ (),
   executableColor_ (),
@@ -135,22 +137,22 @@ void ProxyModel::setShowThumbnails (bool isOn)
 
 bool ProxyModel::isDir (int row) const
 {
-  return model_->isDir (mapToSource (index (row, 0, current ())));
+  return model_->isDir (mapToSource (index (row, 0, rootIndex ())));
 }
 
 qint64 ProxyModel::fileSize (int row) const
 {
-  return model_->size (mapToSource (index (row, 0, current ())));
+  return model_->size (mapToSource (index (row, 0, rootIndex ())));
 }
 
 QString ProxyModel::fileName (int row) const
 {
-  return model_->fileName (mapToSource (index (row, 0, current ())));
+  return model_->fileName (mapToSource (index (row, 0, rootIndex ())));
 }
 
 int ProxyModel::count () const
 {
-  return rowCount (current ());
+  return rowCount (rootIndex ());
 }
 
 bool ProxyModel::isDotDot (const QModelIndex &index) const
@@ -160,7 +162,18 @@ bool ProxyModel::isDotDot (const QModelIndex &index) const
 
 QFileInfo ProxyModel::currentPath () const
 {
-  return model_->fileInfo (current_);
+  return model_->fileInfo (rootItem_);
+}
+
+void ProxyModel::setCurrentIndex (const QModelIndex &index)
+{
+  currentItem_ = index;
+  if (currentItem_.isValid ())
+  {
+    emit dataChanged (currentItem_.sibling (currentItem_.row (),0),
+                      currentItem_.sibling (currentItem_.row (),FileSystemModel::ColumnCount),
+                      {Qt::BackgroundRole});
+  }
 }
 
 void ProxyModel::setNameFilter (const QString &name)
@@ -174,22 +187,22 @@ void ProxyModel::setNameFilter (const QString &name)
   emit contentsChanged ();
 }
 
-void ProxyModel::setCurrent (const QModelIndex &current)
+void ProxyModel::setRootIndex (const QModelIndex &index)
 {
-  const auto mapped = mapToSource (current);
-  if (current_ == mapped)
+  const auto mapped = mapToSource (index);
+  if (rootItem_ == mapped)
   {
     return;
   }
-  current_ = mapToSource (current);
+  rootItem_ = mapped;
   invalidateFilter ();
-  emit currentChanged (current_);
+  emit currentChanged (index);
   emit contentsChanged ();
 }
 
-QModelIndex ProxyModel::current () const
+QModelIndex ProxyModel::rootIndex () const
 {
-  return mapFromSource (current_);
+  return mapFromSource (rootItem_);
 }
 
 bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const
@@ -204,7 +217,7 @@ bool ProxyModel::filterAcceptsRow (int sourceRow, const QModelIndex &sourceParen
     }
   }
 #endif
-  if (sourceParent == current_)
+  if (sourceParent == rootItem_)
   {
     const auto canFilter = !showDirs_ || !showFiles_ || !showDotDot_ ||
                            !showHidden_ || !nameFilter_.isEmpty ();
@@ -247,6 +260,10 @@ QVariant ProxyModel::data (const QModelIndex &index, int role) const
 {
   if (role == Qt::BackgroundRole)
   {
+    if (index.row () == currentItem_.row ())
+    {
+      return currentColor_;
+    }
     const auto info = model_->fileInfo (mapToSource (index));
     if (info.isDir ())
     {
@@ -304,14 +321,15 @@ void ProxyModel::updateIcon (const QString &fileName, const QPixmap &pixmap)
 void ProxyModel::updateStyle ()
 {
   const auto &options = StyleOptionsProxy::instance ();
+  currentColor_ = options.currentRowColor ();
   dirColor_ =  options.dirColor ();
   inaccessibleDirColor_ =  options.inaccessibleDirColor ();
   executableColor_ =  options.executableColor ();
   unreadableFileColor_ =  options.unreadableFileColor ();
 
-  if (current_.isValid ())
+  if (rootItem_.isValid ())
   {
-    const auto parent = mapFromSource (current_);
+    const auto parent = mapFromSource (rootItem_);
     const auto rows = rowCount (parent);
     if (rows > 0)
     {
@@ -369,7 +387,7 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
 
 void ProxyModel::detectContentsChange (const QModelIndex &parent)
 {
-  if (parent == current_)
+  if (parent == rootItem_)
   {
     emit contentsChanged ();
   }

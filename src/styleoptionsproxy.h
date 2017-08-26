@@ -6,6 +6,7 @@ class StyleOptionsProxy : public QWidget
 {
 Q_OBJECT
 Q_PROPERTY (QColor activeGlowColor READ activeGlowColor WRITE setActiveGlowColor)
+Q_PROPERTY (QColor currentRowColor READ currentRowColor WRITE setCurrentRowColor)
 Q_PROPERTY (QColor dirColor READ dirColor WRITE setDirColor)
 Q_PROPERTY (QColor inaccessibleDirColor READ inaccessibleDirColor WRITE setInaccessibleDirColor)
 Q_PROPERTY (QColor executableColor READ executableColor WRITE setExecutableColor)
@@ -22,6 +23,9 @@ public:
   QColor activeGlowColor () const;
   void setActiveGlowColor (const QColor &color);
 
+  QColor currentRowColor () const;
+  void setCurrentRowColor (const QColor &color);
+
   QColor dirColor () const;
   void setDirColor (const QColor &color);
 
@@ -35,16 +39,16 @@ public:
   void setUnreadableFileColor (const QColor &color);
 
   QColor stdErrOutputColor () const;
-  void setStdErrOutputColor (const QColor &stdErrOutputColor);
+  void setStdErrOutputColor (const QColor &color);
 
   QColor runningCommandColor () const;
-  void setRunningCommandColor (const QColor &runningCommandColor);
+  void setRunningCommandColor (const QColor &color);
 
   QColor finishedCommandColor () const;
-  void setFinishedCommandColor (const QColor &finishedCommandColor);
+  void setFinishedCommandColor (const QColor &color);
 
   QColor erroredCommandColor () const;
-  void setErroredCommandColor (const QColor &erroredCommandColor);
+  void setErroredCommandColor (const QColor &color);
 
 signals:
   void changed ();
@@ -57,6 +61,8 @@ private:
   void setDefaults ();
 
   QColor activeGlowColor_;
+
+  QColor currentRowColor_;
   QColor dirColor_;
   QColor inaccessibleDirColor_;
   QColor executableColor_;

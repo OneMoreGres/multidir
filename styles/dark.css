@@ -57,6 +57,7 @@ selection-color: white;
 }
 
 #style {
+qproperty-currentRowColor: #33cccc;
 qproperty-dirColor: #cccccc;
 qproperty-inaccessibleDirColor: #ff6666;
 qproperty-executableColor: #ffcc99;

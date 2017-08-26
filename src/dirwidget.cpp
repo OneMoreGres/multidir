@@ -101,6 +101,9 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidg
   connect (this, &DirWidget::fileOperation,
            model_, &FileSystemModel::fileOperation);
 
+  connect (view_, &DirView::currentChanged,
+           proxy_, &ProxyModel::setCurrentIndex);
+
 
   using Shortcut = ShortcutManager;
   auto nextTab = Shortcut::create (this, Shortcut::NextTab, nullptr);
@@ -524,7 +527,7 @@ void DirWidget::openPath (const QModelIndex &index)
   if (!index.isValid ()) // drives
   {
     view_->setRootIndex ({});
-    proxy_->setCurrent ({});
+    proxy_->setRootIndex ({});
   }
   else
   {
@@ -533,7 +536,7 @@ void DirWidget::openPath (const QModelIndex &index)
     const auto moveUp = previous.parent () == newIndex;
     view_->setRootIndex (newIndex);
     view_->setCurrentIndex (moveUp ? previous : view_->firstItem ());
-    proxy_->setCurrent (newIndex);
+    proxy_->setRootIndex (newIndex);
   }
   path_ = fileInfo (view_->rootIndex ());
   pathWidget_->setPath (path_);

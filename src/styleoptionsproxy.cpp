@@ -29,6 +29,7 @@ StyleOptionsProxy::StyleOptionsProxy (QWidget *parent) :
 void StyleOptionsProxy::setDefaults ()
 {
   activeGlowColor_ = QColor (0,153,204);
+  currentRowColor_ = QColor (Qt::cyan);
   dirColor_ = QColor (204,255,255);
   inaccessibleDirColor_ = QColor (255,153,153);
   executableColor_ = QColor (255,204,153);
@@ -39,14 +40,24 @@ void StyleOptionsProxy::setDefaults ()
   erroredCommandColor_ = Qt::red;
 }
 
+QColor StyleOptionsProxy::currentRowColor () const
+{
+  return currentRowColor_;
+}
+
+void StyleOptionsProxy::setCurrentRowColor (const QColor &color)
+{
+  currentRowColor_ = color;
+}
+
 QColor StyleOptionsProxy::erroredCommandColor () const
 {
   return erroredCommandColor_;
 }
 
-void StyleOptionsProxy::setErroredCommandColor (const QColor &erroredCommandColor)
+void StyleOptionsProxy::setErroredCommandColor (const QColor &color)
 {
-  erroredCommandColor_ = erroredCommandColor;
+  erroredCommandColor_ = color;
   emit changed ();
 }
 
@@ -55,9 +66,9 @@ QColor StyleOptionsProxy::finishedCommandColor () const
   return finishedCommandColor_;
 }
 
-void StyleOptionsProxy::setFinishedCommandColor (const QColor &finishedCommandColor)
+void StyleOptionsProxy::setFinishedCommandColor (const QColor &color)
 {
-  finishedCommandColor_ = finishedCommandColor;
+  finishedCommandColor_ = color;
   emit changed ();
 }
 
@@ -66,9 +77,9 @@ QColor StyleOptionsProxy::runningCommandColor () const
   return runningCommandColor_;
 }
 
-void StyleOptionsProxy::setRunningCommandColor (const QColor &runningCommandColor)
+void StyleOptionsProxy::setRunningCommandColor (const QColor &color)
 {
-  runningCommandColor_ = runningCommandColor;
+  runningCommandColor_ = color;
   emit changed ();
 }
 
@@ -77,9 +88,9 @@ QColor StyleOptionsProxy::stdErrOutputColor () const
   return stdErrOutputColor_;
 }
 
-void StyleOptionsProxy::setStdErrOutputColor (const QColor &stdErrOutputColor)
+void StyleOptionsProxy::setStdErrOutputColor (const QColor &color)
 {
-  stdErrOutputColor_ = stdErrOutputColor;
+  stdErrOutputColor_ = color;
   emit changed ();
 }
 

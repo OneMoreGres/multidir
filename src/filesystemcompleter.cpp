@@ -96,7 +96,7 @@ QStringList FileSystemCompleter::splitPath (const QString &path) const
   if (index.isValid ())
   {
     lastPath_ = source->filePath (index);
-    proxy_->setCurrent (proxy_->mapFromSource (index));
+    proxy_->setRootIndex (proxy_->mapFromSource (index));
   }
 
   return parts;
