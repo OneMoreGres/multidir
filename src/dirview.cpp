@@ -119,17 +119,19 @@ QModelIndexList DirView::selectedRows () const
 void DirView::renameCurrent ()
 {
   const auto index = currentIndex ();
-  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
-  setCurrentIndex (nameIndex);
-  view ()->edit (nameIndex);
+  const auto editIndex = index.sibling (index.row (), FileSystemModel::Column::Name);
+  setCurrentIndex (editIndex);
+  view ()->scrollTo (editIndex);
+  view ()->edit (editIndex);
 }
 
 void DirView::changeCurrentPermissions ()
 {
   const auto index = currentIndex ();
-  const auto nameIndex = index.sibling (index.row (), FileSystemModel::Column::Permissions);
-  setCurrentIndex (nameIndex);
-  view ()->edit (nameIndex);
+  const auto editIndex = index.sibling (index.row (), FileSystemModel::Column::Permissions);
+  setCurrentIndex (editIndex);
+  view ()->scrollTo (editIndex);
+  view ()->edit (editIndex);
 }
 
 bool DirView::isList () const
