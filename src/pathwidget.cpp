@@ -176,8 +176,12 @@ void PathWidget::rejectEdition ()
 
 void PathWidget::adjust ()
 {
-  const auto stretchWidth = layout ()->itemAt (0)->geometry ().width ();
-  const auto maxWidth = pathLabel_->width () + 2 * stretchWidth - 10; // 10 just for sure
+  const auto metrics = fontMetrics ();
+  const auto maxWidth = width ()
+                        - metrics.boundingRect (indexLabel_->text ()).width ()
+                        - metrics.boundingRect (dirLabel_->text ()).width ()
+                        - 4 * layout ()->spacing () // 2 stretch + indexLabel + dirLabel
+                        - 2 * layout ()->margin ();
   const auto newPath = fittedPath (maxWidth);
   if (newPath != pathLabel_->text ())
   {
