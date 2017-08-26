@@ -18,6 +18,8 @@
 #include <QStyledItemDelegate>
 #include <QComboBox>
 #include <QPixmapCache>
+#include <QMenu>
+#include <QInputDialog>
 
 namespace
 {
@@ -143,6 +145,9 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     shortcuts_->setSelectionBehavior (QTableWidget::SelectRows);
     shortcuts_->setItemDelegateForColumn (ShortcutColumn::Key,new ShortcutDelegate (shortcuts_));
 
+    shortcuts_->setContextMenuPolicy (Qt::CustomContextMenu);
+    connect (shortcuts_, &QWidget::customContextMenuRequested,
+             this, &SettingsEditor::showShortcutsMenu);
 
     ++row;
     layout->addWidget (new QLabel (tr ("Group ids:")), row, 0);
@@ -295,6 +300,42 @@ void SettingsEditor::saveShortcuts ()
 
   QSettings settings;
   ShortcutManager::save (settings);
+}
+
+void SettingsEditor::showShortcutsMenu ()
+{
+  auto item = shortcuts_->currentItem ();
+  if (!item)
+  {
+    return;
+  }
+
+  QMenu menu;
+  auto capture = menu.addAction (tr ("Capture"));
+  auto edit = menu.addAction (tr ("Edit..."));
+  auto clear = menu.addAction (tr ("Clear"));
+
+  auto choice = menu.exec (QCursor::pos ());
+
+  if (choice == capture)
+  {
+    shortcuts_->editItem (item);
+  }
+  else if (choice == edit)
+  {
+    const auto nameItem = shortcuts_->item (item->row (), ShortcutColumn::Name);
+    ASSERT (nameItem);
+    const auto text = QInputDialog::getText (this, tr ("Shortcut"), nameItem->text (),
+                                             QLineEdit::Normal, item->text ());
+    if (!text.isNull ())
+    {
+      item->setText (text);
+    }
+  }
+  else if (choice == clear)
+  {
+    item->setText ({});
+  }
 }
 
 void SettingsEditor::loadLanguage ()

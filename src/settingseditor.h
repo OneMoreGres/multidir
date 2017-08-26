@@ -29,6 +29,8 @@ private:
 
   void loadShortcuts ();
   void saveShortcuts ();
+  void showShortcutsMenu ();
+
   void loadLanguage ();
   void saveLanguage ();
   void loadStyle ();
