@@ -13,7 +13,7 @@ void Notifier::setMain (QStatusBar *bar)
 void Notifier::error (const QString &text)
 {
   LERROR () << text;
-  const auto timeout = 2000;
+  const auto timeout = 4000;
   QMetaObject::invokeMethod (bar_, "showMessage",
                              Q_ARG (QString, text), Q_ARG (int, timeout));
 }
