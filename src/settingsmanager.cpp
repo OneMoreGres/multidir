@@ -41,6 +41,7 @@ QVector<Entry> entries = [] {
   SET (EditorCommand) = {QS ("editor"), defaultEditor};
   SET (CheckUpdates) = {QS ("checkUpdates"), false};
   SET (StartInBackground) = {QS ("startBackground"), false};
+  SET (CaseSensitiveSort) = {QS ("caseSensitiveSort"), true};
   SET (ImageCacheSize) = {QS ("imageCacheSize"), 10240};
   SET (GroupIds) = {QS ("groupIds"),
                     QS ("1234567890QWERTYUIOPASDFGHJKLZXCVBNM")};

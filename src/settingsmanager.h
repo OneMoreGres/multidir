@@ -8,7 +8,7 @@ public:
   enum Type
   {
     OpenConsoleCommand, RunInConsoleCommand, EditorCommand,
-    CheckUpdates, StartInBackground, ImageCacheSize,
+    CheckUpdates, StartInBackground, CaseSensitiveSort, ImageCacheSize,
     GroupIds, TabIds, TabSwitchOrder, Translation,
     ShowFreeSpace, ShowFilesInfo, ShowSelectionInfo,
     Style,

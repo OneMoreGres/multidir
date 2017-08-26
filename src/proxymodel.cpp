@@ -4,6 +4,7 @@
 #include "backgroundreader.h"
 #include "styleoptionsproxy.h"
 #include "debug.h"
+#include "settingsmanager.h"
 
 #include <QDateTime>
 #include <QPixmapCache>
@@ -20,6 +21,7 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   showDotDot_ (true),
   showHidden_ (false),
   showThumbnails_ (false),
+  caseSensitiveSort_ (false),
   nameFilter_ (),
   rootItem_ (),
   currentItem_ (),
@@ -51,6 +53,9 @@ ProxyModel::ProxyModel (FileSystemModel *model, QObject *parent) :
   connect (&StyleOptionsProxy::instance (), &StyleOptionsProxy::changed,
            this, &ProxyModel::updateStyle);
   updateStyle ();
+
+  SettingsManager::subscribeForUpdates (this);
+  updateSettings ();
 }
 
 ProxyModel::~ProxyModel ()
@@ -338,6 +343,13 @@ void ProxyModel::updateStyle ()
   }
 }
 
+void ProxyModel::updateSettings ()
+{
+  SettingsManager settings;
+  caseSensitiveSort_ = settings.get (SettingsManager::CaseSensitiveSort).toBool ();
+  invalidate ();
+}
+
 QVariant ProxyModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Vertical && role == Qt::DisplayRole)
@@ -371,7 +383,8 @@ bool ProxyModel::lessThan (const QModelIndex &left, const QModelIndex &right) co
   switch (sortColumn ())
   {
     case FileSystemModel::Column::Name:
-      return QString::localeAwareCompare (l.fileName (),r.fileName ()) < 0;
+      return QString::compare (l.fileName (), r.fileName (),
+                               caseSensitiveSort_ ? Qt::CaseSensitive : Qt::CaseInsensitive) < 0;
 
     case FileSystemModel::Column::Size:
       return model_->size (left) < model_->size (right);

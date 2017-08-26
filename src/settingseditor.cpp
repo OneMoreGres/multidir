@@ -68,6 +68,7 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
   editor_ (new QLineEdit (this)),
   checkUpdates_ (new QCheckBox (tr ("Check for updates"), this)),
   startInBackground_ (new QCheckBox (tr ("Start in background"), this)),
+  caseSensitiveSort_ (new QCheckBox (tr ("Case sensitive sorting"), this)),
   imageCache_ (new QSpinBox (this)),
   languages_ (new QComboBox (this)),
   tabSwitchOrder_ (new QComboBox (this)),
@@ -114,6 +115,9 @@ SettingsEditor::SettingsEditor (QWidget *parent) :
     ++row;
     layout->addWidget (checkUpdates_, row, 0);
     layout->addWidget (startInBackground_, row, 1);
+
+    ++row;
+    layout->addWidget (caseSensitiveSort_, row, 0);
 
     ++row;
     layout->addWidget (new QLabel (tr ("Language")), row, 0);
@@ -218,6 +222,7 @@ void SettingsEditor::init ()
   editorToSettings_[editor_] = S::EditorCommand;
   editorToSettings_[checkUpdates_] = S::CheckUpdates;
   editorToSettings_[startInBackground_] = S::StartInBackground;
+  editorToSettings_[caseSensitiveSort_] = S::CaseSensitiveSort;
   editorToSettings_[imageCache_] = S::ImageCacheSize;
 
   editorToSettings_[groupShortcuts_] = S::GroupIds;

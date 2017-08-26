@@ -53,6 +53,9 @@ signals:
   void currentChanged (const QModelIndex &index);
   void iconRequested (const QString &fileName);
 
+public slots:
+  void updateSettings ();
+
 protected:
   bool filterAcceptsRow (int sourceRow, const QModelIndex &sourceParent) const override;
   bool lessThan (const QModelIndex &left, const QModelIndex &right) const override;
@@ -68,6 +71,7 @@ private:
   bool showDotDot_;
   bool showHidden_;
   bool showThumbnails_;
+  bool caseSensitiveSort_;
   QString nameFilter_;
   QPersistentModelIndex rootItem_;
   QPersistentModelIndex currentItem_;

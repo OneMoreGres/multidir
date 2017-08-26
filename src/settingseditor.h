@@ -46,6 +46,7 @@ private:
   QLineEdit *editor_;
   QCheckBox *checkUpdates_;
   QCheckBox *startInBackground_;
+  QCheckBox *caseSensitiveSort_;
   QSpinBox *imageCache_;
   QComboBox *languages_;
   QComboBox *tabSwitchOrder_;
