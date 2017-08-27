@@ -55,6 +55,7 @@ signals:
   void contextMenuRequested ();
 
 private:
+  void setCurrentIndex (const QModelIndex &index, bool updateSelection);
   void showHeaderContextMenu ();
   QAbstractItemView * view () const;
   void selectFirst ();

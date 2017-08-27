@@ -86,8 +86,15 @@ QModelIndex DirView::currentIndex () const
 
 void DirView::setCurrentIndex (const QModelIndex &index)
 {
-  view ()->clearSelection ();
-  view ()->setCurrentIndex (index);
+  setCurrentIndex (index, true);
+}
+
+void DirView::setCurrentIndex (const QModelIndex &index, bool updateSelection)
+{
+  using S = QItemSelectionModel;
+  auto model = view ()->selectionModel ();
+  model->setCurrentIndex (index, updateSelection ? S::ClearAndSelect | S::Rows : S::NoUpdate);
+  view ()->scrollTo (index);
 }
 
 QModelIndex DirView::rootIndex () const
@@ -364,32 +371,34 @@ bool DirView::eventFilter (QObject *watched, QEvent *event)
         }
         return true;
       }
+    }
 
-      if (key == Qt::Key_Home)
+    if (key == Qt::Key_Home)
+    {
+      const auto rows = model_->rowCount (rootIndex ());
+      if (rows > 0)
       {
-        const auto rows = model_->rowCount (rootIndex ());
-        if (rows > 0)
-        {
-          setCurrentIndex (model_->index (0, current.column (), rootIndex ()));
-        }
-        return true;
+        setCurrentIndex (model_->index (0, current.column (), rootIndex ()),
+                         modifiers != Qt::ControlModifier);
       }
+      return true;
+    }
 
-      if (key == Qt::Key_End)
+    if (key == Qt::Key_End)
+    {
+      const auto rows = model_->rowCount (rootIndex ());
+      if (rows > 0)
       {
-        const auto rows = model_->rowCount (rootIndex ());
-        if (rows > 0)
-        {
-          setCurrentIndex (model_->index (rows - 1, current.column (), rootIndex ()));
-        }
-        return true;
+        setCurrentIndex (model_->index (rows - 1, current.column (), rootIndex ()),
+                         modifiers != Qt::ControlModifier);
       }
+      return true;
     }
 
     if (!casted->text ().isEmpty () &&
         !(modifiers & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
     {
-      setCurrentIndex (model_->index (current.row (), 0, rootIndex ()));
+      setCurrentIndex (model_->index (current.row (), 0, rootIndex ()), false);
     }
   }
   else if (event->type () == QEvent::FocusIn)
