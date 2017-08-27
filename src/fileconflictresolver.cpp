@@ -21,6 +21,8 @@ FileConflictResolver::FileConflictResolver (QWidget *parent) :
   abort_ (new QPushButton (tr ("Abort"), this)),
   applyToAll_ (new QCheckBox (tr ("Apply to all"), this))
 {
+  setObjectName ("fileConflict");
+
   auto layout = new QGridLayout (this);
   auto font = this->font ();
   font.setBold (true);

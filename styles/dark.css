@@ -18,6 +18,10 @@ background: darkGray;
 background: darkGray;
 }
 
+#fileConflict, #fileConflict * {
+background: darkGray;
+}
+
 QHeaderView::section {
 background: darkGray;
 }
