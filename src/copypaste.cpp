@@ -28,6 +28,9 @@ bool isCut (const QMimeData &mime)
 #ifdef Q_OS_WIN
   return (mime.data (winCut) == winCutValue);
 #endif
+#ifdef Q_OS_OSX
+  return false;
+#endif
 }
 
 QStringList names (const QList<QUrl> &urls)
