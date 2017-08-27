@@ -6,11 +6,11 @@
 class ProxyModel;
 class FileSystemModel;
 class DirView;
-class FileOperation;
 class PathWidget;
 class DirStatusWidget;
 class NavigationHistory;
 class ShellCommandModel;
+class FileOperationModel;
 
 class QLabel;
 class QMenu;
@@ -24,7 +24,8 @@ class DirWidget : public QWidget
 {
 Q_OBJECT
 public:
-  DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidget *parent = nullptr);
+  DirWidget (FileSystemModel *model, ShellCommandModel *commands,
+             FileOperationModel *fileOperations, QWidget *parent = nullptr);
   ~DirWidget ();
 
   void save (QSettings &settings) const;
@@ -55,7 +56,6 @@ signals:
   void nextTabRequested (DirWidget *widget);
   void previousTabRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
-  void fileOperation (QSharedPointer<FileOperation> operation);
 
 protected:
   void resizeEvent (QResizeEvent *event) override;
@@ -118,6 +118,7 @@ private:
   DirStatusWidget *status_;
   QLineEdit *commandPrompt_;
   ShellCommandModel *commandRunner_;
+  FileOperationModel *fileOperations_;
   QList<DirWidget *> siblings_;
   NavigationHistory *navigationHistory_;
 

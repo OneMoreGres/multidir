@@ -5,9 +5,8 @@
 
 class GroupsView;
 class FileSystemModel;
-class FileOperation;
-class FileConflictResolver;
 class ShellCommandModel;
+class FileOperationModel;
 
 class QSettings;
 class QAction;
@@ -43,14 +42,14 @@ private:
   void updateTrayMenu ();
   void handleTrayClick (QSystemTrayIcon::ActivationReason reason);
   void setCheckUpdates (bool isOn);
-  void showFileOperation (QSharedPointer<FileOperation> operation);
   void updateWindowTitle (const QString &groupName);
+  void showFileOperationsMenu ();
 
+  FileOperationModel *fileOperationModel_;
+  QListView *fileOperationView_;
   FileSystemModel *model_;
   GroupsView *groups_;
-  FileConflictResolver *conflictResolver_;
   QLineEdit *findEdit_;
-  QLayout *fileOperationsLayout_;
   QSystemTrayIcon *tray_;
   QAction *toggleAction_;
   ShellCommandModel *commandsModel_;

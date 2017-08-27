@@ -92,55 +92,6 @@ FileOperation::FileOperation () :
 
 }
 
-FileOperation::Ptr FileOperation::paste (const QList<QUrl> &urls, const QFileInfo &target,
-                                         Qt::DropAction action)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  for (const auto &i: urls)
-  {
-    if (!i.toString ().endsWith (constants::dotdot))
-    {
-      result->sources_ << QFileInfo (i.toLocalFile ());
-    }
-  }
-  result->target_ = target;
-  result->action_ = QMap<Qt::DropAction,Action>{
-    {Qt::CopyAction, Action::Copy}, {Qt::MoveAction, Action::Move}, {Qt::LinkAction, Action::Link}
-  }.value (action, Action::Copy);
-  return result;
-}
-
-FileOperation::Ptr FileOperation::remove (const QList<QFileInfo> &infos)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  result->sources_ = infos;
-  result->action_ = Action::Remove;
-  return result;
-}
-
-FileOperation::Ptr FileOperation::trash (const QList<QFileInfo> &infos)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  result->sources_ = infos;
-  result->action_ = Action::Trash;
-  return result;
-}
-
-const QList<QFileInfo> &FileOperation::sources () const
-{
-  return sources_;
-}
-
-const QFileInfo &FileOperation::target () const
-{
-  return target_;
-}
-
-const FileOperation::Action &FileOperation::action () const
-{
-  return action_;
-}
-
 void FileOperation::startAsync (FileConflictResolver *resolver)
 {
   ASSERT (resolver);
@@ -182,8 +133,18 @@ void FileOperation::advance (qint64 size)
   if (newProgress != progress_)
   {
     progress_ = newProgress;
-    emit progress (progress_);
+    emit progress (progress_, this);
   }
+}
+
+void FileOperation::setCurrent (const QString &name)
+{
+  emit currentChanged (name, this);
+}
+
+void FileOperation::finish (bool ok)
+{
+  emit finished (ok, this);
 }
 
 bool FileOperation::copy (const QString &oldName, const QString &newName)
@@ -348,7 +309,8 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       continue;
     }
 
-    emit currentChanged (source.fileName ());
+    setCurrent (source.fileName ());
+
     switch (action_)
     {
       case FileOperation::Action::Copy:
@@ -376,7 +338,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
 
   if (!depth)
   {
-    emit finished (ok);
+    finish (ok);
   }
   return ok;
 }
@@ -393,7 +355,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
       break;
     }
     auto name = source.fileName ();
-    emit currentChanged (name);
+    setCurrent (name);
     const auto targetFileName = targetDir.absoluteFilePath (name);
     if (targetDir.exists (name))
     {
@@ -410,7 +372,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
     }
     advance (1);
   }
-  emit finished (ok);
+  finish (ok);
   return ok;
 }
 
@@ -425,7 +387,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       break;
     }
     const auto size = i.size ();
-    emit currentChanged (i.fileName ());
+    setCurrent (i.fileName ());
     switch (action_)
     {
       case FileOperation::Action::Remove:
@@ -460,7 +422,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
 
   if (!depth)
   {
-    emit finished (ok);
+    finish (ok);
   }
   return ok;
 }

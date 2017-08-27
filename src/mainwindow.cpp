@@ -4,9 +4,6 @@
 #include "settingseditor.h"
 #include "updatechecker.h"
 #include "filesystemmodel.h"
-#include "fileoperation.h"
-#include "fileoperationwidget.h"
-#include "fileconflictresolver.h"
 #include "constants.h"
 #include "debug.h"
 #include "notifier.h"
@@ -14,6 +11,7 @@
 #include "settingsmanager.h"
 #include "shellcommandmodel.h"
 #include "dirwidgetfactory.h"
+#include "fileoperationmodel.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -33,11 +31,11 @@ const QString qs_geometry = "geometry";
 
 MainWindow::MainWindow (QWidget *parent) :
   QWidget (parent),
-  model_ (new FileSystemModel (this)),
+  fileOperationModel_ (new FileOperationModel (this)),
+  fileOperationView_ (new QListView (this)),
+  model_ (new FileSystemModel (fileOperationModel_, this)),
   groups_ (nullptr),
-  conflictResolver_ (new FileConflictResolver),
   findEdit_ (new QLineEdit (this)),
-  fileOperationsLayout_ (new QHBoxLayout),
   tray_ (new QSystemTrayIcon (this)),
   toggleAction_ (nullptr),
   commandsModel_ (new ShellCommandModel (this)),
@@ -50,7 +48,8 @@ MainWindow::MainWindow (QWidget *parent) :
   setWindowIcon (QIcon (":/app.png"));
 
   // widgets
-  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (model_, commandsModel_, this);
+  auto widgetFactory = QSharedPointer<DirWidgetFactory>::create (
+    model_, commandsModel_, fileOperationModel_, this);
   groups_ = new GroupsView (widgetFactory, this);
 
   auto status = new QStatusBar (this);
@@ -59,8 +58,6 @@ MainWindow::MainWindow (QWidget *parent) :
   model_->setRootPath (QDir::rootPath ());
   model_->setFilter (QDir::AllEntries | QDir::NoDot | QDir::AllDirs | QDir::Hidden);
   model_->setReadOnly (false);
-  connect (model_, &FileSystemModel::fileOperation,
-           this, &MainWindow::showFileOperation);
 
 
   connect (findEdit_, &QLineEdit::textChanged,
@@ -83,6 +80,26 @@ MainWindow::MainWindow (QWidget *parent) :
   connect (commandsModel_, &ShellCommandModel::emptied,
            commandsView_, &QListView::hide);
   commandsView_->hide ();
+
+
+
+  fileOperationView_->setModel (fileOperationModel_);
+  fileOperationView_->setObjectName ("fileOperationsList");
+  fileOperationView_->setMaximumHeight (fileOperationView_->fontMetrics ().height () + 2);
+  fileOperationView_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+  fileOperationView_->setFocusPolicy (Qt::NoFocus);
+  fileOperationView_->setFlow (QListView::Flow::LeftToRight);
+  fileOperationView_->setSelectionMode (QAbstractItemView::NoSelection);
+  fileOperationView_->setVerticalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
+  fileOperationView_->setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
+  fileOperationView_->setContextMenuPolicy (Qt::CustomContextMenu);
+  connect (fileOperationView_, &QWidget::customContextMenuRequested,
+           this, &MainWindow::showFileOperationsMenu);
+  connect (fileOperationModel_, &FileOperationModel::filled,
+           fileOperationView_, &QListView::show);
+  connect (fileOperationModel_, &FileOperationModel::emptied,
+           fileOperationView_, &QListView::hide);
+  fileOperationView_->hide ();
 
 
   //menu bar
@@ -148,7 +165,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
   auto menuBarLayout = new QHBoxLayout;
   menuBarLayout->addWidget (menuBar);
-  menuBarLayout->addLayout (fileOperationsLayout_);
+  menuBarLayout->addWidget (fileOperationView_);
   menuBarLayout->addWidget (findEdit_);
 
   auto layout = new QVBoxLayout (this);
@@ -175,8 +192,6 @@ MainWindow::MainWindow (QWidget *parent) :
 
 MainWindow::~MainWindow ()
 {
-  conflictResolver_->deleteLater ();
-
   Notifier::setMain (nullptr);
 
 #ifndef DEVELOPMENT
@@ -318,21 +333,28 @@ void MainWindow::showAbout ()
   about.exec ();
 }
 
-void MainWindow::showFileOperation (QSharedPointer<FileOperation> operation)
-{
-  ASSERT (operation);
-
-  auto widget = new FileOperationWidget (operation);
-  widget->hide ();
-  fileOperationsLayout_->addWidget (widget);
-  QTimer::singleShot (1000, widget, &QWidget::show);
-
-  operation->startAsync (conflictResolver_);
-}
-
 void MainWindow::updateWindowTitle (const QString &groupName)
 {
   setWindowTitle (constants::appName + QString (" - ") + groupName);
+}
+
+void MainWindow::showFileOperationsMenu ()
+{
+  const auto index = fileOperationView_->currentIndex ();
+  if (!index.isValid ())
+  {
+    return;
+  }
+
+  QMenu menu;
+  auto abort = menu.addAction (tr ("Abort"));
+
+  auto choice = menu.exec (QCursor::pos ());
+
+  if (choice == abort)
+  {
+    fileOperationModel_->abort (index);
+  }
 }
 
 #include "moc_mainwindow.cpp"

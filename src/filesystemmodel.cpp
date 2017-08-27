@@ -1,13 +1,14 @@
 #include "filesystemmodel.h"
-#include "fileoperation.h"
 #include "constants.h"
 #include "debug.h"
+#include "fileoperationmodel.h"
 
 #include <QMimeData>
 #include <QUrl>
 
-FileSystemModel::FileSystemModel (QObject *parent) :
-  QFileSystemModel (parent)
+FileSystemModel::FileSystemModel (FileOperationModel *operations, QObject *parent) :
+  QFileSystemModel (parent),
+  operations_ (operations)
 {
 
 }
@@ -23,7 +24,7 @@ bool FileSystemModel::dropMimeData (const QMimeData *data, Qt::DropAction action
     return false;
   }
 
-  emit fileOperation (FileOperation::paste (data->urls (), fileInfo (parent), action));
+  operations_->paste (data->urls (), fileInfo (parent), action);
   return true;
 }
 
