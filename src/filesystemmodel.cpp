@@ -54,7 +54,12 @@ QVariant FileSystemModel::headerData (int section, Qt::Orientation orientation, 
 
 QVariant FileSystemModel::data (const QModelIndex &index, int role) const
 {
-  if (index.isValid () && index.column () >= Column::Permissions)
+  if (!index.isValid ())
+  {
+    return {};
+  }
+
+  if (index.column () >= Column::Permissions)
   {
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
@@ -69,6 +74,44 @@ QVariant FileSystemModel::data (const QModelIndex &index, int role) const
     }
     return {};
   }
+
+  if (index.column () == Column::Type)
+  {
+    if (role == Qt::DisplayRole)
+    {
+      const auto original = QFileSystemModel::data (index, role);
+      const auto info = fileInfo (index);
+      if (info.isSymLink ())
+      {
+        return original.toString () + tr (", link");
+      }
+      return original;
+    }
+  }
+
+  if (index.column () == Column::Name)
+  {
+    if (role == Qt::DisplayRole)
+    {
+      const auto info = fileInfo (index);
+      if (info.isSymLink ())
+      {
+        return info.fileName () + ' ' + QChar (8594);
+      }
+      return info.fileName ();
+    }
+
+    if (role == Qt::ToolTipRole)
+    {
+      const auto info = fileInfo (index);
+      if (info.isSymLink ())
+      {
+        return info.symLinkTarget ();
+      }
+      return {};
+    }
+  }
+
   return QFileSystemModel::data (index, role);
 }
 

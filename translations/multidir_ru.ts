@@ -243,6 +243,11 @@ Modified: %3</source>
         <source>Link target</source>
         <translation>Назначение ссылки</translation>
     </message>
+    <message>
+        <location filename="../src/filesystemmodel.cpp" line="86"/>
+        <source>, link</source>
+        <translation>, ссылка</translation>
+    </message>
 </context>
 <context>
     <name>FileViewer</name>
