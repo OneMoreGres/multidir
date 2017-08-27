@@ -348,7 +348,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       continue;
     }
 
-    const auto size = source.size ();
+    emit currentChanged (source.fileName ());
     switch (action_)
     {
       case FileOperation::Action::Copy:
@@ -393,6 +393,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
       break;
     }
     auto name = source.fileName ();
+    emit currentChanged (name);
     const auto targetFileName = targetDir.absoluteFilePath (name);
     if (targetDir.exists (name))
     {
@@ -424,6 +425,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       break;
     }
     const auto size = i.size ();
+    emit currentChanged (i.fileName ());
     switch (action_)
     {
       case FileOperation::Action::Remove:

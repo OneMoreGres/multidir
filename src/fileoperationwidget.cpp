@@ -27,11 +27,12 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
   layout->addWidget (abortButton);
 
 
-  const auto action = QMap<FileOperation::Action, QString>{
+  const auto action = operation_->action ();
+  const auto actionText = QMap<FileOperation::Action, QString>{
     {FileOperation::Action::Copy, tr ("Copying")},{FileOperation::Action::Link, tr ("Linking")},
     {FileOperation::Action::Move, tr ("Moving")}, {FileOperation::Action::Remove, tr ("Removing")},
     {FileOperation::Action::Trash, tr ("Moving to trash")}
-  }.value (operation_->action ());
+  }.value (action);
 
   ASSERT (!operation_->sources ().isEmpty ());
   auto name = operation_->sources ().first ().fileName ();
@@ -42,11 +43,17 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
 
   const auto target = operation_->target ().fileName ();
 
-  const auto text = tr ("%1 \"%2\" to \"%3\"").arg (action, name, target);
-  progress_->setFormat (text);
+  if (action == FileOperation::Action::Trash || action == FileOperation::Action::Remove)
+  {
+    template_ = tr ("%1 \"%2\"").arg (actionText, QLatin1String ("%1"));
+  }
+  else
+  {
+    template_ = tr ("%1 \"%2\" to \"%3\"").arg (actionText, QLatin1String ("%1"), target);
+  }
+  current_ = name;
+  timerEvent (nullptr);
   progress_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
-  progress_->setMaximumWidth (fontMetrics ().boundingRect (text).width ());
-  progress_->setMinimumWidth (fontMetrics ().boundingRect (text).width ());
   progress_->setRange (0, 100);
   progress_->setValue (0);
 
@@ -55,4 +62,25 @@ FileOperationWidget::FileOperationWidget (QSharedPointer<FileOperation> operatio
 
   connect (operation_.data (), &FileOperation::finished,
            this, &QObject::deleteLater);
+  connect (operation_.data (), &FileOperation::currentChanged,
+           this, &FileOperationWidget::setCurrent);
+
+  startTimer (100);
+}
+
+
+void FileOperationWidget::timerEvent (QTimerEvent *)
+{
+  const auto text = template_.arg (current_);
+  if (progress_->format () != text)
+  {
+    progress_->setFormat (text);
+    progress_->setMaximumWidth (fontMetrics ().boundingRect (text).width ());
+    progress_->setMinimumWidth (fontMetrics ().boundingRect (text).width ());
+  }
+}
+
+void FileOperationWidget::setCurrent (const QString &current)
+{
+  current_ = current;
 }

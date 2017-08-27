@@ -36,6 +36,7 @@ public:
 signals:
   void progress (int percent);
   void finished (bool ok);
+  void currentChanged (const QString &name);
 
 private:
   bool transfer (const Infos &sources, const QFileInfo &target, int depth);
