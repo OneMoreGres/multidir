@@ -11,6 +11,8 @@
 #include <QtConcurrentRun>
 #include <QApplication>
 
+#include <array>
+
 namespace
 {
 
