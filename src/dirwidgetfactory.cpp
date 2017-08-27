@@ -4,9 +4,10 @@
 #include "mainwindow.h"
 
 DirWidgetFactory::DirWidgetFactory (FileSystemModel *model, ShellCommandModel *commands,
-                                    MainWindow *main) :
+                                    FileOperationModel *fileOperations, MainWindow *main) :
   model_ (model),
   commands_ (commands),
+  fileOperations_ (fileOperations),
   main_ (main)
 {
 
@@ -14,7 +15,7 @@ DirWidgetFactory::DirWidgetFactory (FileSystemModel *model, ShellCommandModel *c
 
 DirWidget * DirWidgetFactory::create (QWidget *parent)
 {
-  auto *widget = new DirWidget (model_, commands_, parent);
+  auto *widget = new DirWidget (model_, commands_, fileOperations_, parent);
   QObject::connect (main_, &MainWindow::nameFilterChanged, widget, &DirWidget::setNameFilter);
   return widget;
 }

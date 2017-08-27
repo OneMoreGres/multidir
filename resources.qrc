@@ -20,7 +20,6 @@
         <file alias="remove.png">icons/trash.png</file>
         <file alias="app.png">icons/multidir.png</file>
         <file alias="hidden.png">icons/view.png</file>
-        <file alias="abort.png">icons/multiply-1.png</file>
         <file alias="view.png">icons/television.png</file>
         <file alias="debug.png">icons/help.png</file>
         <file alias="about.png">icons/info.png</file>

@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "utils.h"
 #include "constants.h"
+#include "storagemanager.h"
 
 #include <QDir>
 #include <QtConcurrentRun>
@@ -91,55 +92,6 @@ FileOperation::FileOperation () :
 
 }
 
-FileOperation::Ptr FileOperation::paste (const QList<QUrl> &urls, const QFileInfo &target,
-                                         Qt::DropAction action)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  for (const auto &i: urls)
-  {
-    if (!i.toString ().endsWith (constants::dotdot))
-    {
-      result->sources_ << QFileInfo (i.toLocalFile ());
-    }
-  }
-  result->target_ = target;
-  result->action_ = QMap<Qt::DropAction,Action>{
-    {Qt::CopyAction, Action::Copy}, {Qt::MoveAction, Action::Move}, {Qt::LinkAction, Action::Link}
-  }.value (action, Action::Copy);
-  return result;
-}
-
-FileOperation::Ptr FileOperation::remove (const QList<QFileInfo> &infos)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  result->sources_ = infos;
-  result->action_ = Action::Remove;
-  return result;
-}
-
-FileOperation::Ptr FileOperation::trash (const QList<QFileInfo> &infos)
-{
-  auto result = QSharedPointer<FileOperation>::create ();
-  result->sources_ = infos;
-  result->action_ = Action::Trash;
-  return result;
-}
-
-const QList<QFileInfo> &FileOperation::sources () const
-{
-  return sources_;
-}
-
-const QFileInfo &FileOperation::target () const
-{
-  return target_;
-}
-
-const FileOperation::Action &FileOperation::action () const
-{
-  return action_;
-}
-
 void FileOperation::startAsync (FileConflictResolver *resolver)
 {
   ASSERT (resolver);
@@ -181,8 +133,121 @@ void FileOperation::advance (qint64 size)
   if (newProgress != progress_)
   {
     progress_ = newProgress;
-    emit progress (progress_);
+    emit progress (progress_, this);
   }
+}
+
+void FileOperation::setCurrent (const QString &name)
+{
+  emit currentChanged (name, this);
+}
+
+void FileOperation::finish (bool ok)
+{
+  emit finished (ok, this);
+}
+
+bool FileOperation::copy (const QString &oldName, const QString &newName)
+{
+  QFile in (oldName);
+  const auto size = in.size ();
+  QFile out (newName);
+  if (!in.open (QFile::ReadOnly) || !out.open (QFile::WriteOnly | QFile::Truncate))
+  {
+    return false;
+  }
+
+  std::array<char, 4096> block;
+  qint64 totalRead = 0;
+  while (!in.atEnd ())
+  {
+    auto read = in.read (block.data (), block.size ());
+    if (read <= 0)
+    {
+      break;
+    }
+
+    advance (read);
+
+    totalRead += read;
+    if (read != out.write (block.data (), read))
+    {
+      break;
+    }
+  }
+  in.close ();
+  out.close ();
+
+  if (totalRead != size)
+  {
+    QFile::remove (newName);
+    return false;
+  }
+
+  return QFile::setPermissions (newName, in.permissions ());
+}
+
+bool FileOperation::rename (const QString &oldName, const QString &newName)
+{
+  auto source = StorageManager::storage (oldName);
+  auto target = StorageManager::storage (newName);
+  if (source == target)
+  {
+    QFile in (newName);
+    const auto size = in.size ();
+    auto result = QFile::rename (oldName, newName);
+    advance (size);
+    return result;
+  }
+
+
+  QFile in (oldName);
+  if (in.isSequential ())
+  {
+    return false;
+  }
+
+  const auto size = in.size ();
+  QFile out (newName);
+  if (!in.open (QFile::ReadOnly) || !out.open (QFile::WriteOnly | QFile::Truncate))
+  {
+    return false;
+  }
+
+  std::array<char, 4096> block;
+  qint64 totalRead = 0;
+  while (!in.atEnd ())
+  {
+    auto read = in.read (block.data (), block.size ());
+    if (read <= 0)
+    {
+      break;
+    }
+
+    advance (read);
+
+    totalRead += read;
+    if (read != out.write (block.data (), read))
+    {
+      break;
+    }
+  }
+  in.close ();
+  out.close ();
+
+  if (totalRead != size)
+  {
+    QFile::remove (newName);
+    return false;
+  }
+
+  if (QFile::setPermissions (newName, in.permissions ()) && QFile::remove (oldName))
+  {
+    return true;
+  }
+
+  QFile::remove (newName);
+  return false;
 }
 
 bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileInfo &target,
@@ -244,11 +309,12 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       continue;
     }
 
-    const auto size = source.size ();
+    setCurrent (source.fileName ());
+
     switch (action_)
     {
       case FileOperation::Action::Copy:
-        if (!QFile::copy (source.absoluteFilePath (), targetFileName))
+        if (!copy (source.absoluteFilePath (), targetFileName))
         {
           ok = false;
           Notifier::error (tr ("Failed to copy file %1 to %2")
@@ -257,7 +323,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
         break;
 
       case FileOperation::Action::Move:
-        if (!QFile::rename (source.absoluteFilePath (), targetFileName))
+        if (!rename (source.absoluteFilePath (), targetFileName))
         {
           ok = false;
           Notifier::error (tr ("Failed to move file %1 to %2")
@@ -268,13 +334,11 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       default:
         ASSERT_X (false, "wrong switch");
     }
-
-    advance (size);
   }
 
   if (!depth)
   {
-    emit finished (ok);
+    finish (ok);
   }
   return ok;
 }
@@ -291,6 +355,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
       break;
     }
     auto name = source.fileName ();
+    setCurrent (name);
     const auto targetFileName = targetDir.absoluteFilePath (name);
     if (targetDir.exists (name))
     {
@@ -307,7 +372,7 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
     }
     advance (1);
   }
-  emit finished (ok);
+  finish (ok);
   return ok;
 }
 
@@ -322,6 +387,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
       break;
     }
     const auto size = i.size ();
+    setCurrent (i.fileName ());
     switch (action_)
     {
       case FileOperation::Action::Remove:
@@ -356,7 +422,7 @@ bool FileOperation::erase (const FileOperation::Infos &infos, int depth)
 
   if (!depth)
   {
-    emit finished (ok);
+    finish (ok);
   }
   return ok;
 }

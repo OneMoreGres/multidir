@@ -6,12 +6,12 @@
 #include <atomic>
 
 class FileConflictResolver;
+class FileOperationModel;
 
 class FileOperation : public QObject
 {
 Q_OBJECT
 public:
-  using Ptr = QSharedPointer<FileOperation>;
   using Infos = QList<QFileInfo>;
 
   enum class Action
@@ -21,29 +21,27 @@ public:
 
   FileOperation ();
 
-  const QList<QFileInfo> &sources () const;
-  const QFileInfo &target () const;
-  const Action &action () const;
-
-  void startAsync (FileConflictResolver *resolver);
-
-  static Ptr paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action);
-  static Ptr remove (const QList<QFileInfo> &infos);
-  static Ptr trash (const QList<QFileInfo> &infos);
-
-  void abort ();
-
 signals:
-  void progress (int percent);
-  void finished (bool ok);
+  void progress (int percent, FileOperation *operation);
+  void finished (bool ok, FileOperation *operation);
+  void currentChanged (const QString &name, FileOperation *operation);
 
 private:
+  friend class FileOperationModel;
+  void startAsync (FileConflictResolver *resolver);
+  void abort ();
+
   bool transfer (const Infos &sources, const QFileInfo &target, int depth);
   bool link (const Infos &sources, const QFileInfo &target);
   bool erase (const Infos &infos, int depth);
 
   int resolveConflict (const QFileInfo &source, const QFileInfo &target);
   void advance (qint64 size);
+  void setCurrent (const QString &name);
+  void finish (bool ok);
+
+  bool copy (const QString &oldName, const QString &newName);
+  bool rename (const QString &oldName, const QString &newName);
 
   Infos sources_;
   QFileInfo target_;

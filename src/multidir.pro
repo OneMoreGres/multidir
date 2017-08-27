@@ -62,7 +62,6 @@ SOURCES += \
     mainwindow.cpp \
     backgroundreader.cpp \
     debug.cpp \
-    fileoperationwidget.cpp \
     fileoperation.cpp \
     groupwidget.cpp \
     filedelegate.cpp \
@@ -89,7 +88,9 @@ SOURCES += \
     styleloader.cpp \
     shellcommandwidget.cpp \
     shellcommandmodel.cpp \
-    dirwidgetfactory.cpp
+    dirwidgetfactory.cpp \
+    fileoperationmodel.cpp \
+    fileoperationdelegate.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -107,7 +108,6 @@ HEADERS  += \
     mainwindow.h \
     backgroundreader.h \
     debug.h \
-    fileoperationwidget.h \
     fileoperation.h \
     groupwidget.h \
     filedelegate.h \
@@ -134,7 +134,9 @@ HEADERS  += \
     styleloader.h \
     shellcommandwidget.h \
     shellcommandmodel.h \
-    dirwidgetfactory.h
+    dirwidgetfactory.h \
+    fileoperationmodel.h \
+    fileoperationdelegate.h
 
 RESOURCES += \
     $$PWD/../resources.qrc

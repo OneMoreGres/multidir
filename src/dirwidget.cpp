@@ -3,7 +3,6 @@
 #include "filesystemmodel.h"
 #include "copypaste.h"
 #include "dirview.h"
-#include "fileoperation.h"
 #include "openwith.h"
 #include "notifier.h"
 #include "shortcutmanager.h"
@@ -16,6 +15,7 @@
 #include "settingsmanager.h"
 #include "navigationhistory.h"
 #include "shellcommandmodel.h"
+#include "fileoperationmodel.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -45,7 +45,8 @@ const QString qs_showThumbs = "showThumbs";
 const QString qs_minSize = "minSize";
 }
 
-DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidget *parent) :
+DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
+                      FileOperationModel *fileOperations, QWidget *parent) :
   QWidget (parent),
   model_ (model),
   proxy_ (new ProxyModel (model, this)),
@@ -57,6 +58,7 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidg
   status_ (new DirStatusWidget (proxy_, this)),
   commandPrompt_ (new QLineEdit (this)),
   commandRunner_ (commands),
+  fileOperations_ (fileOperations),
   siblings_ (),
   navigationHistory_ (new NavigationHistory (this)),
   menu_ (new QMenu (this)),
@@ -98,8 +100,6 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands, QWidg
            this, &DirWidget::handleDirRename);
   connect (model_, &QFileSystemModel::fileRenamed,
            this, &DirWidget::handleFileRename);
-  connect (this, &DirWidget::fileOperation,
-           model_, &FileSystemModel::fileOperation);
 
   connect (view_, &DirView::currentChanged,
            proxy_, &ProxyModel::setCurrentIndex);
@@ -418,8 +418,7 @@ void DirWidget::createSiblingActions ()
                       addAction (action);
                     }
                     connect (action, &QAction::triggered, this, [this, i, drop] {
-        using utils::toUrls;
-        emit fileOperation (FileOperation::paste (toUrls (selected ()), i->path (), drop));
+        fileOperations_->paste (utils::toUrls (selected ()), i->path (), drop);
       });
                   }
                 };
@@ -652,7 +651,7 @@ void DirWidget::promptTrash ()
     {
       infos << model_->fileInfo (proxy_->mapToSource (i));
     }
-    emit fileOperation (FileOperation::trash (infos));
+    fileOperations_->trash (infos);
   }
 }
 
@@ -673,7 +672,7 @@ void DirWidget::promptRemove ()
     {
       infos << model_->fileInfo (proxy_->mapToSource (i));
     }
-    emit fileOperation (FileOperation::remove (infos));
+    fileOperations_->remove (infos);
   }
 }
 
@@ -779,7 +778,7 @@ void DirWidget::paste ()
     return;
   }
   const auto action = CopyPaste::clipboardAction ();
-  emit fileOperation (FileOperation::paste (urls, target, action));
+  fileOperations_->paste (urls, target, action);
 }
 
 void DirWidget::copyPath ()

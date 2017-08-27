@@ -2,7 +2,7 @@
 
 #include <QFileSystemModel>
 
-class FileOperation;
+class FileOperationModel;
 
 class FileSystemModel : public QFileSystemModel
 {
@@ -14,7 +14,7 @@ public:
     ColumnCount
   };
 
-  explicit FileSystemModel (QObject *parent = nullptr);
+  FileSystemModel (FileOperationModel *operations, QObject *parent = nullptr);
   bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row,
                      int column, const QModelIndex &parent) override;
   int columnCount (const QModelIndex &parent) const override;
@@ -23,6 +23,6 @@ public:
   bool setData (const QModelIndex &index, const QVariant &value, int role) override;
   Qt::ItemFlags flags (const QModelIndex &index) const override;
 
-signals:
-  void fileOperation (QSharedPointer<FileOperation> operation);
+private:
+  FileOperationModel *operations_;
 };
