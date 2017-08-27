@@ -45,6 +45,9 @@ private:
   int resolveConflict (const QFileInfo &source, const QFileInfo &target);
   void advance (qint64 size);
 
+  bool copy (const QString &oldName, const QString &newName);
+  bool rename (const QString &oldName, const QString &newName);
+
   Infos sources_;
   QFileInfo target_;
   Action action_;

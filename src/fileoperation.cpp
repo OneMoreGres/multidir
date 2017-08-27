@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "utils.h"
 #include "constants.h"
+#include "storagemanager.h"
 
 #include <QDir>
 #include <QtConcurrentRun>
@@ -185,6 +186,109 @@ void FileOperation::advance (qint64 size)
   }
 }
 
+bool FileOperation::copy (const QString &oldName, const QString &newName)
+{
+  QFile in (oldName);
+  const auto size = in.size ();
+  QFile out (newName);
+  if (!in.open (QFile::ReadOnly) || !out.open (QFile::WriteOnly | QFile::Truncate))
+  {
+    return false;
+  }
+
+  std::array<char, 4096> block;
+  qint64 totalRead = 0;
+  while (!in.atEnd ())
+  {
+    auto read = in.read (block.data (), block.size ());
+    if (read <= 0)
+    {
+      break;
+    }
+
+    advance (read);
+
+    totalRead += read;
+    if (read != out.write (block.data (), read))
+    {
+      break;
+    }
+  }
+  in.close ();
+  out.close ();
+
+  if (totalRead != size)
+  {
+    QFile::remove (newName);
+    return false;
+  }
+
+  return QFile::setPermissions (newName, in.permissions ());
+}
+
+bool FileOperation::rename (const QString &oldName, const QString &newName)
+{
+  auto source = StorageManager::storage (oldName);
+  auto target = StorageManager::storage (newName);
+  if (source == target)
+  {
+    QFile in (newName);
+    const auto size = in.size ();
+    auto result = QFile::rename (oldName, newName);
+    advance (size);
+    return result;
+  }
+
+
+  QFile in (oldName);
+  if (in.isSequential ())
+  {
+    return false;
+  }
+
+  const auto size = in.size ();
+  QFile out (newName);
+  if (!in.open (QFile::ReadOnly) || !out.open (QFile::WriteOnly | QFile::Truncate))
+  {
+    return false;
+  }
+
+  std::array<char, 4096> block;
+  qint64 totalRead = 0;
+  while (!in.atEnd ())
+  {
+    auto read = in.read (block.data (), block.size ());
+    if (read <= 0)
+    {
+      break;
+    }
+
+    advance (read);
+
+    totalRead += read;
+    if (read != out.write (block.data (), read))
+    {
+      break;
+    }
+  }
+  in.close ();
+  out.close ();
+
+  if (totalRead != size)
+  {
+    QFile::remove (newName);
+    return false;
+  }
+
+  if (QFile::setPermissions (newName, in.permissions ()) && QFile::remove (oldName))
+  {
+    return true;
+  }
+
+  QFile::remove (newName);
+  return false;
+}
+
 bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileInfo &target,
                               int depth)
 {
@@ -248,7 +352,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
     switch (action_)
     {
       case FileOperation::Action::Copy:
-        if (!QFile::copy (source.absoluteFilePath (), targetFileName))
+        if (!copy (source.absoluteFilePath (), targetFileName))
         {
           ok = false;
           Notifier::error (tr ("Failed to copy file %1 to %2")
@@ -257,7 +361,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
         break;
 
       case FileOperation::Action::Move:
-        if (!QFile::rename (source.absoluteFilePath (), targetFileName))
+        if (!rename (source.absoluteFilePath (), targetFileName))
         {
           ok = false;
           Notifier::error (tr ("Failed to move file %1 to %2")
@@ -268,8 +372,6 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       default:
         ASSERT_X (false, "wrong switch");
     }
-
-    advance (size);
   }
 
   if (!depth)
