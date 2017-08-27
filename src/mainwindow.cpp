@@ -12,6 +12,7 @@
 #include "shellcommandmodel.h"
 #include "dirwidgetfactory.h"
 #include "fileoperationmodel.h"
+#include "fileoperationdelegate.h"
 
 #include <QSystemTrayIcon>
 #include <QBoxLayout>
@@ -73,6 +74,8 @@ MainWindow::MainWindow (QWidget *parent) :
   commandsView_->setFocusPolicy (Qt::NoFocus);
   commandsView_->setFlow (QListView::Flow::LeftToRight);
   commandsView_->setSelectionMode (QAbstractItemView::NoSelection);
+  fileOperationView_->setVerticalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
+  fileOperationView_->setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
   connect (commandsView_, &QListView::doubleClicked,
            commandsModel_, &ShellCommandModel::show);
   connect (commandsModel_, &ShellCommandModel::filled,
@@ -99,6 +102,7 @@ MainWindow::MainWindow (QWidget *parent) :
            fileOperationView_, &QListView::show);
   connect (fileOperationModel_, &FileOperationModel::emptied,
            fileOperationView_, &QListView::hide);
+  fileOperationView_->setItemDelegate (new FileOperationDelegate (this));
   fileOperationView_->hide ();
 
 

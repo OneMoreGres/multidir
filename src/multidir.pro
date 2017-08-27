@@ -89,7 +89,8 @@ SOURCES += \
     shellcommandwidget.cpp \
     shellcommandmodel.cpp \
     dirwidgetfactory.cpp \
-    fileoperationmodel.cpp
+    fileoperationmodel.cpp \
+    fileoperationdelegate.cpp
 
 HEADERS  += \
     dirwidget.h \
@@ -134,7 +135,8 @@ HEADERS  += \
     shellcommandwidget.h \
     shellcommandmodel.h \
     dirwidgetfactory.h \
-    fileoperationmodel.h
+    fileoperationmodel.h \
+    fileoperationdelegate.h
 
 RESOURCES += \
     $$PWD/../resources.qrc
