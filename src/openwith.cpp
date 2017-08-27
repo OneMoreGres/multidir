@@ -491,8 +491,10 @@ ExternalApp parseBundle (const CFBundleRef bundle)
   app.icon = QFileIconProvider ().icon (info);
 
   const auto name = CFBundleGetValueForInfoDictionaryKey (bundle, kCFBundleNameKey);
-  ASSERT (name);
-  app.name = toString (reinterpret_cast<CFStringRef>(name));
+  if (name)
+  {
+    app.name = toString (reinterpret_cast<CFStringRef>(name));
+  }
   if (app.name.isEmpty ())
   {
     app.name = info.baseName ();
