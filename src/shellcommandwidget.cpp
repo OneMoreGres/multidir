@@ -140,7 +140,7 @@ void ShellCommandWidget::readError ()
   const auto color = log_->textColor ();
   log_->setTextColor (errorColor_);
 
-  log_->append (process_->readAll ());
+  log_->append (QString::fromLocal8Bit (process_->readAll ()));
 
   log_->setTextColor (color);
 }
@@ -148,7 +148,7 @@ void ShellCommandWidget::readError ()
 void ShellCommandWidget::readOut ()
 {
   process_->setReadChannel (QProcess::StandardOutput);
-  log_->append (process_->readAll ());
+  log_->append (QString::fromLocal8Bit (process_->readAll ()));
 }
 
 void ShellCommandWidget::processUserInput ()
