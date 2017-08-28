@@ -767,18 +767,13 @@ void DirWidget::copy ()
 
 void DirWidget::paste ()
 {
-  auto target = current ();
-  if (!target.exists () || !target.isDir ())
-  {
-    target = path ();
-  }
   const auto urls = CopyPaste::clipboardUrls ();
   if (urls.isEmpty ())
   {
     return;
   }
   const auto action = CopyPaste::clipboardAction ();
-  fileOperations_->paste (urls, target, action);
+  fileOperations_->paste (urls, path_, action);
 }
 
 void DirWidget::copyPath ()
