@@ -69,7 +69,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
   commandsView_->setModel (commandsModel_);
   commandsView_->setObjectName ("commandList");
-  commandsView_->setMaximumHeight (status->height () - 2);
+  commandsView_->setMaximumHeight (fileOperationView_->fontMetrics ().height () + 4);
   commandsView_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
   commandsView_->setFocusPolicy (Qt::NoFocus);
   commandsView_->setFlow (QListView::Flow::LeftToRight);
@@ -88,7 +88,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
   fileOperationView_->setModel (fileOperationModel_);
   fileOperationView_->setObjectName ("fileOperationsList");
-  fileOperationView_->setMaximumHeight (fileOperationView_->fontMetrics ().height () + 2);
+  fileOperationView_->setMaximumHeight (fileOperationView_->fontMetrics ().height () + 4);
   fileOperationView_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
   fileOperationView_->setFocusPolicy (Qt::NoFocus);
   fileOperationView_->setFlow (QListView::Flow::LeftToRight);
