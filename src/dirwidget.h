@@ -106,6 +106,7 @@ private:
   void updateCurrentFile ();
   void handleDirRename (const QString &path, const QString &old, const QString &now);
   void handleFileRename (const QString &path, const QString &old, const QString &now);
+  void handleIsVisibleChanged (bool isVisible);
 
 
   FileSystemModel *model_;
@@ -121,6 +122,7 @@ private:
   FileOperationModel *fileOperations_;
   QList<DirWidget *> siblings_;
   NavigationHistory *navigationHistory_;
+  QString nameFilter_;
 
   QMenu *menu_;
   QAction *isLocked_;

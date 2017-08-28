@@ -507,7 +507,11 @@ void DirWidget::setPath (const QFileInfo &path)
 
 void DirWidget::setNameFilter (const QString &filter)
 {
-  proxy_->setNameFilter (QLatin1Char ('*') + filter + QLatin1Char ('*'));
+  nameFilter_ = QLatin1Char ('*') + filter + QLatin1Char ('*');
+  if (isVisible ())
+  {
+    proxy_->setNameFilter (nameFilter_);
+  }
 }
 
 void DirWidget::openPath (const QModelIndex &index)
@@ -583,7 +587,8 @@ void DirWidget::resizeEvent (QResizeEvent *)
 
 bool DirWidget::eventFilter (QObject *watched, QEvent *event)
 {
-  if (watched == this && event->type () == QEvent::MouseButtonPress)
+  const auto type = event->type ();
+  if (watched == this && type == QEvent::MouseButtonPress)
   {
     auto casted = static_cast<QMouseEvent *>(event);
     if (casted->button () == Qt::LeftButton)
@@ -597,12 +602,17 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
     return false;
   }
 
+  if (watched == this && (type == QEvent::Show || type == QEvent::Hide))
+  {
+    handleIsVisibleChanged (isVisible ());
+  }
+
   if (isLocked ())
   {
     return false;
   }
 
-  if (event->type () == QEvent::KeyPress && watched == commandPrompt_)
+  if (type == QEvent::KeyPress && watched == commandPrompt_)
   {
     if (static_cast<QKeyEvent *>(event)->key () == Qt::Key_Escape)
     {
@@ -956,6 +966,14 @@ void DirWidget::handleFileRename (const QString &path, const QString &old, const
   {
     lastCurrentFile_ = now;
     view_->setCurrentIndex (proxy_->mapFromSource (model_->index (path + '/' + now)));
+  }
+}
+
+void DirWidget::handleIsVisibleChanged (bool isVisible)
+{
+  if (isVisible)
+  {
+    proxy_->setNameFilter (nameFilter_);
   }
 }
 
