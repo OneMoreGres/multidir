@@ -54,3 +54,8 @@ replace traditional file managers.
 ## License
 
 Released under [GPLv3 License](LICENSE.md).
+
+### Used libraries
+
+* [Qt](https://www.qt.io/) (LGPLv3)
+* [Catch](https://github.com/philsquared/Catch) (BSL 1.0)
