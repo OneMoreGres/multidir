@@ -31,13 +31,6 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
-  using Base = QSplitter;
-  using Base::addWidget;
-  using Base::widget;
-  using Base::count;
-  using Base::insertWidget;
-  using Base::indexOf;
-
   enum class Zone
   {
     None, Left, Right, Top, Bottom, Center
