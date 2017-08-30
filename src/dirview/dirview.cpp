@@ -65,6 +65,11 @@ void DirView::activate ()
   view ()->setFocus ();
 }
 
+bool DirView::isActive () const
+{
+  return view ()->hasFocus ();
+}
+
 void DirView::adjustItems ()
 {
   if (table_)

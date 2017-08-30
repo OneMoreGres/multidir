@@ -100,6 +100,9 @@ void ShortcutManager::setDefaults ()
                                 QIcon (":/minus.png"), c};
   shortcuts[SM::SwitchGroup] = {{QS ("Ctrl+Q")}, QObject::tr ("Switch (plus ID)"),
                                 {}, c};
+  shortcuts[SM::EqulalizeTabs] = {{QS ("Ctrl+Shift+A")},
+                                  QObject::tr ("Equalize current and sibling tabs sizes"),
+                                  {}, c};
 
   c = SM::Tab;
   shortcuts[SM::AddTab] = {{QS ("Ctrl+N")}, QObject::tr ("Add tab"),

@@ -423,6 +423,18 @@ void TiledView::restore (QSettings &settings)
   }
 }
 
+void TiledView::equalizeWithSiblings (QWidget &widget)
+{
+  if (auto *w = cast (widget.parentWidget ()))
+  {
+    if (w->count () == 2)
+    {
+      const auto half = (w->orientation () == Qt::Horizontal ? w->width () : w->height ()) / 2;
+      w->setSizes ({half, half});
+    }
+  }
+}
+
 void TiledView::restoreImpl (QSettings &settings, QHash<QString, QWidget *> &widgetByName)
 {
   auto count = settings.beginReadArray (qs_tiles);

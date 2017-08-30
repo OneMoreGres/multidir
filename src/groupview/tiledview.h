@@ -12,9 +12,11 @@ public:
   explicit TiledView (QWidget *parent = 0);
   ~TiledView ();
 
+  QList<QWidget *> widgets () const;
+
   void add (QWidget &widget);
   void remove (QWidget &widget);
-  QList<QWidget *> widgets () const;
+  void equalizeWithSiblings (QWidget &widget);
 
   void save (QSettings &settings) const;
   void restore (QSettings &settings);

@@ -40,6 +40,10 @@ GroupWidget::GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidge
   connect (view_, &TiledView::tileSwapped,
            this, &GroupWidget::updateWidgetShortcuts);
 
+  auto ac = ShortcutManager::create (this, ShortcutManager::EqulalizeTabs);
+  connect (ac, &QAction::triggered,
+           this,&GroupWidget::equalizeActiveSiblings);
+
   SettingsManager::subscribeForUpdates (this);
   updateSettings ();
 }
@@ -109,6 +113,14 @@ void GroupWidget::updateSettings ()
   using Order = TabSwitchOrder;
   tabSwitchOrder_ = settings.get (SettingsManager::TabSwitchOrder).toInt () == int (Order::ByPosition)
                     ? Order::ByPosition : Order::ByIndex;
+}
+
+QWidget * GroupWidget::current () const
+{
+  auto it = std::find_if (widgets_.begin (), widgets_.end (), [](const Widget &i) {
+                            return i.widget->isActive ();
+                          });
+  return (it != widgets_.end ()) ? it->widget : nullptr;
 }
 
 DirWidget * GroupWidget::addWidget ()
@@ -251,6 +263,14 @@ QList<QWidget *> GroupWidget::orderedWidgets () const
                });
   }
   return order;
+}
+
+void GroupWidget::equalizeActiveSiblings ()
+{
+  if (auto *w = current ())
+  {
+    view_->equalizeWithSiblings (*w);
+  }
 }
 
 void GroupWidget::add (const QFileInfo &path)

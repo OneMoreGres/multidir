@@ -41,7 +41,9 @@ private:
   void updateWidgetNames ();
   void updateWidgetShortcuts ();
   void setIds (const QString &ids);
-  
+  void equalizeActiveSiblings ();
+
+  QWidget * current () const;
   QList<QWidget *> orderedWidgets () const;
 
   struct Widget

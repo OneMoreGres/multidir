@@ -48,6 +48,7 @@ public:
   bool eventFilter (QObject *watched, QEvent *event) override;
 
   void activate ();
+  bool isActive () const;
   void adjustItems ();
 
 signals:

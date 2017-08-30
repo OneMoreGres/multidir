@@ -628,6 +628,11 @@ void DirWidget::activate ()
   view_->activate ();
 }
 
+bool DirWidget::isActive () const
+{
+  return view_->isActive ();
+}
+
 void DirWidget::adjustItems ()
 {
   view_->adjustItems ();

@@ -21,6 +21,7 @@ public:
   void restore (QSettings &settings);
 
   void activate ();
+  bool isActive () const;
   void adjustItems ();
 
   QModelIndex firstItem () const;
