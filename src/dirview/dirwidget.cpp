@@ -668,43 +668,33 @@ void DirWidget::promptClose ()
 
 void DirWidget::promptTrash ()
 {
-  const auto indexes = view_->selectedRows ();
-  if (indexes.isEmpty ())
+  const auto selection = selected ();
+  if (selection.isEmpty ())
   {
     return;
   }
-  auto res = QMessageBox::question (this, {}, tr ("Move files \"%1\" to trash?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+  const auto names = utils::fileNames (selection);
+  auto res = QMessageBox::question (this, {}, tr ("Move files %1 to trash?").arg (names),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
-    QList<QFileInfo> infos;
-    for (const auto &i: indexes)
-    {
-      infos << model_->fileInfo (proxy_->mapToSource (i));
-    }
-    fileOperations_->trash (infos);
+    fileOperations_->trash (selection);
   }
 }
 
 void DirWidget::promptRemove ()
 {
-  const auto indexes = view_->selectedRows ();
-  if (indexes.isEmpty ())
+  const auto selection = selected ();
+  if (selection.isEmpty ())
   {
     return;
   }
-  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+  const auto names = utils::fileNames (selection);
+  auto res = QMessageBox::question (this, {}, tr ("Remove %1 permanently?").arg (names),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
-    QList<QFileInfo> infos;
-    for (const auto &i: indexes)
-    {
-      infos << model_->fileInfo (proxy_->mapToSource (i));
-    }
-    fileOperations_->remove (infos);
+    fileOperations_->remove (selection);
   }
 }
 
@@ -746,16 +736,6 @@ QFileInfo DirWidget::fileInfo (const QModelIndex &index) const
 #endif
 
   return result;
-}
-
-QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
-{
-  QStringList names;
-  for (const auto &i: indexes)
-  {
-    names << i.data ().toString ();
-  }
-  return names;
 }
 
 void DirWidget::openSelected ()

@@ -65,7 +65,6 @@ private:
   void newFolder ();
 
   QFileInfo fileInfo (const QModelIndex &index) const;
-  QStringList names (const QList<QModelIndex> &indexes) const;
 
   void openSelected ();
   void openPath (const QModelIndex &index);
