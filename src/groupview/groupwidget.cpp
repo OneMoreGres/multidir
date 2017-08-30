@@ -220,7 +220,7 @@ void GroupWidget::clone (DirWidget *widget)
 
 void GroupWidget::nextTab (DirWidget *widget)
 {
-  const auto order = orderedTabs ();
+  const auto order = orderedWidgets ();
   auto it = std::find (order.cbegin (), order.cend (), widget);
 
   auto casted = qobject_cast<DirWidget *>((++it == order.cend ()) ? order.first () : *it);
@@ -230,7 +230,7 @@ void GroupWidget::nextTab (DirWidget *widget)
 
 void GroupWidget::previousTab (DirWidget *widget)
 {
-  const auto order = orderedTabs ();
+  const auto order = orderedWidgets ();
   auto it = std::find (order.cbegin (), order.cend (), widget);
 
   auto casted = qobject_cast<DirWidget *>((it == order.cbegin ()) ? order.last () : *(--it));
@@ -238,7 +238,7 @@ void GroupWidget::previousTab (DirWidget *widget)
   casted->activate ();
 }
 
-QList<QWidget *> GroupWidget::orderedTabs () const
+QList<QWidget *> GroupWidget::orderedWidgets () const
 {
   auto order = view_->widgets ();
   ASSERT (!order.isEmpty ());

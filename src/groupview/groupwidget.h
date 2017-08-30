@@ -41,7 +41,8 @@ private:
   void updateWidgetNames ();
   void updateWidgetShortcuts ();
   void setIds (const QString &ids);
-  QList<QWidget *> orderedTabs () const;
+  
+  QList<QWidget *> orderedWidgets () const;
 
   struct Widget
   {
