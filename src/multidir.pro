@@ -98,6 +98,7 @@ SOURCES += \
     widgets/mainwindow.cpp \
     widgets/propertieswidget.cpp \
     widgets/settingseditor.cpp \
+    widgets/transferdialog.cpp \
     main.cpp \
     utils.cpp
 
@@ -143,6 +144,7 @@ HEADERS  += \
     widgets/mainwindow.h \
     widgets/propertieswidget.h \
     widgets/settingseditor.h \
+    widgets/transferdialog.h \
     backport.h \
     constants.h \
     utils.h

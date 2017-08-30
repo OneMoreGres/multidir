@@ -16,6 +16,7 @@
 #include "navigationhistory.h"
 #include "shellcommandmodel.h"
 #include "fileoperationmodel.h"
+#include "transferdialog.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -87,6 +88,9 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
   copyToMenu_ (nullptr),
   moveToMenu_ (nullptr),
   linkToMenu_ (nullptr),
+  copyToPathAction_ (nullptr),
+  moveToPathAction_ (nullptr),
+  linkToPathAction_ (nullptr),
   upAction_ (nullptr),
   newFolderAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
@@ -216,6 +220,19 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
 
   linkToMenu_ = viewMenu_->addMenu (tr ("Link to..."));
   linkToMenu_->setIcon (Shortcut::icon (Shortcut::LinkTo));
+
+
+  copyToPathAction_ = Shortcut::create (this, Shortcut::CopyToPath);
+  connect (copyToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::CopyAction);});
+
+  moveToPathAction_ = Shortcut::create (this, Shortcut::MoveToPath);
+  connect (moveToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::MoveAction);});
+
+  linkToPathAction_ = Shortcut::create (this, Shortcut::LinkToPath);
+  connect (linkToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::LinkAction);});
 
   viewMenu_->addSeparator ();
 
@@ -840,6 +857,28 @@ void DirWidget::viewCurrent ()
 void DirWidget::moveUp ()
 {
   openPath (view_->rootIndex ().parent ());
+}
+
+void DirWidget::transferToPath (Qt::DropAction action)
+{
+  const auto items = selected ();
+  if (items.isEmpty ())
+  {
+    return;
+  }
+
+  TransferDialog dialog (model_);
+  if (dialog.prompt (action, items) != QDialog::Accepted)
+  {
+    return;
+  }
+
+  QFileInfo target (dialog.destination ());
+  if (target.isRelative ())
+  {
+    target = path_.absoluteFilePath () + '/' + target.filePath ();
+  }
+  fileOperations_->paste (items, target, action);
 }
 
 bool DirWidget::isMinSizeFixed () const

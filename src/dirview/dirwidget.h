@@ -82,6 +82,7 @@ private:
   void showProperties ();
   void viewCurrent ();
   void moveUp ();
+  void transferToPath (Qt::DropAction action);
 
   void openConsole ();
   void openInEditor ();
@@ -152,6 +153,9 @@ private:
   QMenu *copyToMenu_;
   QMenu *moveToMenu_;
   QMenu *linkToMenu_;
+  QAction *copyToPathAction_;
+  QAction *moveToPathAction_;
+  QAction *linkToPathAction_;
 
   QAction *upAction_;
   QAction *newFolderAction_;

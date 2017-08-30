@@ -12,6 +12,18 @@ FileOperationModel::FileOperationModel (QObject *parent) :
 
 }
 
+void FileOperationModel::paste (const QList<QFileInfo> &infos, const QFileInfo &target,
+                                Qt::DropAction action)
+{
+  auto fileAction = QMap<Qt::DropAction,FileOperation::Action>{
+    {Qt::CopyAction, FileOperation::Action::Copy},
+    {Qt::MoveAction, FileOperation::Action::Move},
+    {Qt::LinkAction, FileOperation::Action::Link}
+  }.value (action, FileOperation::Action::Copy);
+
+  add (infos, target, int (fileAction));
+}
+
 void FileOperationModel::paste (const QList<QUrl> &urls, const QFileInfo &target,
                                 Qt::DropAction action)
 {

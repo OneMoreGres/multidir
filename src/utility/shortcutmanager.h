@@ -19,7 +19,7 @@ public:
     AddGroup, RenameGroup, RemoveGroup, CreateFolder, SwitchGroup, SwitchTab,
     NextTab, OpenItem, MoveUp, Settings, Quit, Debug, About, CopyTo, MoveTo, LinkTo,
     FixMinSize, RunCommand, ShowProperties, ChangePermissions, View, HistoryForward, HistoryBackward,
-    AdjustColumSizes, PreviousTab, EqulalizeTabs,
+    AdjustColumSizes, PreviousTab, EqulalizeTabs, CopyToPath, MoveToPath, LinkToPath,
     ShortcutCount
   };
 
