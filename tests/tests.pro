@@ -8,14 +8,23 @@ CONFIG += c++11
 OTHER_FILES += \
     $$PWD/../uncrustify.cfg
 
-INCLUDEPATH += $$PWD/../src
-VPATH += $$PWD/..
+INCLUDEPATH += \
+    $$PWD/../src \
+    $$PWD/../src/dirview \
+    $$PWD/../src/fileoperation \
+    $$PWD/../src/filesystem \
+    $$PWD/../src/groupview \
+    $$PWD/../src/shellcommand \
+    $$PWD/../src/utility \
+    $$PWD/../src/widgets
+
+VPATH += $$PWD/../src
 
 SOURCES += \
-    $$PWD/../src/filepermissions.cpp \
-    $$PWD/../src/shellcommand.cpp \
-    $$PWD/../src/notifier.cpp \
-    $$PWD/../src/debug.cpp \
+    filesystem/filepermissions.cpp \
+    shellcommand/shellcommand.cpp \
+    utility/notifier.cpp \
+    utility/debug.cpp \
     main.cpp \
     filepermissions_test.cpp \
     shellcommand_test.cpp
