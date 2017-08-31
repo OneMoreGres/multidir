@@ -46,7 +46,7 @@ deploy:
       condition: $TRAVIS_OS_NAME = osx
 
 after_deploy:
-  - if [[ "$TRAVIS_OS_NAME" == "linux"]]; then chmod +x ./utils/update_github_release.sh & ./utils/update_github_release.sh "$TRAVIS_TAG"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x ./utils/update_github_release.sh & ./utils/update_github_release.sh "$TRAVIS_TAG"; fi
 
 notifications:
   email:
