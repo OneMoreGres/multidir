@@ -37,60 +37,60 @@
 <context>
     <name>DirWidget</name>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="173"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="177"/>
         <source>Open with</source>
         <translation>Открыть с помощью</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="211"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="215"/>
         <source>Copy to...</source>
         <translation>Копировать в...</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="214"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="218"/>
         <source>Move to...</source>
         <translation>Переместить в...</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="217"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="221"/>
         <source>Link to...</source>
         <translation>Создать ссылку в...</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="249"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="266"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="311"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="328"/>
         <source>Prefix with &apos;+&apos; to show output. Substitutions: %ID% - tab with ID, %-ID% - current item of tab,%&lt;separator?&gt;*ID% - selected items of tab</source>
         <translation>Начните с &apos;+&apos; для показа вывода. Автозамена: %ID% - вкладка с ID, %-ID% - текущий элемента вкладки,%&lt;разделитель?&gt;*ID% - выделенные элементы вкладки</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="564"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="581"/>
         <source>Failed to open &apos;%1&apos;</source>
         <translation>Ошибка открытия &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="571"/>
-        <location filename="../src/dirview/dirwidget.cpp" line="575"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="588"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="592"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="643"/>
+        <location filename="../src/dirview/dirwidget.cpp" line="660"/>
         <source>Close tab &quot;%1&quot;?</source>
         <translation>Закрыть вкладку &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="659"/>
-        <source>Move files &quot;%1&quot; to trash?</source>
-        <translation>Переместить файлы &quot;%1&quot; в корзину?</translation>
+        <location filename="../src/dirview/dirwidget.cpp" line="677"/>
+        <source>Move files %1 to trash?</source>
+        <translation>Отправить файлы %1 в корзину?</translation>
     </message>
     <message>
-        <location filename="../src/dirview/dirwidget.cpp" line="680"/>
-        <source>Remove &quot;%1&quot; permanently?</source>
-        <translation>Удалить &quot;%1&quot; безвозвратно?</translation>
+        <location filename="../src/dirview/dirwidget.cpp" line="693"/>
+        <source>Remove %1 permanently?</source>
+        <translation>Безвозвратно удалить %1?</translation>
     </message>
 </context>
 <context>
@@ -158,32 +158,32 @@ Modified: %3</source>
 <context>
     <name>FileOperation</name>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="322"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="342"/>
         <source>Failed to copy file %1 to %2</source>
         <translation>Ошибка копирования файла %1 в %2</translation>
     </message>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="331"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="351"/>
         <source>Failed to move file %1 to %2</source>
         <translation>Ошибка перемещения файла %1 в %2</translation>
     </message>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="365"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="397"/>
         <source>Target already exists </source>
         <translation>Целевой файл уже существует </translation>
     </message>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="372"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="404"/>
         <source>Failed to link file %1 to %2</source>
         <translation>Ошибка создания ссылки на файл %1 в %2</translation>
     </message>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="401"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="433"/>
         <source>Failed to remove file </source>
         <translation>Ошибка удаления файла </translation>
     </message>
     <message>
-        <location filename="../src/fileoperation/fileoperation.cpp" line="415"/>
+        <location filename="../src/fileoperation/fileoperation.cpp" line="447"/>
         <source>Failed to trash </source>
         <translation>Ошибка отправки в корзину </translation>
     </message>
@@ -735,6 +735,21 @@ Modified: %3</source>
         <translation>Просмотреть</translation>
     </message>
     <message>
+        <location filename="../src/utility/shortcutmanager.cpp" line="186"/>
+        <source>Copy to given path</source>
+        <translation>Скопировать в адрес</translation>
+    </message>
+    <message>
+        <location filename="../src/utility/shortcutmanager.cpp" line="188"/>
+        <source>Move to given path</source>
+        <translation>Переместить в адрес</translation>
+    </message>
+    <message>
+        <location filename="../src/utility/shortcutmanager.cpp" line="190"/>
+        <source>Link to given path</source>
+        <translation>Ссылка в адрес</translation>
+    </message>
+    <message>
         <location filename="../src/utils.cpp" line="23"/>
         <source>Tb</source>
         <translation>Тб</translation>
@@ -758,6 +773,11 @@ Modified: %3</source>
         <location filename="../src/utils.cpp" line="37"/>
         <source>bytes</source>
         <translation>байт</translation>
+    </message>
+    <message>
+        <location filename="../src/utils.cpp" line="106"/>
+        <source>&quot;%1&quot;, ... (%2 files)</source>
+        <translation>&quot;%1&quot;, ... (%2 файлов)</translation>
     </message>
     <message>
         <location filename="../src/utility/openwith.cpp" line="185"/>
@@ -1017,6 +1037,29 @@ Modified: %3</source>
         <location filename="../src/shellcommand/shellcommandwidget.cpp" line="174"/>
         <source>&lt;b&gt;closed write channel&lt;/b&gt;</source>
         <translation>&lt;b&gt;закрыт канал ввода&lt;/b&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>TransferDialog</name>
+    <message>
+        <location filename="../src/widgets/transferdialog.cpp" line="23"/>
+        <source>To:</source>
+        <translation>В:</translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/transferdialog.cpp" line="36"/>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/transferdialog.cpp" line="37"/>
+        <source>Move</source>
+        <translation>Переместить</translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/transferdialog.cpp" line="38"/>
+        <source>Link</source>
+        <translation>Создать ссылку</translation>
     </message>
 </context>
 </TS>
