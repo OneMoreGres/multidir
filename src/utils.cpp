@@ -86,4 +86,25 @@ QList<QUrl> toUrls (const Infos &infos)
   return urls;
 }
 
+QString fileNames (const Infos &infos)
+{
+  if (infos.isEmpty ())
+  {
+    return {};
+  }
+
+  const auto maxFileNames = 2;
+  if (infos.size () <= maxFileNames)
+  {
+    return std::accumulate (infos.cbegin (), infos.cend (), QString (),
+                            [](const QString &sum, const QFileInfo &i) {
+                              const auto name = '"' + i.fileName () + '"';
+                              return !sum.isEmpty () ? sum + ',' + name : name;
+                            });
+  }
+
+  return QObject::tr ("\"%1\", ... (%2 files)").arg (infos.first ().fileName ())
+         .arg (infos.size ());
+}
+
 }

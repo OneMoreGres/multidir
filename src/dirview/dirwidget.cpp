@@ -16,6 +16,7 @@
 #include "navigationhistory.h"
 #include "shellcommandmodel.h"
 #include "fileoperationmodel.h"
+#include "transferdialog.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -87,6 +88,9 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
   copyToMenu_ (nullptr),
   moveToMenu_ (nullptr),
   linkToMenu_ (nullptr),
+  copyToPathAction_ (nullptr),
+  moveToPathAction_ (nullptr),
+  linkToPathAction_ (nullptr),
   upAction_ (nullptr),
   newFolderAction_ (nullptr),
   controlsLayout_ (new QHBoxLayout)
@@ -216,6 +220,19 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
 
   linkToMenu_ = viewMenu_->addMenu (tr ("Link to..."));
   linkToMenu_->setIcon (Shortcut::icon (Shortcut::LinkTo));
+
+
+  copyToPathAction_ = Shortcut::create (this, Shortcut::CopyToPath);
+  connect (copyToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::CopyAction);});
+
+  moveToPathAction_ = Shortcut::create (this, Shortcut::MoveToPath);
+  connect (moveToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::MoveAction);});
+
+  linkToPathAction_ = Shortcut::create (this, Shortcut::LinkToPath);
+  connect (linkToPathAction_, &QAction::triggered,
+           this, [this] {transferToPath (Qt::LinkAction);});
 
   viewMenu_->addSeparator ();
 
@@ -651,43 +668,33 @@ void DirWidget::promptClose ()
 
 void DirWidget::promptTrash ()
 {
-  const auto indexes = view_->selectedRows ();
-  if (indexes.isEmpty ())
+  const auto selection = selected ();
+  if (selection.isEmpty ())
   {
     return;
   }
-  auto res = QMessageBox::question (this, {}, tr ("Move files \"%1\" to trash?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+  const auto names = utils::fileNames (selection);
+  auto res = QMessageBox::question (this, {}, tr ("Move files %1 to trash?").arg (names),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
-    QList<QFileInfo> infos;
-    for (const auto &i: indexes)
-    {
-      infos << model_->fileInfo (proxy_->mapToSource (i));
-    }
-    fileOperations_->trash (infos);
+    fileOperations_->trash (selection);
   }
 }
 
 void DirWidget::promptRemove ()
 {
-  const auto indexes = view_->selectedRows ();
-  if (indexes.isEmpty ())
+  const auto selection = selected ();
+  if (selection.isEmpty ())
   {
     return;
   }
-  auto res = QMessageBox::question (this, {}, tr ("Remove \"%1\" permanently?")
-                                    .arg (names (indexes).join (QLatin1String ("\", \""))),
+  const auto names = utils::fileNames (selection);
+  auto res = QMessageBox::question (this, {}, tr ("Remove %1 permanently?").arg (names),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
-    QList<QFileInfo> infos;
-    for (const auto &i: indexes)
-    {
-      infos << model_->fileInfo (proxy_->mapToSource (i));
-    }
-    fileOperations_->remove (infos);
+    fileOperations_->remove (selection);
   }
 }
 
@@ -729,16 +736,6 @@ QFileInfo DirWidget::fileInfo (const QModelIndex &index) const
 #endif
 
   return result;
-}
-
-QStringList DirWidget::names (const QList<QModelIndex> &indexes) const
-{
-  QStringList names;
-  for (const auto &i: indexes)
-  {
-    names << i.data ().toString ();
-  }
-  return names;
 }
 
 void DirWidget::openSelected ()
@@ -840,6 +837,28 @@ void DirWidget::viewCurrent ()
 void DirWidget::moveUp ()
 {
   openPath (view_->rootIndex ().parent ());
+}
+
+void DirWidget::transferToPath (Qt::DropAction action)
+{
+  const auto items = selected ();
+  if (items.isEmpty ())
+  {
+    return;
+  }
+
+  TransferDialog dialog (model_);
+  if (dialog.prompt (action, items) != QDialog::Accepted)
+  {
+    return;
+  }
+
+  QFileInfo target (dialog.destination ());
+  if (target.isRelative ())
+  {
+    target = path_.absoluteFilePath () + '/' + target.filePath ();
+  }
+  fileOperations_->paste (items, target, action);
 }
 
 bool DirWidget::isMinSizeFixed () const

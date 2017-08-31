@@ -16,4 +16,6 @@ QString uniqueChars (const QString &source);
 
 QList<QUrl> toUrls (const Infos &infos);
 
+QString fileNames (const Infos &infos);
+
 }

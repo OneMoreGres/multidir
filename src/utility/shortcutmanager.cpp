@@ -183,6 +183,12 @@ void ShortcutManager::setDefaults ()
                                       QIcon (":/permissions.png"), c};
   shortcuts[SM::View] = {{QS ("F3")}, QObject::tr ("View"),
                          QIcon (":/read.png"), c};
+  shortcuts[SM::CopyToPath] = {{QS ("F5,F5")}, QObject::tr ("Copy to given path"),
+                               {}, c};
+  shortcuts[SM::MoveToPath] = {{QS ("F6,F6")}, QObject::tr ("Move to given path"),
+                               {}, c};
+  shortcuts[SM::LinkToPath] = {{}, QObject::tr ("Link to given path"),
+                               {}, c};
 }
 
 QAction * ShortcutManager::create (QWidget *context, Shortcut type, QMenu *menu,

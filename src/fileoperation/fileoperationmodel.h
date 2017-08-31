@@ -32,6 +32,7 @@ public:
 
   explicit FileOperationModel (QObject *parent = nullptr);
 
+  void paste (const QList<QFileInfo> &infos, const QFileInfo &target, Qt::DropAction action);
   void paste (const QList<QUrl> &urls, const QFileInfo &target, Qt::DropAction action);
   void remove (const QList<QFileInfo> &infos);
   void trash (const QList<QFileInfo> &infos);

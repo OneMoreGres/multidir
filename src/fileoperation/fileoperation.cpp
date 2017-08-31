@@ -114,10 +114,20 @@ void FileOperation::startAsync (FileConflictResolver *resolver)
   {
     case FileOperation::Action::Copy:
     case FileOperation::Action::Move:
+      if (!target_.exists () && sources_.size () > 1)
+      {
+        QDir d;
+        d.mkpath (target_.absoluteFilePath ());
+      }
       QtConcurrent::run (this, &FileOperation::transfer, sources_, target_, 0);
       break;
 
     case FileOperation::Action::Link:
+      if (!target_.exists () && sources_.size () > 1)
+      {
+        QDir d;
+        d.mkpath (target_.absoluteFilePath ());
+      }
       QtConcurrent::run (this, &FileOperation::link, sources_, target_);
       break;
 
@@ -256,6 +266,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
                               int depth)
 {
   auto ok = true;
+  const auto shouldRename = (depth == 0 && !target.exists () && sources.size () == 1);
   QDir targetDir (target.absoluteFilePath ());
   for (const auto &source: sources)
   {
@@ -294,6 +305,15 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
       if (resolution & FileConflictResolver::Rename)
       {
         name = uniqueFileName (targetFile);
+      }
+    }
+    else if (shouldRename)
+    {
+      targetDir.mkpath (target.absolutePath ());
+      targetDir.setPath (target.absolutePath ());
+      if (!target.fileName ().isEmpty ())
+      {
+        name = target.fileName ();
       }
     }
 
@@ -348,6 +368,7 @@ bool FileOperation::transfer (const FileOperation::Infos &sources, const QFileIn
 bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &target)
 {
   auto ok = true;
+  const auto shouldRename = (!target.exists () && sources.size () == 1);
   QDir targetDir (target.absoluteFilePath ());
   for (const auto &source: sources)
   {
@@ -358,6 +379,17 @@ bool FileOperation::link (const FileOperation::Infos &sources, const QFileInfo &
     }
     auto name = source.fileName ();
     setCurrent (name);
+
+    if (shouldRename)
+    {
+      targetDir.mkpath (target.absolutePath ());
+      targetDir.setPath (target.absolutePath ());
+      if (!target.fileName ().isEmpty ())
+      {
+        name = target.fileName ();
+      }
+    }
+
     const auto targetFileName = targetDir.absoluteFilePath (name);
     if (targetDir.exists (name))
     {
