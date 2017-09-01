@@ -123,7 +123,7 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
   auto openExternal = Shortcut::create (this, Shortcut::OpenInExplorer, menu_);
   connect (openExternal, &QAction::triggered,
            this, [this] {QDesktopServices::openUrl (QUrl::fromLocalFile (
-                                                      path ().absoluteFilePath ()));});
+                                                      path_.absoluteFilePath ()));});
 
   auto openConsole = Shortcut::create (this, Shortcut::OpenConsole, menu_);
   connect (openConsole, &QAction::triggered,
@@ -362,7 +362,7 @@ DirWidget::~DirWidget ()
 void DirWidget::save (QSettings &settings) const
 {
   settings.setValue (qs_isList, listMode_->isChecked ());
-  settings.setValue (qs_dir, path ().absoluteFilePath ());
+  settings.setValue (qs_dir, path_.absoluteFilePath ());
   settings.setValue (qs_isLocked, isLocked ());
   settings.setValue (qs_extensive, extensiveAction_->isChecked ());
   settings.setValue (qs_showDirs, proxy_->showDirs ());
@@ -389,11 +389,6 @@ void DirWidget::restore (QSettings &settings)
     isMinSizeFixed_->setChecked (true);
   }
   view_->restore (settings);
-}
-
-QFileInfo DirWidget::path () const
-{
-  return path_;
 }
 
 void DirWidget::setSiblings (const QList<DirWidget *> siblings)
@@ -426,7 +421,7 @@ void DirWidget::createSiblingActions ()
                       addAction (action);
                     }
                     connect (action, &QAction::triggered, this, [this, i, drop] {
-        fileOperations_->paste (utils::toUrls (selected ()), i->path (), drop);
+        fileOperations_->paste (utils::toUrls (selected ()), i->path_, drop);
       });
                   }
                 };
@@ -575,7 +570,7 @@ void DirWidget::openFile (const QFileInfo &info)
 
 void DirWidget::newFolder ()
 {
-  QDir dir (path ().absoluteFilePath ());
+  QDir dir (path_.absoluteFilePath ());
   auto name = tr ("New");
   auto i = 0;
   while (dir.exists (name))
@@ -654,7 +649,7 @@ void DirWidget::adjustItems ()
 void DirWidget::promptClose ()
 {
   auto res = QMessageBox::question (this, {}, tr ("Close tab \"%1\"?")
-                                    .arg (path ().absoluteFilePath ()),
+                                    .arg (path_.absoluteFilePath ()),
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
   if (res == QMessageBox::Yes)
   {
@@ -944,7 +939,7 @@ void DirWidget::updateActions ()
 
 void DirWidget::checkDirExistence ()
 {
-  const auto path = this->path ().absoluteFilePath ();
+  const auto path = path_.absoluteFilePath ();
   if (QFileInfo::exists (path))
   {
     return;

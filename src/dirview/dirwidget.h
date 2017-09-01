@@ -32,7 +32,6 @@ public:
   void restore (QSettings &settings);
 
   void setPath (const QFileInfo &path);
-  QFileInfo path () const;
 
   void setSiblings (const QList<DirWidget *> siblings);
 
