@@ -34,9 +34,8 @@ public slots:
 
 private:
   void close (DirWidget *widget);
-  void clone (DirWidget *widget);
-  void nextTab (DirWidget *widget);
-  void previousTab (DirWidget *widget);
+  void nextTab ();
+  void previousTab ();
   void add (const QFileInfo &path);
   void updateWidgetNames ();
   void updateWidgetShortcuts ();

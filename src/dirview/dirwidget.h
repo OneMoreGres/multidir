@@ -53,9 +53,6 @@ public:
 
 signals:
   void closeRequested (DirWidget *widget);
-  void cloneRequested (DirWidget *widget);
-  void nextTabRequested (DirWidget *widget);
-  void previousTabRequested (DirWidget *widget);
   void newTabRequested (const QFileInfo &path);
 
 protected:
@@ -63,6 +60,7 @@ protected:
 
 private:
   void newFolder ();
+  void clone ();
 
   QFileInfo fileInfo (const QModelIndex &index) const;
 

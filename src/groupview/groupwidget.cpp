@@ -40,9 +40,17 @@ GroupWidget::GroupWidget (QSharedPointer<DirWidgetFactory> widgetFactory, QWidge
   connect (view_, &TiledView::tileSwapped,
            this, &GroupWidget::updateWidgetShortcuts);
 
-  auto ac = ShortcutManager::create (this, ShortcutManager::EqulalizeTabs);
-  connect (ac, &QAction::triggered,
-           this,&GroupWidget::equalizeActiveSiblings);
+  auto nextTab = ShortcutManager::create (this, ShortcutManager::NextTab);
+  connect (nextTab, &QAction::triggered,
+           this, &GroupWidget::nextTab);
+
+  auto previousTab = ShortcutManager::create (this, ShortcutManager::PreviousTab);
+  connect (previousTab, &QAction::triggered,
+           this, &GroupWidget::previousTab);
+
+  auto equalize = ShortcutManager::create (this, ShortcutManager::EqulalizeTabs);
+  connect (equalize, &QAction::triggered,
+           this, &GroupWidget::equalizeActiveSiblings);
 
   SettingsManager::subscribeForUpdates (this);
   updateSettings ();
@@ -131,12 +139,6 @@ DirWidget * GroupWidget::addWidget ()
 
   connect (w, &DirWidget::closeRequested,
            this, &GroupWidget::close);
-  connect (w, &DirWidget::cloneRequested,
-           this, &GroupWidget::clone);
-  connect (w, &DirWidget::nextTabRequested,
-           this, &GroupWidget::nextTab);
-  connect (w, &DirWidget::previousTabRequested,
-           this, &GroupWidget::previousTab);
   connect (w, &DirWidget::newTabRequested,
            this, &GroupWidget::add);
 
@@ -223,31 +225,30 @@ void GroupWidget::close (DirWidget *widget)
   }
 }
 
-void GroupWidget::clone (DirWidget *widget)
+void GroupWidget::nextTab ()
 {
-  auto w = addWidget ();
-  w->setPath (widget->path ());
-  w->activate ();
+  if (auto *w = current ())
+  {
+    const auto order = orderedWidgets ();
+    auto it = std::find (order.cbegin (), order.cend (), w);
+
+    auto casted = qobject_cast<DirWidget *>((++it == order.cend ()) ? order.first () : *it);
+    ASSERT (casted);
+    casted->activate ();
+  }
 }
 
-void GroupWidget::nextTab (DirWidget *widget)
+void GroupWidget::previousTab ()
 {
-  const auto order = orderedWidgets ();
-  auto it = std::find (order.cbegin (), order.cend (), widget);
+  if (auto *w = current ())
+  {
+    const auto order = orderedWidgets ();
+    auto it = std::find (order.cbegin (), order.cend (), w);
 
-  auto casted = qobject_cast<DirWidget *>((++it == order.cend ()) ? order.first () : *it);
-  ASSERT (casted);
-  casted->activate ();
-}
-
-void GroupWidget::previousTab (DirWidget *widget)
-{
-  const auto order = orderedWidgets ();
-  auto it = std::find (order.cbegin (), order.cend (), widget);
-
-  auto casted = qobject_cast<DirWidget *>((it == order.cbegin ()) ? order.last () : *(--it));
-  ASSERT (casted);
-  casted->activate ();
+    auto casted = qobject_cast<DirWidget *>((it == order.cbegin ()) ? order.last () : *(--it));
+    ASSERT (casted);
+    casted->activate ();
+  }
 }
 
 QList<QWidget *> GroupWidget::orderedWidgets () const

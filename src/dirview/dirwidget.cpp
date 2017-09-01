@@ -110,15 +110,6 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
 
 
   using Shortcut = ShortcutManager;
-  auto nextTab = Shortcut::create (this, Shortcut::NextTab, nullptr);
-  connect (nextTab, &QAction::triggered,
-           this, [this] {emit nextTabRequested (this);});
-
-  auto previousTab = Shortcut::create (this, Shortcut::PreviousTab, nullptr);
-  connect (previousTab, &QAction::triggered,
-           this, [this] {emit previousTabRequested (this);});
-
-
   auto adjustColumns = ShortcutManager::create (this, Shortcut::AdjustColumSizes);
   connect (adjustColumns, &QAction::triggered,
            view_, &DirView::adjustItems);
@@ -158,7 +149,7 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
 
   auto clone = Shortcut::create (this, Shortcut::CloneTab, menu_);
   connect (clone, &QAction::triggered,
-           this, [this]() {emit cloneRequested (this);});
+           this, &DirWidget::clone);
 
   menu_->addSeparator ();
 
@@ -597,6 +588,11 @@ void DirWidget::newFolder ()
   view_->renameCurrent ();
 }
 
+void DirWidget::clone ()
+{
+  emit newTabRequested (path_);
+}
+
 void DirWidget::resizeEvent (QResizeEvent *)
 {
   pathWidget_->adjust ();
@@ -614,7 +610,7 @@ bool DirWidget::eventFilter (QObject *watched, QEvent *event)
     }
     else if (casted->button () == Qt::MiddleButton)
     {
-      emit cloneRequested (this);
+      clone ();
     }
     return false;
   }
