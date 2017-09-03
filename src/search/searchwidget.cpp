@@ -19,6 +19,8 @@
 namespace
 {
 const QString qs_geometry = "search/geometry";
+const QString qs_files = "search/files";
+const QString qs_text = "search/text";
 }
 
 SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
@@ -106,11 +108,15 @@ SearchWidget::~SearchWidget ()
 void SearchWidget::saveState (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
+  settings.setValue (qs_files, filePattern_->text ());
+  settings.setValue (qs_text, text_->text ());
 }
 
 void SearchWidget::restoreState (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry).toByteArray ());
+  filePattern_->setText (settings.value (qs_files, QLatin1String ("*")).toString ());
+  text_->setText (settings.value (qs_text).toString ());
 }
 
 void SearchWidget::setRunning (bool isRunning)
