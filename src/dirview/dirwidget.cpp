@@ -17,6 +17,7 @@
 #include "shellcommandmodel.h"
 #include "fileoperationmodel.h"
 #include "transferdialog.h"
+#include "searchwidget.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -136,6 +137,10 @@ DirWidget::DirWidget (FileSystemModel *model, ShellCommandModel *commands,
   auto runCommand = Shortcut::create (this, Shortcut::RunCommand, menu_);
   connect (runCommand, &QAction::triggered,
            this, &DirWidget::showCommandPrompt);
+
+  auto search = Shortcut::create (this, Shortcut::Search, menu_);
+  connect (search, &QAction::triggered,
+           this, &DirWidget::advancedSearch);
 
 
   menu_->addSeparator ();
@@ -475,6 +480,14 @@ void DirWidget::execCommandPrompt ()
 
   commandRunner_->run (commandPrompt_->text (), selections, path_);
   commandPrompt_->hide ();
+}
+
+void DirWidget::advancedSearch ()
+{
+  auto w = new SearchWidget;
+  w->setAttribute (Qt::WA_DeleteOnClose);
+  w->setDefaultDir (path_.absoluteFilePath ());
+  w->show ();
 }
 
 void DirWidget::openConsole ()
