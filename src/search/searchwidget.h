@@ -39,6 +39,7 @@ private:
   QLineEdit *filePattern_;
   QLineEdit *text_;
   QCheckBox *recursive_;
+  QCheckBox *caseSensitive_;
   QDialogButtonBox *buttons_;
   QTreeView *results_;
 

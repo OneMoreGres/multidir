@@ -39,12 +39,14 @@ void Searcher::setFilePatterns (const QStringList &filePatterns)
   }
 }
 
-void Searcher::setText (const QString &text)
+void Searcher::setText (const QString &text, Qt::CaseSensitivity caseSeisitivity)
 {
-  auto *codec = QTextCodec::codecForLocale ();
-  options_.text.setPattern (codec->fromUnicode (text));
+  options_.text.setPattern (text);
+  options_.text.setCaseSensitivity (caseSeisitivity);
   const auto textLength = options_.text.pattern ().size ();
   options_.maxOccurenceLength = options_.sideContextLength * 2 + textLength;
+
+  auto *codec = QTextCodec::codecForLocale ();
   options_.textDecoder = codec->makeDecoder (QTextCodec::ConvertInvalidToNull);
 }
 
@@ -134,9 +136,10 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
 
   auto offset = 0;
   QMap<int, QString> occurrences;
+  ASSERT (options.textDecoder);
   while (!f.atEnd ())
   {
-    const auto line = f.readLine ();
+    const auto line = options.textDecoder->toUnicode (f.readLine ());
     auto start = 0;
 
     while (true)
@@ -152,8 +155,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
         const auto start = std::max (0, index - options.sideContextLength);
         context = context.mid (start, options.maxOccurenceLength);
       }
-      const auto text = options.textDecoder->toUnicode (context).trimmed ();
-      occurrences.insert (offset + index, text);
+      occurrences.insert (offset + index, context);
       start = index + 1;
     }
 

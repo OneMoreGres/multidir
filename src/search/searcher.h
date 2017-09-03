@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QVector>
-#include <QByteArrayMatcher>
+#include <QStringMatcher>
 
 #include <atomic>
 
@@ -19,7 +19,7 @@ public:
 
   void setRecursive (bool isOn);
   void setFilePatterns (const QStringList &filePatterns);
-  void setText (const QString &text);
+  void setText (const QString &text, Qt::CaseSensitivity caseSeisitivity);
 
   void startAsync (const QStringList &dirs);
   void abort ();
@@ -33,7 +33,7 @@ private:
   struct Options
   {
     QVector<QRegExp> filePatterns;
-    QByteArrayMatcher text;
+    QStringMatcher text;
     bool recursive{true};
     int sideContextLength{50};
     int maxOccurenceLength{0};
