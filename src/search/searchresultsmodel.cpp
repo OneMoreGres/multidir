@@ -180,6 +180,20 @@ SearchResultsModel::Item::Item (const Item &r) :
   }
 }
 
+SearchResultsModel::Item &SearchResultsModel::Item::operator= (const Item &r)
+{
+  parent = r.parent;
+  children = r.children;
+  text = r.text;
+  byteOffset = r.byteOffset;
+
+  for (auto &i: children)
+  {
+    i.parent = this;
+  }
+  return *this;
+}
+
 bool SearchResultsModel::Item::operator== (const SearchResultsModel::Item &r) const
 {
   return text == r.text;

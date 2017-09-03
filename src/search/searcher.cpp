@@ -133,6 +133,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
   }
 
   auto offset = 0;
+  QMap<int, QString> occurrences;
   while (!f.atEnd ())
   {
     const auto line = f.readLine ();
@@ -152,11 +153,15 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
         context = context.mid (start, options.maxOccurenceLength);
       }
       const auto text = options.textDecoder->toUnicode (context).trimmed ();
-      emit foundText (fileName, offset + index, text);
+      occurrences.insert (offset + index, text);
       start = index + 1;
     }
 
     offset += line.size ();
+  }
+  if (!occurrences.isEmpty ())
+  {
+    emit foundText (fileName, occurrences);
   }
 }
 

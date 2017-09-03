@@ -35,10 +35,11 @@ private:
     Item (const QString &text = {});
     Item (const QString &text, int byteOffset, Item *parent);
     Item (const Item &r);
+    Item &operator= (const Item &r);
     bool operator== (const Item &r) const;
 
     Item *parent{nullptr};
-    QVector<Item> children;
+    QList<Item> children;
     QString text;
     int byteOffset{0};
   };
@@ -46,5 +47,5 @@ private:
   Item * toItem (const QModelIndex &index) const;
   QModelIndex toIndex (const Item &item) const;
 
-  QVector<Item> items_;
+  QList<Item> items_;
 };
