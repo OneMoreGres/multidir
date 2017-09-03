@@ -43,9 +43,7 @@ SearchWidget::SearchWidget (QWidget *parent) :
 
   results_->setModel (model_);
   results_->hideColumn (SearchResultsModel::ByteOffset);
-  results_->setUniformRowHeights (true);
 
-  //  searcher_->setModel (*model_);
   connect (searcher_, &Searcher::foundText,
            model_, &SearchResultsModel::addText);
   connect (searcher_, &Searcher::foundFile,

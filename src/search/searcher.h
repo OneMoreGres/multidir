@@ -6,6 +6,8 @@
 
 #include <atomic>
 
+class QTextDecoder;
+
 class SearchResultsModel;
 
 class Searcher : public QObject
@@ -25,7 +27,7 @@ public:
 signals:
   void finished ();
   void foundFile (const QString &file);
-  void foundText (const QString &file, int byteOffset, const QString &line);
+  void foundText (const QString &file, int byteOffset, const QString &occurence);
 
 private:
   struct Options
@@ -33,6 +35,9 @@ private:
     QVector<QRegExp> filePatterns;
     QByteArrayMatcher text;
     bool recursive{true};
+    int sideContextLength{50};
+    int maxOccurenceLength{0};
+    QTextDecoder *textDecoder{nullptr};
   };
 
   void searchFiles (QStringList dirs, Options options, int depth);

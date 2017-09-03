@@ -24,7 +24,7 @@ void SearchResultsModel::addFile (const QString &file)
   }
 }
 
-void SearchResultsModel::addText (const QString &file, int byteOffset, const QString &line)
+void SearchResultsModel::addText (const QString &file, int byteOffset, const QString &occurence)
 {
   auto it = std::find (items_.begin (), items_.end (), file);
   if (it == items_.end ())
@@ -42,7 +42,7 @@ void SearchResultsModel::addText (const QString &file, int byteOffset, const QSt
   auto parent = index (row, 0, {});
   const auto last = it->children.size ();
   beginInsertRows (parent, last, last);
-  it->children.append ({line, byteOffset, &(*it)});
+  it->children.append ({occurence, byteOffset, &(*it)});
   endInsertRows ();
 }
 

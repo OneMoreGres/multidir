@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QByteArrayMatcher>
+#include <QTextCodec>
 
 Searcher::Searcher (QObject *parent) :
   QObject (parent),
@@ -40,7 +41,11 @@ void Searcher::setFilePatterns (const QStringList &filePatterns)
 
 void Searcher::setText (const QString &text)
 {
-  options_.text.setPattern (text.toLocal8Bit ());
+  auto *codec = QTextCodec::codecForLocale ();
+  options_.text.setPattern (codec->fromUnicode (text));
+  const auto textLength = options_.text.pattern ().size ();
+  options_.maxOccurenceLength = options_.sideContextLength * 2 + textLength;
+  options_.textDecoder = codec->makeDecoder (QTextCodec::ConvertInvalidToNull);
 }
 
 void Searcher::startAsync (const QStringList &dirs)
@@ -140,7 +145,14 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
       {
         break;
       }
-      emit foundText (fileName, offset + index, QString::fromLocal8Bit (line));
+      auto context = line;
+      if (context.length () > options.maxOccurenceLength)
+      {
+        const auto start = std::max (0, index - options.sideContextLength);
+        context = context.mid (start, options.maxOccurenceLength);
+      }
+      const auto text = options.textDecoder->toUnicode (context).trimmed ();
+      emit foundText (fileName, offset + index, text);
       start = index + 1;
     }
 
