@@ -17,7 +17,7 @@ public:
   ~SearchResultsModel ();
 
   void addFile (const QString &file);
-  void addText (const QString &file, int byteOffset, const QString &occurence);
+  void addText (const QString &file, const QMap<int, QString> &occurrences);
   void clear ();
 
   QString fileName (const QModelIndex &index) const;

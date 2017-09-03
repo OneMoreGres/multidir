@@ -27,7 +27,7 @@ public:
 signals:
   void finished ();
   void foundFile (const QString &file);
-  void foundText (const QString &file, int byteOffset, const QString &occurence);
+  void foundText (const QString &file, const QMap<int, QString> &occurrences);
 
 private:
   struct Options

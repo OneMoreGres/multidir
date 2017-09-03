@@ -1,4 +1,5 @@
 #include "searchresultsmodel.h"
+#include "debug.h"
 
 SearchResultsModel::SearchResultsModel (QObject *parent) :
   QAbstractItemModel (parent),
@@ -14,35 +15,26 @@ SearchResultsModel::~SearchResultsModel ()
 
 void SearchResultsModel::addFile (const QString &file)
 {
-  auto it = std::find (items_.begin (), items_.end (), file);
-  if (it == items_.end ())
-  {
-    const auto last = items_.size ();
-    beginInsertRows ({}, last, last);
-    items_.append (Item{file});
-    endInsertRows ();
-  }
+  const auto last = items_.size ();
+  beginInsertRows ({}, last, last);
+  items_.append (Item{file});
+  endInsertRows ();
 }
 
-void SearchResultsModel::addText (const QString &file, int byteOffset, const QString &occurence)
+void SearchResultsModel::addText (const QString &file,
+                                  const QMap<int, QString> &occurrences)
 {
-  auto it = std::find (items_.begin (), items_.end (), file);
-  if (it == items_.end ())
-  {
-    const auto last = items_.size ();
-    beginInsertRows ({}, last, last);
-    items_.append (Item{file});
-    endInsertRows ();
+  const auto last = items_.size ();
+  beginInsertRows ({}, last, last);
 
-    it = items_.end ();
-    --it;
+  items_.append (Item{file});
+  auto &item = items_.last ();
+  item.children.reserve (occurrences.size ());
+  for (auto i = occurrences.cbegin (), end = occurrences.cend (); i != end; ++i)
+  {
+    item.children.append (Item (i.value (), i.key (), &item));
   }
 
-  const auto row = int (it - items_.begin ());
-  auto parent = index (row, 0, {});
-  const auto last = it->children.size ();
-  beginInsertRows (parent, last, last);
-  it->children.append ({occurence, byteOffset, &(*it)});
   endInsertRows ();
 }
 

@@ -14,7 +14,7 @@ Searcher::Searcher (QObject *parent) :
   isAborted_ (false),
   options_ ()
 {
-
+  qRegisterMetaType<QMap<int, QString> >();
 }
 
 Searcher::~Searcher ()
