@@ -145,7 +145,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
   ASSERT (options.textDecoder);
   while (!f.atEnd ())
   {
-    const auto line = options.textDecoder->toUnicode (f.readLine ());
+    const auto line = options.textDecoder->toUnicode (f.readLine ()).trimmed ();
     auto start = 0;
 
     while (true)
