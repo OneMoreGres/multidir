@@ -23,6 +23,7 @@ const QString qs_files = "search/files";
 const QString qs_text = "search/text";
 const QString qs_recursive = "search/recursive";
 const QString qs_caseSensitive = "search/caseSensitive";
+const QString qs_wordOnly = "search/wordOnly";
 }
 
 SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
@@ -33,6 +34,7 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   text_ (new QLineEdit (this)),
   recursive_ (new QCheckBox (tr ("Recursive"), this)),
   caseSensitive_ (new QCheckBox (tr ("Case sensitive"), this)),
+  wordOnly_ (new QCheckBox (tr ("Word only"), this)),
   buttons_ (new QDialogButtonBox (QDialogButtonBox::Apply |
                                   QDialogButtonBox::Abort, this)),
   results_ (new QTreeView (this)),
@@ -83,8 +85,11 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
     layout->addWidget (text_, row, 1);
 
     ++row;
-    layout->addWidget (recursive_, row, 0);
-    layout->addWidget (caseSensitive_, row, 1);
+    auto options = new QHBoxLayout;
+    layout->addLayout (options, row, 0, 1, 2);
+    options->addWidget (recursive_);
+    options->addWidget (caseSensitive_);
+    options->addWidget (wordOnly_);
 
     ++row;
     layout->addWidget (buttons_, row, 0, 1, 2);
@@ -114,6 +119,7 @@ void SearchWidget::saveState (QSettings &settings) const
   settings.setValue (qs_text, text_->text ());
   settings.setValue (qs_recursive, recursive_->isChecked ());
   settings.setValue (qs_caseSensitive, caseSensitive_->isChecked ());
+  settings.setValue (qs_wordOnly, wordOnly_->isChecked ());
 }
 
 void SearchWidget::restoreState (QSettings &settings)
@@ -123,6 +129,7 @@ void SearchWidget::restoreState (QSettings &settings)
   text_->setText (settings.value (qs_text).toString ());
   recursive_->setChecked (settings.value (qs_recursive, true).toBool ());
   caseSensitive_->setChecked (settings.value (qs_caseSensitive, false).toBool ());
+  wordOnly_->setChecked (settings.value (qs_wordOnly, false).toBool ());
 }
 
 void SearchWidget::setRunning (bool isRunning)
@@ -150,7 +157,7 @@ void SearchWidget::start ()
   searcher_->setFilePatterns (filePattern_->text ().split (','));
   const auto caseSence = caseSensitive_->isChecked () ? Qt::CaseSensitive
                                                       : Qt::CaseInsensitive;
-  searcher_->setText (text_->text (), caseSence);
+  searcher_->setText (text_->text (), caseSence, wordOnly_->isChecked ());
 
   searcher_->startAsync (dirs);
 

@@ -19,7 +19,8 @@ public:
 
   void setRecursive (bool isOn);
   void setFilePatterns (const QStringList &filePatterns);
-  void setText (const QString &text, Qt::CaseSensitivity caseSeisitivity);
+  void setText (const QString &text, Qt::CaseSensitivity caseSeisitivity,
+                bool wordOnly);
 
   void startAsync (const QStringList &dirs);
   void abort ();
@@ -35,6 +36,8 @@ private:
     QVector<QRegExp> filePatterns;
     QStringMatcher text;
     bool recursive{true};
+    bool wordOnly{false};
+    int textLength{0};
     int sideContextLength{50};
     int maxOccurenceLength{0};
     QTextDecoder *textDecoder{nullptr};

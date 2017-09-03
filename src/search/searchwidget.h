@@ -40,6 +40,7 @@ private:
   QLineEdit *text_;
   QCheckBox *recursive_;
   QCheckBox *caseSensitive_;
+  QCheckBox *wordOnly_;
   QDialogButtonBox *buttons_;
   QTreeView *results_;
 

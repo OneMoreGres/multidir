@@ -39,11 +39,17 @@ void Searcher::setFilePatterns (const QStringList &filePatterns)
   }
 }
 
-void Searcher::setText (const QString &text, Qt::CaseSensitivity caseSeisitivity)
+void Searcher::setText (const QString &text, Qt::CaseSensitivity caseSeisitivity,
+                        bool wordOnly)
 {
   options_.text.setPattern (text);
   options_.text.setCaseSensitivity (caseSeisitivity);
-  const auto textLength = options_.text.pattern ().size ();
+
+  options_.textLength = text.size ();
+
+  options_.wordOnly = wordOnly;
+
+  const auto textLength = text.size ();
   options_.maxOccurenceLength = options_.sideContextLength * 2 + textLength;
 
   auto *codec = QTextCodec::codecForLocale ();
@@ -149,18 +155,42 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
       {
         break;
       }
+      start = index + 1;
+      const auto lineOffset = offset;
+      offset += line.size ();
+
       auto context = line;
-      if (context.length () > options.maxOccurenceLength)
+      const auto contextLength = context.size ();
+
+      if (options.wordOnly)
+      {
+        const auto charBefore = (index > 0 ? context.at (index - 1) : QChar ());
+        if (charBefore.isLetterOrNumber ())
+        {
+          continue;
+        }
+
+        const auto pastEnd = index + options.textLength + 1;
+        const auto charAfter = (pastEnd < options.textLength ? context.at (pastEnd)
+                                                             : QChar ());
+        if (charAfter.isLetterOrNumber ())
+        {
+          continue;
+        }
+      }
+
+      if (contextLength > options.maxOccurenceLength)
       {
         const auto start = std::max (0, index - options.sideContextLength);
         context = context.mid (start, options.maxOccurenceLength);
       }
-      occurrences.insert (offset + index, context);
-      start = index + 1;
+
+      occurrences.insert (lineOffset + index, context);
+
     }
 
-    offset += line.size ();
   }
+
   if (!occurrences.isEmpty ())
   {
     emit foundText (fileName, occurrences);
