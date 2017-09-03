@@ -25,7 +25,7 @@ public:
 signals:
   void finished ();
   void foundFile (const QString &file);
-  void foundText (const QString &file, int offset, const QString &line);
+  void foundText (const QString &file, int byteOffset, const QString &line);
 
 private:
   struct Options

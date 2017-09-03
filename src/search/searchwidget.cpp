@@ -42,7 +42,7 @@ SearchWidget::SearchWidget (QWidget *parent) :
   recursive_->setChecked (true);
 
   results_->setModel (model_);
-  results_->hideColumn (SearchResultsModel::Offset);
+  results_->hideColumn (SearchResultsModel::ByteOffset);
   results_->setUniformRowHeights (true);
 
   //  searcher_->setModel (*model_);

@@ -9,7 +9,7 @@ class SearchResultsModel : public QAbstractItemModel
 public:
   enum Column
   {
-    Text, Offset,
+    Text, ByteOffset,
     ColumnCount
   };
 
@@ -17,7 +17,7 @@ public:
   ~SearchResultsModel ();
 
   void addFile (const QString &file);
-  void addText (const QString &file, int offset, const QString &line);
+  void addText (const QString &file, int byteOffset, const QString &line);
   void clear ();
 
   QModelIndex index (int row, int column, const QModelIndex &parent) const override;
@@ -31,14 +31,14 @@ private:
   struct Item
   {
     Item (const QString &text = {});
-    Item (const QString &text, int offset, Item *parent);
+    Item (const QString &text, int byteOffset, Item *parent);
     Item (const Item &r);
     bool operator== (const Item &r) const;
 
     Item *parent{nullptr};
     QVector<Item> children;
     QString text;
-    int offset{0};
+    int byteOffset{0};
   };
 
   Item * toItem (const QModelIndex &index) const;

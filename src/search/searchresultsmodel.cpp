@@ -24,7 +24,7 @@ void SearchResultsModel::addFile (const QString &file)
   }
 }
 
-void SearchResultsModel::addText (const QString &file, int offset, const QString &line)
+void SearchResultsModel::addText (const QString &file, int byteOffset, const QString &line)
 {
   auto it = std::find (items_.begin (), items_.end (), file);
   if (it == items_.end ())
@@ -42,7 +42,7 @@ void SearchResultsModel::addText (const QString &file, int offset, const QString
   auto parent = index (row, 0, {});
   const auto last = it->children.size ();
   beginInsertRows (parent, last, last);
-  it->children.append ({line, offset, &(*it)});
+  it->children.append ({line, byteOffset, &(*it)});
   endInsertRows ();
 }
 
@@ -114,7 +114,7 @@ QVariant SearchResultsModel::headerData (int section, Qt::Orientation orientatio
   switch (section)
   {
     case Column::Text: return tr ("Text");
-    case Column::Offset: return tr ("Offset");
+    case Column::ByteOffset: return tr ("Offset");
   }
 
   return {};
@@ -136,7 +136,7 @@ QVariant SearchResultsModel::data (const QModelIndex &index, int role) const
   switch (index.column ())
   {
     case Column::Text: return casted->text;
-    case Column::Offset: return casted->parent ? casted->offset : QVariant ();
+    case Column::ByteOffset: return casted->parent ? casted->byteOffset : QVariant ();
   }
 
   return {};
@@ -154,7 +154,7 @@ SearchResultsModel::Item::Item (const QString &text, int offset, Item *parent) :
   parent (parent),
   children (),
   text (text),
-  offset (offset)
+  byteOffset (offset)
 {
 
 }
@@ -163,7 +163,7 @@ SearchResultsModel::Item::Item (const Item &r) :
   parent (r.parent),
   children (r.children),
   text (r.text),
-  offset (r.offset)
+  byteOffset (r.byteOffset)
 {
   for (auto &i: children)
   {
