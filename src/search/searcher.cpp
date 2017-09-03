@@ -61,7 +61,7 @@ void Searcher::searchFiles (QStringList dirs, Options options, int depth)
   {
     if (isAborted_)
     {
-      return;
+      break;
     }
 
     QDir d (dir);
@@ -83,7 +83,7 @@ void Searcher::searchFiles (QStringList dirs, Options options, int depth)
     {
       if (isAborted_)
       {
-        return;
+        break;
       }
 
       auto passPattern = options.filePatterns.isEmpty ();
