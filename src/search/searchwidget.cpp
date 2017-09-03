@@ -15,6 +15,8 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QAction>
+#include <QClipboard>
+#include <QApplication>
 
 namespace
 {
@@ -179,6 +181,7 @@ void SearchWidget::viewCurrent ()
   auto file = model_->fileName (results_->currentIndex ());
   if (!file.isEmpty ())
   {
+    QApplication::clipboard ()->setText (text_->text ());
     auto view = new FileViewer;
     view->showFile (file);
   }
@@ -189,6 +192,7 @@ void SearchWidget::editCurrent ()
   auto file = model_->fileName (results_->currentIndex ());
   if (!file.isEmpty ())
   {
+    QApplication::clipboard ()->setText (text_->text ());
     commandRunner_->openInEditor (file);
   }
 }
