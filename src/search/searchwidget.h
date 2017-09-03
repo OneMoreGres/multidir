@@ -30,6 +30,7 @@ private:
   void abort ();
   void finished ();
 
+  void viewCurrent ();
   void editCurrent ();
 
   ShellCommandModel *commandRunner_;

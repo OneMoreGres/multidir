@@ -3,6 +3,7 @@
 #include "searcher.h"
 #include "shellcommandmodel.h"
 #include "shortcutmanager.h"
+#include "fileviewer.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -55,10 +56,13 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   connect (searcher_, &Searcher::finished,
            this, &SearchWidget::finished);
 
+  auto view = ShortcutManager::create (this, ShortcutManager::View);
+  connect (view, &QAction::triggered,
+           this, &SearchWidget::viewCurrent);
+
   auto edit = ShortcutManager::create (this, ShortcutManager::OpenInEditor);
   connect (edit, &QAction::triggered,
            this, &SearchWidget::editCurrent);
-
 
 
   {
@@ -147,6 +151,16 @@ void SearchWidget::abort ()
 void SearchWidget::finished ()
 {
   setRunning (false);
+}
+
+void SearchWidget::viewCurrent ()
+{
+  auto file = model_->fileName (results_->currentIndex ());
+  if (!file.isEmpty ())
+  {
+    auto view = new FileViewer;
+    view->showFile (file);
+  }
 }
 
 void SearchWidget::editCurrent ()
