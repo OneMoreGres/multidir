@@ -20,6 +20,8 @@ public:
   void addText (const QString &file, int byteOffset, const QString &occurence);
   void clear ();
 
+  QString fileName (const QModelIndex &index) const;
+
   QModelIndex index (int row, int column, const QModelIndex &parent) const override;
   QModelIndex parent (const QModelIndex &child) const override;
   int rowCount (const QModelIndex &parent) const override;

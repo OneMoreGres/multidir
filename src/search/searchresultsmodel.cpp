@@ -53,6 +53,15 @@ void SearchResultsModel::clear ()
   endResetModel ();
 }
 
+QString SearchResultsModel::fileName (const QModelIndex &index) const
+{
+  if (auto *casted = toItem (index))
+  {
+    return (casted->parent ? casted->parent->text : casted->text);
+  }
+  return {};
+}
+
 SearchResultsModel::Item * SearchResultsModel::toItem (const QModelIndex &index) const
 {
   return static_cast<Item *>(index.internalPointer ());

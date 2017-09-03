@@ -4,6 +4,7 @@
 
 class SearchResultsModel;
 class Searcher;
+class ShellCommandModel;
 
 class QLabel;
 class QLineEdit;
@@ -15,7 +16,7 @@ class QSettings;
 class SearchWidget : public QWidget
 {
 public:
-  explicit SearchWidget (QWidget *parent = nullptr);
+  explicit SearchWidget (ShellCommandModel *commanRunner, QWidget *parent = nullptr);
   ~SearchWidget ();
 
   void setDefaultDir (const QString &path);
@@ -28,6 +29,10 @@ private:
   void start ();
   void abort ();
   void finished ();
+
+  void editCurrent ();
+
+  ShellCommandModel *commandRunner_;
 
   QLineEdit *dir_;
   QLineEdit *filePattern_;

@@ -1,6 +1,8 @@
 #include "searchwidget.h"
 #include "searchresultsmodel.h"
 #include "searcher.h"
+#include "shellcommandmodel.h"
+#include "shortcutmanager.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -11,14 +13,16 @@
 #include <QDir>
 #include <QPushButton>
 #include <QSettings>
+#include <QAction>
 
 namespace
 {
 const QString qs_geometry = "search/geometry";
 }
 
-SearchWidget::SearchWidget (QWidget *parent) :
+SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   QWidget (parent),
+  commandRunner_ (commanRunner),
   dir_ (new QLineEdit (this)),
   filePattern_ (new QLineEdit (this)),
   text_ (new QLineEdit (this)),
@@ -50,6 +54,11 @@ SearchWidget::SearchWidget (QWidget *parent) :
            model_, &SearchResultsModel::addFile);
   connect (searcher_, &Searcher::finished,
            this, &SearchWidget::finished);
+
+  auto edit = ShortcutManager::create (this, ShortcutManager::OpenInEditor);
+  connect (edit, &QAction::triggered,
+           this, &SearchWidget::editCurrent);
+
 
 
   {
@@ -138,4 +147,13 @@ void SearchWidget::abort ()
 void SearchWidget::finished ()
 {
   setRunning (false);
+}
+
+void SearchWidget::editCurrent ()
+{
+  auto file = model_->fileName (results_->currentIndex ());
+  if (!file.isEmpty ())
+  {
+    commandRunner_->openInEditor (file);
+  }
 }

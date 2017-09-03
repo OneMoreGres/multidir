@@ -484,7 +484,7 @@ void DirWidget::execCommandPrompt ()
 
 void DirWidget::advancedSearch ()
 {
-  auto w = new SearchWidget;
+  auto w = new SearchWidget (commandRunner_);
   w->setAttribute (Qt::WA_DeleteOnClose);
   w->setDefaultDir (path_.absoluteFilePath ());
   w->show ();
