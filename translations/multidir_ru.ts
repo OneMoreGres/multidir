@@ -647,6 +647,56 @@ Modified: %3</source>
         <source>Default</source>
         <translation>По умолчанию</translation>
     </message>
+    <message>
+        <source>Search...</source>
+        <translation>Поиск...</translation>
+    </message>
+</context>
+<context>
+    <name>SearchResultsModel</name>
+    <message>
+        <source>Text </source>
+        <translation>Текст </translation>
+    </message>
+    <message>
+        <source>Offset </source>
+        <translation>Отступ </translation>
+    </message>
+    <message>
+        <source>Line </source>
+        <translation>Строка </translation>
+    </message>
+</context>
+<context>
+    <name>SearchWidget</name>
+    <message>
+        <source>Recursive</source>
+        <translation>Рекурсивно</translation>
+    </message>
+    <message>
+        <source>Case sensitive</source>
+        <translation>С учетом регистра</translation>
+    </message>
+    <message>
+        <source>Word only</source>
+        <translation>Слово целиком</translation>
+    </message>
+    <message>
+        <source>Search in:</source>
+        <translation>Искать в:</translation>
+    </message>
+    <message>
+        <source>File pattern:</source>
+        <translation>Шаблон файлов:</translation>
+    </message>
+    <message>
+        <source>Search text:</source>
+        <translation>Текст для поиска:</translation>
+    </message>
+    <message>
+        <source>Results</source>
+        <translation>Результаты</translation>
+    </message>
 </context>
 <context>
     <name>SettingsEditor</name>

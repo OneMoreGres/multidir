@@ -15,6 +15,7 @@ class QSettings;
 
 class SearchWidget : public QWidget
 {
+Q_OBJECT
 public:
   explicit SearchWidget (ShellCommandModel *commanRunner, QWidget *parent = nullptr);
   ~SearchWidget ();

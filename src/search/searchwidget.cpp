@@ -205,3 +205,5 @@ void SearchWidget::editCurrent ()
     commandRunner_->openInEditor (file);
   }
 }
+
+#include "moc_searchwidget.cpp"
