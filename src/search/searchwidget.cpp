@@ -45,6 +45,8 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   model_ (new SearchResultsModel (this)),
   searcher_ (new Searcher (this))
 {
+  setObjectName ("searchWidget");
+
   setRunning (false);
   connect (buttons_->button (QDialogButtonBox::Apply), &QPushButton::clicked,
            this, &SearchWidget::start);
