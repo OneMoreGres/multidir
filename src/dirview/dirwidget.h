@@ -93,6 +93,8 @@ private:
   void showCommandPrompt ();
   void execCommandPrompt ();
 
+  void advancedSearch ();
+
   bool isLocked () const;
   void setLocked (bool isLocked);
 

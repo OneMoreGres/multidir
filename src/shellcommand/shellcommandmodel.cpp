@@ -78,7 +78,14 @@ void ShellCommandModel::openInEditor (const QFileInfo &path, const QFileInfo &wo
 {
   ShellCommand command (editorCommand_);
   command.preprocessFileArguments (path, true);
-  command.setWorkDir (workingDir);
+  if (!workingDir.path ().isEmpty ())
+  {
+    command.setWorkDir (workingDir);
+  }
+  else
+  {
+    command.setWorkDir (path.absolutePath ());
+  }
   run (command);
 }
 

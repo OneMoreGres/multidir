@@ -24,7 +24,7 @@ public:
   bool run (const QString &command, const QMap<QString, Selection> &selectionPerIndex,
             const QFileInfo &workingDir);
   void openConsole (const QFileInfo &path);
-  void openInEditor (const QFileInfo &path, const QFileInfo &workingDir);
+  void openInEditor (const QFileInfo &path, const QFileInfo &workingDir = {});
 
   int rowCount (const QModelIndex &parent) const override;
   QVariant data (const QModelIndex &index, int role) const override;

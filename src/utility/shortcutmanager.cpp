@@ -149,6 +149,8 @@ void ShortcutManager::setDefaults ()
                                     {}, c};
   shortcuts[SM::AdjustColumSizes] = {{QS ("Alt+Shift+R")}, QObject::tr ("Adjust column sizes"),
                                      {}, c};
+  shortcuts[SM::Search] = {{QS ("Ctrl+Shift+F")}, QObject::tr ("Search..."),
+                           QIcon (":/search.png"), c};
 
   c = SM::Item;
   shortcuts[SM::OpenItem] = {{}, QObject::tr ("Open"),

@@ -36,5 +36,6 @@
         <file alias="properties.png">icons/id-card-5.png</file>
         <file alias="permissions.png">icons/fingerprint.png</file>
         <file alias="read.png">icons/reading.png</file>
+        <file alias="search.png">icons/radar.png</file>
     </qresource>
 </RCC>

@@ -16,7 +16,8 @@ INCLUDEPATH += \
     $$PWD/../src/groupview \
     $$PWD/../src/shellcommand \
     $$PWD/../src/utility \
-    $$PWD/../src/widgets
+    $$PWD/../src/widgets \
+    $$PWD/../src/search
 
 VPATH += $$PWD/../src
 

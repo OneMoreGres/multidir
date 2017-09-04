@@ -34,6 +34,14 @@ QMessageBox {
 background: darkGray;
 }
 
+QPushButton {
+background: darkGray;
+}
+
+#searchWidget, #searchWidget * {
+background: darkGray;
+}
+
 #path, #pathLabel, #dirLabel {
 font: normal;
 }

@@ -45,7 +45,8 @@ INCLUDEPATH += \
     groupview \
     shellcommand \
     utility \
-    widgets
+    widgets \
+    search
 
 OTHER_FILES += \
     $$PWD/../uncrustify.cfg \
@@ -100,7 +101,10 @@ SOURCES += \
     widgets/settingseditor.cpp \
     widgets/transferdialog.cpp \
     main.cpp \
-    utils.cpp
+    utils.cpp \
+    search/searchwidget.cpp \
+    search/searcher.cpp \
+    search/searchresultsmodel.cpp
 
 HEADERS  += \
     dirview/dirstatuswidget.h \
@@ -147,7 +151,10 @@ HEADERS  += \
     widgets/transferdialog.h \
     backport.h \
     constants.h \
-    utils.h
+    utils.h \
+    search/searchwidget.h \
+    search/searcher.h \
+    search/searchresultsmodel.h
 
 RESOURCES += \
     $$PWD/../resources.qrc
