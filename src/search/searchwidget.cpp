@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QClipboard>
 #include <QApplication>
+#include <QHeaderView>
 
 namespace
 {
@@ -26,6 +27,7 @@ const QString qs_text = "search/text";
 const QString qs_recursive = "search/recursive";
 const QString qs_caseSensitive = "search/caseSensitive";
 const QString qs_wordOnly = "search/wordOnly";
+const QString qs_header = "search/header";
 }
 
 SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
@@ -118,6 +120,7 @@ SearchWidget::~SearchWidget ()
 void SearchWidget::saveState (QSettings &settings) const
 {
   settings.setValue (qs_geometry, saveGeometry ());
+  settings.setValue (qs_header, results_->header ()->saveState ());
   settings.setValue (qs_files, filePattern_->text ());
   settings.setValue (qs_text, text_->text ());
   settings.setValue (qs_recursive, recursive_->isChecked ());
@@ -128,6 +131,7 @@ void SearchWidget::saveState (QSettings &settings) const
 void SearchWidget::restoreState (QSettings &settings)
 {
   restoreGeometry (settings.value (qs_geometry).toByteArray ());
+  results_->header ()->restoreState (settings.value (qs_header).toByteArray ());
   filePattern_->setText (settings.value (qs_files, QLatin1String ("*")).toString ());
   text_->setText (settings.value (qs_text).toString ());
   recursive_->setChecked (settings.value (qs_recursive, true).toBool ());
