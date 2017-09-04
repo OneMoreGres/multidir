@@ -22,7 +22,8 @@ const QString qs_zoom = "viewer/fontSize";
 FileViewer::FileViewer (QWidget *parent) :
   QWidget (parent),
   edit_ (new QTextEdit (this)),
-  watcher_ (nullptr)
+  watcher_ (nullptr),
+  initialPosition_ (0)
 {
   setWindowIcon (QIcon (":/app.png"));
   setAttribute (Qt::WA_DeleteOnClose);
@@ -55,7 +56,6 @@ void FileViewer::save (QSettings &settings) const
 
 void FileViewer::restore (QSettings &settings)
 {
-
   restoreGeometry (settings.value (qs_grometry, saveGeometry ()).toByteArray ());
   auto zoom = settings.value (qs_zoom).toDouble ();
   if (zoom > 0)
@@ -103,6 +103,30 @@ void FileViewer::showFile (const QString &name)
   }
 }
 
+void FileViewer::setPosition (int position)
+{
+  initialPosition_ = position;
+  if (!watcher_->isFinished ())
+  {
+    return;
+  }
+  showAtPosition ();
+}
+
+void FileViewer::showAtPosition ()
+{
+  if (initialPosition_ < 1)
+  {
+    return;
+  }
+
+  auto cursor = edit_->textCursor ();
+  cursor.movePosition (QTextCursor::End);
+  edit_->setTextCursor (cursor);
+  cursor.setPosition (initialPosition_);
+  edit_->setTextCursor (cursor);
+}
+
 void FileViewer::readInBackground (const QString &name)
 {
   ASSERT (!watcher_);
@@ -137,6 +161,8 @@ void FileViewer::setFileContents ()
 {
   ASSERT (watcher_);
   edit_->setText (watcher_->result ());
+  showAtPosition ();
+
   watcher_->deleteLater ();
   watcher_ = nullptr;
 }

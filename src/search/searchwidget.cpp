@@ -54,7 +54,7 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   filePattern_->setText (QLatin1String ("*"));
 
   results_->setModel (model_);
-  results_->hideColumn (SearchResultsModel::ByteOffset);
+  results_->hideColumn (SearchResultsModel::Offset);
 
   connect (searcher_, &Searcher::foundText,
            model_, &SearchResultsModel::addText);
@@ -178,12 +178,14 @@ void SearchWidget::finished ()
 
 void SearchWidget::viewCurrent ()
 {
-  auto file = model_->fileName (results_->currentIndex ());
+  const auto index = results_->currentIndex ();
+  auto file = model_->fileName (index);
   if (!file.isEmpty ())
   {
     QApplication::clipboard ()->setText (text_->text ());
     auto view = new FileViewer;
     view->showFile (file);
+    view->setPosition (model_->occurrenceOffset (index));
   }
 }
 

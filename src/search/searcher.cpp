@@ -145,7 +145,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
   ASSERT (options.textDecoder);
   while (!f.atEnd ())
   {
-    const auto line = options.textDecoder->toUnicode (f.readLine ()).trimmed ();
+    const auto line = options.textDecoder->toUnicode (f.readLine ());
     auto start = 0;
 
     while (true)
@@ -156,8 +156,6 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
         break;
       }
       start = index + 1;
-      const auto lineOffset = offset;
-      offset += line.size ();
 
       auto context = line;
       const auto contextLength = context.size ();
@@ -181,14 +179,14 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
 
       if (contextLength > options.maxOccurenceLength)
       {
-        const auto start = std::max (0, index - options.sideContextLength);
-        context = context.mid (start, options.maxOccurenceLength);
+        const auto contextStart = std::max (0, index - options.sideContextLength);
+        context = context.mid (contextStart, options.maxOccurenceLength);
       }
 
-      occurrences.insert (lineOffset + index, context);
-
+      occurrences.insert (offset + index, context.trimmed ());
     }
 
+    offset += line.size ();
   }
 
   if (!occurrences.isEmpty ())

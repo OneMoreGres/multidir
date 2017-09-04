@@ -54,6 +54,15 @@ QString SearchResultsModel::fileName (const QModelIndex &index) const
   return {};
 }
 
+int SearchResultsModel::occurrenceOffset (const QModelIndex &index) const
+{
+  if (auto *casted = toItem (index))
+  {
+    return (casted->parent ? casted->charOffset : 0);
+  }
+  return {};
+}
+
 SearchResultsModel::Item * SearchResultsModel::toItem (const QModelIndex &index) const
 {
   return static_cast<Item *>(index.internalPointer ());
@@ -115,7 +124,7 @@ QVariant SearchResultsModel::headerData (int section, Qt::Orientation orientatio
   switch (section)
   {
     case Column::Text: return tr ("Text");
-    case Column::ByteOffset: return tr ("Offset");
+    case Column::Offset: return tr ("Offset");
   }
 
   return {};
@@ -137,7 +146,7 @@ QVariant SearchResultsModel::data (const QModelIndex &index, int role) const
   switch (index.column ())
   {
     case Column::Text: return casted->text;
-    case Column::ByteOffset: return casted->parent ? casted->byteOffset : QVariant ();
+    case Column::Offset: return casted->parent ? casted->charOffset : QVariant ();
   }
 
   return {};
@@ -155,7 +164,7 @@ SearchResultsModel::Item::Item (const QString &text, int offset, Item *parent) :
   parent (parent),
   children (),
   text (text),
-  byteOffset (offset)
+  charOffset (offset)
 {
 
 }
@@ -164,7 +173,7 @@ SearchResultsModel::Item::Item (const Item &r) :
   parent (r.parent),
   children (r.children),
   text (r.text),
-  byteOffset (r.byteOffset)
+  charOffset (r.charOffset)
 {
   for (auto &i: children)
   {
@@ -177,7 +186,7 @@ SearchResultsModel::Item &SearchResultsModel::Item::operator= (const Item &r)
   parent = r.parent;
   children = r.children;
   text = r.text;
-  byteOffset = r.byteOffset;
+  charOffset = r.charOffset;
 
   for (auto &i: children)
   {
