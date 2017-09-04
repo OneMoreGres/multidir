@@ -14,7 +14,7 @@ Searcher::Searcher (QObject *parent) :
   isAborted_ (false),
   options_ ()
 {
-  qRegisterMetaType<QMap<int, QString> >();
+  qRegisterMetaType<QVector<SearchOccurence> >();
 }
 
 Searcher::~Searcher ()
@@ -121,7 +121,7 @@ void Searcher::searchFiles (QStringList dirs, Options options, int depth)
       }
       else
       {
-        emit foundFile (fullName);
+        emit foundFile (fullName, {});
       }
     }
   }
@@ -141,11 +141,13 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
   }
 
   auto offset = 0;
-  QMap<int, QString> occurrences;
+  auto lineNumber = 0;
+  QVector<SearchOccurence> occurrences;
   ASSERT (options.textDecoder);
   while (!f.atEnd ())
   {
     const auto line = options.textDecoder->toUnicode (f.readLine ());
+    ++lineNumber;
     auto start = 0;
 
     while (true)
@@ -183,7 +185,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
         context = context.mid (contextStart, options.maxOccurenceLength);
       }
 
-      occurrences.insert (offset + index, context.trimmed ());
+      occurrences.append ({context.trimmed (), lineNumber, offset + index});
     }
 
     offset += line.size ();
@@ -191,7 +193,7 @@ void Searcher::searchText (const QString &fileName, Searcher::Options options)
 
   if (!occurrences.isEmpty ())
   {
-    emit foundText (fileName, occurrences);
+    emit foundFile (fileName, occurrences);
   }
 }
 

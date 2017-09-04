@@ -8,12 +8,18 @@
 
 class QTextDecoder;
 
-class SearchResultsModel;
+struct SearchOccurence
+{
+  QString lineText;
+  int lineNumber;
+  int offset;
+};
 
 class Searcher : public QObject
 {
 Q_OBJECT
 public:
+
   explicit Searcher (QObject *parent = nullptr);
   ~Searcher ();
 
@@ -27,8 +33,7 @@ public:
 
 signals:
   void finished ();
-  void foundFile (const QString &file);
-  void foundText (const QString &file, const QMap<int, QString> &occurrences);
+  void foundFile (const QString &file, const QVector<SearchOccurence> &occurrences);
 
 private:
   struct Options
@@ -49,3 +54,5 @@ private:
   std::atomic_bool isAborted_;
   Options options_;
 };
+
+Q_DECLARE_METATYPE (QVector<SearchOccurence>)

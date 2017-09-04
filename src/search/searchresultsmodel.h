@@ -4,20 +4,21 @@
 
 #include <memory>
 
+struct SearchOccurence;
+
 class SearchResultsModel : public QAbstractItemModel
 {
 public:
   enum Column
   {
-    Text, Offset,
+    Text, Offset, LineNumber,
     ColumnCount
   };
 
   explicit SearchResultsModel (QObject *parent = nullptr);
   ~SearchResultsModel ();
 
-  void addFile (const QString &file);
-  void addText (const QString &file, const QMap<int, QString> &occurrences);
+  void addFile (const QString &file, const QVector<SearchOccurence> &occurrences);
   void clear ();
 
   QString fileName (const QModelIndex &index) const;
@@ -34,7 +35,7 @@ private:
   struct Item
   {
     Item (const QString &text = {});
-    Item (const QString &text, int charOffset, Item *parent);
+    Item (const QString &text, int charOffset, int lineNumber, Item *parent);
     Item (const Item &r);
     Item &operator= (const Item &r);
     bool operator== (const Item &r) const;
@@ -42,6 +43,7 @@ private:
     Item *parent{nullptr};
     QList<Item> children;
     QString text;
+    int lineNumber{-1};
     int charOffset{0};
   };
 

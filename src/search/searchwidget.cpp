@@ -56,8 +56,6 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   results_->setModel (model_);
   results_->hideColumn (SearchResultsModel::Offset);
 
-  connect (searcher_, &Searcher::foundText,
-           model_, &SearchResultsModel::addText);
   connect (searcher_, &Searcher::foundFile,
            model_, &SearchResultsModel::addFile);
   connect (searcher_, &Searcher::finished,

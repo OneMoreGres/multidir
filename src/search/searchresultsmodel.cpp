@@ -1,5 +1,6 @@
 #include "searchresultsmodel.h"
 #include "debug.h"
+#include "searcher.h"
 
 SearchResultsModel::SearchResultsModel (QObject *parent) :
   QAbstractItemModel (parent),
@@ -13,16 +14,8 @@ SearchResultsModel::~SearchResultsModel ()
 
 }
 
-void SearchResultsModel::addFile (const QString &file)
-{
-  const auto last = items_.size ();
-  beginInsertRows ({}, last, last);
-  items_.append (Item{file});
-  endInsertRows ();
-}
-
-void SearchResultsModel::addText (const QString &file,
-                                  const QMap<int, QString> &occurrences)
+void SearchResultsModel::addFile (const QString &file,
+                                  const QVector<SearchOccurence> &occurrences)
 {
   const auto last = items_.size ();
   beginInsertRows ({}, last, last);
@@ -30,9 +23,9 @@ void SearchResultsModel::addText (const QString &file,
   items_.append (Item{file});
   auto &item = items_.last ();
   item.children.reserve (occurrences.size ());
-  for (auto i = occurrences.cbegin (), end = occurrences.cend (); i != end; ++i)
+  for (const auto &i: occurrences)
   {
-    item.children.append (Item (i.value (), i.key (), &item));
+    item.children.append (Item (i.lineText, i.offset, i.lineNumber, &item));
   }
 
   endInsertRows ();
@@ -123,8 +116,9 @@ QVariant SearchResultsModel::headerData (int section, Qt::Orientation orientatio
 
   switch (section)
   {
-    case Column::Text: return tr ("Text");
-    case Column::Offset: return tr ("Offset");
+    case Column::Text: return tr ("Text ");
+    case Column::Offset: return tr ("Offset ");
+    case Column::LineNumber: return tr ("Line ");
   }
 
   return {};
@@ -147,6 +141,7 @@ QVariant SearchResultsModel::data (const QModelIndex &index, int role) const
   {
     case Column::Text: return casted->text;
     case Column::Offset: return casted->parent ? casted->charOffset : QVariant ();
+    case Column::LineNumber: return casted->parent ? casted->lineNumber : QVariant ();
   }
 
   return {};
@@ -155,15 +150,16 @@ QVariant SearchResultsModel::data (const QModelIndex &index, int role) const
 
 
 SearchResultsModel::Item::Item (const QString &text) :
-  Item (text, 0, nullptr)
+  Item (text, 0, 0, nullptr)
 {
 
 }
 
-SearchResultsModel::Item::Item (const QString &text, int offset, Item *parent) :
+SearchResultsModel::Item::Item (const QString &text, int offset, int lineNumber, Item *parent) :
   parent (parent),
   children (),
   text (text),
+  lineNumber (lineNumber),
   charOffset (offset)
 {
 
@@ -173,6 +169,7 @@ SearchResultsModel::Item::Item (const Item &r) :
   parent (r.parent),
   children (r.children),
   text (r.text),
+  lineNumber (r.lineNumber),
   charOffset (r.charOffset)
 {
   for (auto &i: children)
@@ -186,6 +183,7 @@ SearchResultsModel::Item &SearchResultsModel::Item::operator= (const Item &r)
   parent = r.parent;
   children = r.children;
   text = r.text;
+  lineNumber = r.lineNumber;
   charOffset = r.charOffset;
 
   for (auto &i: children)
