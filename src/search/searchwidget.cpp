@@ -71,6 +71,9 @@ SearchWidget::SearchWidget (ShellCommandModel *commanRunner, QWidget *parent) :
   connect (edit, &QAction::triggered,
            this, &SearchWidget::editCurrent);
 
+  connect (results_, &QTreeView::doubleClicked,
+           this, &SearchWidget::editCurrent);
+
 
   {
     auto layout = new QGridLayout (this);
