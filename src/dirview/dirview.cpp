@@ -86,7 +86,12 @@ QModelIndex DirView::firstItem () const
 
 QModelIndex DirView::currentIndex () const
 {
-  return view ()->currentIndex ();
+  const auto index = view ()->currentIndex ();
+  if (!index.isValid () || index.column () == FileSystemModel::Name)
+  {
+    return index;
+  }
+  return index.sibling (index.row (), FileSystemModel::Name);
 }
 
 void DirView::setCurrentIndex (const QModelIndex &index)
